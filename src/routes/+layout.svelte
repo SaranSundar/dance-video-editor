@@ -8,48 +8,114 @@
 	let currentPath = $derived($page.url.pathname);
 	let state = $derived(store.getState());
 	let folderName = $derived(store.getFolderName());
+	let storageType = $derived(store.getStorageType());
+	let isPwa = $state(false);
 	let exporting = $state(false);
 	let importing = $state(false);
-	let importInput: HTMLInputElement | undefined = $state();
-
+	let progressPct = $state(0);
+	let progressMsg = $state('');
 	async function handleExport() {
 		exporting = true;
+		progressPct = 0;
+		progressMsg = 'Exporting metadata...';
 		try {
-			const blob = await store.exportData();
+			const json = await store.exportMetadata();
+			const blob = new Blob([json], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
-			a.download = `clipit-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+			a.download = `clipit-metadata-${new Date().toISOString().slice(0, 10)}.json`;
 			a.click();
 			URL.revokeObjectURL(url);
 		} catch (e) {
 			alert(`Export failed: ${e}`);
 		} finally {
 			exporting = false;
+			progressPct = 0;
+			progressMsg = '';
 		}
 	}
 
 	async function handleImport(e: Event) {
 		const input = e.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (!file) return;
-		if (!confirm('This will replace all existing data. Continue?')) {
-			input.value = '';
+		const files = input.files;
+		if (!files || files.length === 0) return;
+		const file = files[0];
+		input.value = '';
+
+		if (!file.name.endsWith('.json')) {
+			alert('Please select a .json metadata file.');
 			return;
 		}
+
+		if (!confirm('Import this metadata file? Clips will be replaced.')) return;
+
 		importing = true;
+		progressPct = 0;
+		progressMsg = `Importing ${file.name}...`;
 		try {
-			await store.importData(file);
+			const text = await file.text();
+			await store.importMetadata(text);
+			progressPct = 100;
+			progressMsg = 'Done';
 		} catch (err) {
 			alert(`Import failed: ${err}`);
 		} finally {
 			importing = false;
-			input.value = '';
+			progressPct = 0;
+			progressMsg = '';
 		}
 	}
 
+	let updating = $state(false);
+
+	async function handleUpdate() {
+		updating = true;
+		try {
+			if ('serviceWorker' in navigator) {
+				const reg = await navigator.serviceWorker.getRegistration();
+				if (reg) {
+					await reg.update();
+					const cacheKeys = await caches.keys();
+					await Promise.all(cacheKeys.map(k => caches.delete(k)));
+				}
+			}
+			window.location.reload();
+		} catch {
+			window.location.reload();
+		}
+	}
+
+	async function handleNuke() {
+		if (!confirm('Delete ALL videos and clips? This cannot be undone.')) return;
+		if (!confirm('Are you really sure? Everything will be permanently deleted.')) return;
+		try {
+			await store.nukeAll();
+		} catch (e) {
+			alert(`Failed: ${e}`);
+		}
+	}
+
+	let consoleLogs = $state<string[]>([]);
+	let showConsole = $state(false);
+
 	onMount(() => {
+		// Intercept console.log and console.error to show in UI
+		const origLog = console.log;
+		const origError = console.error;
+		const origWarn = console.warn;
+		function capture(prefix: string, args: any[]) {
+			const msg = prefix + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+			consoleLogs = [...consoleLogs.slice(-50), msg];
+		}
+		console.log = (...args) => { origLog(...args); capture('', args); };
+		console.error = (...args) => { origError(...args); capture('ERR: ', args); };
+		console.warn = (...args) => { origWarn(...args); capture('WARN: ', args); };
+
 		store.init();
+		if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+		isPwa = window.matchMedia('(display-mode: standalone)').matches
+			|| (navigator as any).standalone === true;
 	});
 </script>
 
@@ -74,34 +140,63 @@
 		<div class="nav-links">
 			<a href="/" class:active={currentPath === '/'}>Home</a>
 			{#if state === 'ready'}
-				<button class="nav-action-btn" onclick={handleExport} disabled={exporting} title="Export backup">
+				<button class="nav-action-btn" onclick={handleExport} disabled={exporting} title="Export metadata as JSON">
 					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
 					</svg>
 					{exporting ? 'Exporting...' : 'Export'}
 				</button>
-				<button class="nav-action-btn" onclick={() => importInput?.click()} disabled={importing} title="Import backup">
+				<label class="nav-action-btn import-label" title="Import metadata JSON">
 					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
 					</svg>
 					{importing ? 'Importing...' : 'Import'}
-				</button>
-				<input bind:this={importInput} type="file" accept=".zip" onchange={handleImport} style="display:none" />
-				<button class="folder-btn" onclick={() => store.pickFolder()} title="Change storage folder">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+					<input type="file" accept=".json" onchange={handleImport} style="position:absolute;width:0;height:0;overflow:hidden;opacity:0" />
+				</label>
+				{#if isPwa}
+					<button class="nav-action-btn" onclick={handleUpdate} disabled={updating} title="Check for updates and refresh">
+						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+						</svg>
+						{updating ? 'Updating...' : 'Update'}
+					</button>
+				{/if}
+				<button class="nav-action-btn nuke-btn" onclick={handleNuke} title="Delete all data">
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 					</svg>
-					{folderName ?? 'Folder'}
+					Nuke
 				</button>
+				{#if storageType === 'filesystem'}
+					<button class="folder-btn" onclick={() => store.pickFolder()} title="Change storage folder">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+						</svg>
+						{folderName ?? 'Folder'}
+					</button>
+				{:else}
+					<span class="storage-badge" title="Data stored in browser (IndexedDB)">
+						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+						</svg>
+						Browser storage
+					</span>
+				{/if}
 			{/if}
 		</div>
 	</nav>
+	{#if exporting || importing}
+		<div class="progress-bar-container">
+			<div class="progress-bar" style="width: {progressPct}%"></div>
+			<span class="progress-text">{progressMsg}</span>
+		</div>
+	{/if}
 	<main>
 		{#if state === 'loading'}
 			<div class="gate">
 				<div class="gate-spinner"></div>
 			</div>
-		{:else if state === 'no-folder'}
+		{:else if state === 'no-folder' && storageType === 'filesystem'}
 			<div class="gate">
 				<div class="gate-icon">
 					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -117,7 +212,7 @@
 					Select Folder
 				</button>
 			</div>
-		{:else if state === 'need-permission'}
+		{:else if state === 'need-permission' && storageType === 'filesystem'}
 			<div class="gate">
 				<div class="gate-icon">
 					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -134,9 +229,87 @@
 			{@render children()}
 		{/if}
 	</main>
+
+	<button class="console-toggle" onclick={() => showConsole = !showConsole}>
+		{showConsole ? 'Hide' : 'Console'} ({consoleLogs.length})
+	</button>
+
+	{#if showConsole && consoleLogs.length > 0}
+		<div class="console-panel">
+			<div class="console-header">
+				<span>Console</span>
+				<button onclick={() => consoleLogs = []}>Clear</button>
+			</div>
+			<pre>{consoleLogs.join('\n')}</pre>
+		</div>
+	{/if}
 </div>
 
 <style>
+	.console-toggle {
+		position: fixed;
+		bottom: 8px;
+		right: 8px;
+		background: rgba(24, 24, 27, 0.9);
+		color: #52525b;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 4px 10px;
+		border-radius: 6px;
+		font-size: 10px;
+		cursor: pointer;
+		z-index: 9998;
+		font-family: 'Inter', monospace;
+	}
+
+	.console-toggle:hover {
+		color: #a1a1aa;
+	}
+
+	.console-panel {
+		position: fixed;
+		bottom: 36px;
+		left: 0;
+		right: 0;
+		max-height: 40vh;
+		background: rgba(9, 9, 11, 0.95);
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		z-index: 9998;
+		overflow-y: auto;
+		padding: 0;
+	}
+
+	.console-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 6px 12px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		font-size: 11px;
+		color: #71717a;
+		font-weight: 500;
+		position: sticky;
+		top: 0;
+		background: rgba(9, 9, 11, 0.95);
+	}
+
+	.console-header button {
+		background: none;
+		border: none;
+		color: #52525b;
+		font-size: 10px;
+		cursor: pointer;
+	}
+
+	.console-panel pre {
+		margin: 0;
+		padding: 8px 12px;
+		font-family: 'SF Mono', 'Fira Code', monospace;
+		font-size: 10px;
+		line-height: 1.6;
+		color: #a1a1aa;
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
 	:global(*, *::before, *::after) {
 		box-sizing: border-box;
 	}
@@ -182,8 +355,11 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0 24px;
-		height: 56px;
-		background: rgba(9, 9, 11, 0.8);
+		padding-top: env(safe-area-inset-top, 0);
+		padding-left: max(env(safe-area-inset-left, 0), 24px);
+		padding-right: max(env(safe-area-inset-right, 0), 24px);
+		min-height: 56px;
+		background: rgba(9, 9, 11, 0.95);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -211,6 +387,8 @@
 	.nav-links {
 		display: flex;
 		gap: 4px;
+		flex-wrap: wrap;
+		align-items: center;
 	}
 
 	.nav-links a {
@@ -240,18 +418,31 @@
 		color: #52525b;
 		background: none;
 		border: none;
-		padding: 5px 8px;
+		padding: 8px 10px;
 		border-radius: 6px;
 		font-size: 12px;
 		font-weight: 500;
 		cursor: pointer;
 		font-family: 'Inter', sans-serif;
 		transition: all 0.15s;
+		-webkit-tap-highlight-color: transparent;
+		touch-action: manipulation;
+		min-height: 44px;
 	}
 
 	.nav-action-btn:hover:not(:disabled) {
 		color: #a1a1aa;
 		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.import-label {
+		cursor: pointer;
+		position: relative;
+	}
+
+	.nuke-btn:hover:not(:disabled) {
+		color: #ef4444 !important;
+		background: rgba(239, 68, 68, 0.08) !important;
 	}
 
 	.nav-action-btn:disabled {
@@ -276,10 +467,50 @@
 		margin-left: 8px;
 	}
 
+	.storage-badge {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		color: #3f3f46;
+		font-size: 11px;
+		font-weight: 500;
+		padding: 5px 10px;
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		border-radius: 6px;
+		margin-left: 8px;
+	}
+
 	.folder-btn:hover {
 		color: #a1a1aa;
 		border-color: rgba(255, 255, 255, 0.12);
 		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.progress-bar-container {
+		position: relative;
+		height: 28px;
+		background: #18181b;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.progress-bar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		background: rgba(99, 102, 241, 0.2);
+		transition: width 0.3s ease;
+	}
+
+	.progress-text {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		font-size: 11px;
+		color: #818cf8;
+		font-weight: 500;
 	}
 
 	main {
@@ -288,6 +519,7 @@
 		width: 100%;
 		margin: 0 auto;
 		padding: 28px 24px;
+		padding-bottom: max(env(safe-area-inset-bottom, 0), 28px);
 	}
 
 	.gate {

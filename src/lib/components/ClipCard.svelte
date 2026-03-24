@@ -11,6 +11,9 @@
 		onDelete?: () => void;
 	} = $props();
 
+	let subClipCount = $derived(store.getSubClips(clip.id).length);
+	let parentClip = $derived(clip.parentClipId ? store.getClips().find(c => c.id === clip.parentClipId) : null);
+
 	let thumbnailUrl = $state<string | null>(null);
 	let videoUrl = $state<string | null>(null);
 	let showVideo = $state(false);
@@ -47,50 +50,45 @@
 	let editLabel = $state(clip.label);
 	let editTags = $state(clip.tags.join(', '));
 
-	// Generate thumbnail on-the-fly by seeking a hidden video to startTime
+	// Generate thumbnail by seeking a hidden video to startTime
 	$effect(() => {
 		let cancelled = false;
-		let url: string | null = null;
+		let thumbUrl: string | null = null;
+		let revokeVideoSrc: (() => void) | null = null;
 
-		store.getVideoBlob(clip.videoId).then((blob) => {
-			if (cancelled) return;
+		store.getVideoUrl(clip.videoId).then(({ url: videoSrcUrl, revoke }) => {
+			if (cancelled) { revoke(); return; }
+			revokeVideoSrc = revoke;
 			const video = document.createElement('video');
 			video.muted = true;
 			video.preload = 'metadata';
-			video.onloadedmetadata = () => {
-				video.currentTime = clip.startTime;
-			};
+			video.onloadedmetadata = () => { video.currentTime = clip.startTime; };
 			video.onseeked = () => {
-				try {
-					const canvas = document.createElement('canvas');
-					canvas.width = video.videoWidth;
-					canvas.height = video.videoHeight;
-					const ctx = canvas.getContext('2d');
-					if (ctx) {
-						ctx.drawImage(video, 0, 0);
-						canvas.toBlob((b) => {
-							URL.revokeObjectURL(video.src);
-							if (b && !cancelled) {
-								url = URL.createObjectURL(b);
-								thumbnailUrl = url;
-							}
-						}, 'image/jpeg', 0.8);
-					} else {
-						URL.revokeObjectURL(video.src);
-					}
-				} catch {
-					URL.revokeObjectURL(video.src);
+				const canvas = document.createElement('canvas');
+				canvas.width = video.videoWidth;
+				canvas.height = video.videoHeight;
+				const ctx = canvas.getContext('2d');
+				if (ctx && !cancelled) {
+					ctx.drawImage(video, 0, 0);
+					canvas.toBlob((b) => {
+						revoke();
+						if (b && !cancelled) {
+							thumbUrl = URL.createObjectURL(b);
+							thumbnailUrl = thumbUrl;
+						}
+					}, 'image/jpeg', 0.8);
+				} else {
+					revoke();
 				}
 			};
-			video.onerror = () => {
-				URL.revokeObjectURL(video.src);
-			};
-			video.src = URL.createObjectURL(blob);
+			video.onerror = () => revoke();
+			video.src = videoSrcUrl;
 		}).catch(() => {});
 
 		return () => {
 			cancelled = true;
-			if (url) URL.revokeObjectURL(url);
+			if (thumbUrl) URL.revokeObjectURL(thumbUrl);
+			if (revokeVideoSrc) revokeVideoSrc();
 		};
 	});
 
@@ -100,9 +98,12 @@
 		return `${m}:${s.toString().padStart(2, '0')}`;
 	}
 
+	let revokeVideoUrl: (() => void) | null = null;
+
 	async function play() {
-		const blob = await store.getVideoBlob(clip.videoId);
-		videoUrl = URL.createObjectURL(blob);
+		const { url, revoke } = await store.getVideoUrl(clip.videoId);
+		videoUrl = url;
+		revokeVideoUrl = revoke;
 		showVideo = true;
 	}
 
@@ -112,13 +113,30 @@
 		}
 	}
 
+	let wrapperEl: HTMLElement | undefined = $state();
+
+	let fakeFullscreen = $state(false);
+
+	function toggleFullscreen(e: Event) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!wrapperEl) return;
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+		} else if (typeof wrapperEl.requestFullscreen === 'function') {
+			wrapperEl.requestFullscreen().catch(() => {
+				fakeFullscreen = !fakeFullscreen;
+			});
+		} else {
+			fakeFullscreen = !fakeFullscreen;
+		}
+	}
+
 	function stopVideo() {
 		showVideo = false;
 		playing = false;
-		if (videoUrl) {
-			URL.revokeObjectURL(videoUrl);
-			videoUrl = null;
-		}
+		if (revokeVideoUrl) { revokeVideoUrl(); revokeVideoUrl = null; }
+		videoUrl = null;
 	}
 
 	async function download() {
@@ -157,16 +175,17 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="video-wrapper" onclick={togglePlay}>
+		<div class="video-wrapper" bind:this={wrapperEl} class:fake-fullscreen={fakeFullscreen} onclick={togglePlay}>
 			<!-- svelte-ignore a11y_media_has_caption -->
 			<video
 				bind:this={videoEl}
-				src={videoUrl}
 				autoplay
+				playsinline
 				onplay={() => playing = true}
 				onpause={() => playing = false}
 				ontimeupdate={handleTimeUpdate}
 				onloadedmetadata={handleVideoLoaded}
+				src={videoUrl}
 			></video>
 			{#if !playing}
 				<div class="pause-overlay">
@@ -174,13 +193,19 @@
 				</div>
 			{/if}
 			<div class="video-controls-overlay" onclick={(e) => e.stopPropagation()}>
-				<button class="loop-btn" class:active={looping} onclick={(e) => { e.preventDefault(); looping = !looping; }} title={looping ? 'Looping on' : 'Looping off'}>
+				<button class="overlay-btn" onclick={toggleFullscreen} title="Fullscreen">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" />
+						<line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
+					</svg>
+				</button>
+				<button class="overlay-btn loop-btn" class:active={looping} onclick={(e) => { e.preventDefault(); looping = !looping; }} title={looping ? 'Looping on' : 'Looping off'}>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
 						<polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
 					</svg>
 				</button>
-				<button class="close-btn" onclick={(e) => { e.preventDefault(); stopVideo(); }} title="Close">
+				<button class="overlay-btn close-btn" onclick={(e) => { e.preventDefault(); stopVideo(); }} title="Close">
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
 				</button>
 			</div>
@@ -213,11 +238,15 @@
 			</div>
 		{:else}
 			<a href="/clips/{clip.id}" class="clip-title"><h4>{clip.label}</h4></a>
+			{#if parentClip}
+				<p class="parent-ref">part of <a href="/clips/{parentClip.id}">{parentClip.label}</a></p>
+			{/if}
 			<div class="badges">
 				{#if clip.dance}<span class="badge dance">{clip.dance}</span>{/if}
 				{#if clip.clipType}<span class="badge type">{clip.clipType}</span>{/if}
 				{#if clip.style}<span class="badge style">{clip.style}</span>{/if}
 				{#if clip.mastery}<span class="badge mastery">{clip.mastery}</span>{/if}
+				{#if subClipCount > 0}<span class="badge sub-count">{subClipCount} sub-clip{subClipCount === 1 ? '' : 's'}</span>{/if}
 			</div>
 			{#if clip.lead || clip.follow}
 				<p class="dancers">{clip.lead || '?'} & {clip.follow || '?'}</p>
@@ -381,7 +410,7 @@
 		gap: 6px;
 	}
 
-	.close-btn, .loop-btn {
+	.overlay-btn {
 		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(4px);
 		color: #d4d4d8;
@@ -396,7 +425,7 @@
 		transition: background 0.15s, color 0.15s;
 	}
 
-	.close-btn:hover, .loop-btn:hover {
+	.overlay-btn:hover {
 		background: rgba(0, 0, 0, 0.8);
 	}
 
@@ -406,6 +435,27 @@
 
 	.loop-btn:not(.active) {
 		color: #52525b;
+	}
+
+	:global(.video-wrapper:fullscreen),
+	.fake-fullscreen {
+		background: #000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	:global(.video-wrapper:fullscreen video),
+	.fake-fullscreen video {
+		max-height: 100vh;
+		max-width: 100vw;
+		object-fit: contain;
+	}
+
+	.fake-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
 	}
 
 	.info {
@@ -463,6 +513,26 @@
 	.badge.mastery {
 		background: rgba(52, 211, 153, 0.12);
 		color: #34d399;
+	}
+
+	.badge.sub-count {
+		background: rgba(168, 85, 247, 0.12);
+		color: #a855f7;
+	}
+
+	.parent-ref {
+		font-size: 11px;
+		color: #52525b;
+		margin: 0 0 4px;
+	}
+
+	.parent-ref a {
+		color: #818cf8;
+		text-decoration: none;
+	}
+
+	.parent-ref a:hover {
+		text-decoration: underline;
 	}
 
 	.dancers {

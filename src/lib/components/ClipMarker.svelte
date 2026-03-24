@@ -12,6 +12,8 @@
 		videoDance = '',
 		inPoint = $bindable(null),
 		outPoint = $bindable(null),
+		parentClipId = null,
+		parentClipLabel = '',
 		onClipSaved
 	}: {
 		videoId: string;
@@ -21,13 +23,15 @@
 		videoDance?: string;
 		inPoint?: number | null;
 		outPoint?: number | null;
+		parentClipId?: string | null;
+		parentClipLabel?: string;
 		onClipSaved?: () => void;
 	} = $props();
 
 	let label = $state('');
-	let style = $state('');
-	let mastery = $state('');
-	let clipType = $state('');
+	let style = $state('moderna');
+	let mastery = $state('seen');
+	let clipType = $state('pattern');
 
 	const styles = ['', 'sensual', 'moderna', 'dominicana', 'fusion'];
 	let tags = $state<string[]>([]);
@@ -85,13 +89,14 @@
 				clipType,
 				startTime: inPoint,
 				endTime: outPoint,
-				tags
+				tags,
+				parentClipId
 			});
 
 			label = '';
-			style = '';
-			mastery = '';
-			clipType = '';
+			style = 'moderna';
+			mastery = 'seen';
+			clipType = 'pattern';
 			tags = [];
 			inPoint = null;
 			outPoint = null;
@@ -106,7 +111,10 @@
 
 <div class="clip-marker">
 	<div class="section-header">
-		<h3>Create Clip</h3>
+		<h3>{parentClipId ? 'Create Sub-clip' : 'Create Clip'}</h3>
+		{#if parentClipId && parentClipLabel}
+			<p class="sub-clip-notice">Sub-clip of: {parentClipLabel}</p>
+		{/if}
 	</div>
 
 	<div class="timecodes">
@@ -201,7 +209,7 @@
 	<div class="shortcuts">
 		<span><kbd>i</kbd> in-point</span>
 		<span><kbd>o</kbd> out-point</span>
-		<span><kbd>,</kbd><kbd>.</kbd> frame step</span>
+		<span><kbd>,</kbd><kbd>.</kbd> seek 1s</span>
 		<span><kbd>Space</kbd> play/pause</span>
 		<span><kbd>f</kbd> fullscreen</span>
 	</div>
@@ -225,6 +233,13 @@
 		font-size: 15px;
 		font-weight: 600;
 		letter-spacing: -0.01em;
+	}
+
+	.sub-clip-notice {
+		margin: 4px 0 0;
+		font-size: 12px;
+		color: #818cf8;
+		font-weight: 500;
 	}
 
 	.timecodes {

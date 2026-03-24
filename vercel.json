@@ -1,12 +1,6 @@
 {
 	"outputDirectory": "build",
-	"headers": [
-		{
-			"source": "/(.*)",
-			"headers": [
-				{ "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
-				{ "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" }
-			]
-		}
+	"rewrites": [
+		{ "source": "/((?!_app/|favicon|robots|manifest|sw\\.js|icon-).*)", "destination": "/index.html" }
 	]
 }

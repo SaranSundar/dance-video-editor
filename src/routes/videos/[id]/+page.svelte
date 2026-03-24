@@ -6,42 +6,102 @@
 	import VideoPlayer from '$lib/components/VideoPlayer.svelte';
 	import ClipMarker from '$lib/components/ClipMarker.svelte';
 	import ClipCard from '$lib/components/ClipCard.svelte';
+	import Dropdown from '$lib/components/Dropdown.svelte';
 
 	let videoId = $derived($page.params.id);
 	let videoMeta = $derived(store.getVideos().find(v => v.id === videoId));
 	let clips = $derived(store.getClipsByVideo(videoId));
 
-	let videoBlob = $state<Blob | null>(null);
+	let editLead = $state('');
+	let editFollow = $state('');
+	let editDance = $state('');
+	let metaInitialized = $state(false);
+
+	const couples: [string, string][] = [
+		['Anthony', 'Katie'],
+		['Cornel', 'Rithika'],
+		['Emilien', 'Tehina'],
+		['Gero', 'Migle'],
+		['Irakli', 'Maria'],
+		['Luis', 'Andrea'],
+		['Marcus', 'Bianca'],
+		['Melvin', 'Gatica'],
+		['Miguel', 'Sunsire'],
+		['Ofir', 'Ofri'],
+	];
+	const extraLeads = ['Favian'];
+	const leadOptions = [...new Set([...couples.map(c => c[0]), ...extraLeads])].sort().map(n => ({ value: n, label: n }));
+	const followOptions = [...new Set(couples.map(c => c[1]))].sort().map(n => ({ value: n, label: n }));
+	const danceOptions = [{ value: 'bachata', label: 'Bachata' }, { value: 'salsa', label: 'Salsa' }];
+
+	// Populate edit fields from video meta
+	$effect(() => {
+		if (videoMeta && !metaInitialized) {
+			editLead = videoMeta.lead || '';
+			editFollow = videoMeta.follow || '';
+			editDance = videoMeta.dance || '';
+			metaInitialized = true;
+		}
+	});
+
+	// Auto-save on change
+	$effect(() => {
+		if (metaInitialized && videoMeta) {
+			const lead = editLead;
+			const follow = editFollow;
+			const dance = editDance;
+			if (lead !== videoMeta.lead || follow !== videoMeta.follow || dance !== videoMeta.dance) {
+				store.updateVideo(videoId, { lead, follow, dance });
+			}
+		}
+	});
+
+	function selectCouple(l: string, f: string) {
+		editLead = l;
+		editFollow = f;
+	}
+
 	let videoSrc = $state<string | null>(null);
+	let videoLoadError = $state('');
 	let currentTime = $state(0);
 	let duration = $state(0);
 	let inPoint = $state<number | null>(null);
 	let outPoint = $state<number | null>(null);
+	let revokeUrl: (() => void) | null = null;
+	let loadingVideoId = '';
 
 	$effect(() => {
 		const id = videoId;
-		const state = store.getState();
-
-		// Don't redirect while store is still loading
-		if (state !== 'ready') return;
+		const s = store.getState();
+		if (s !== 'ready') return;
 
 		if (!videoMeta) {
 			goto('/');
 			return;
 		}
 
-		store.getVideoBlob(id).then((blob) => {
-			videoBlob = blob;
-			videoSrc = URL.createObjectURL(blob);
+		if (videoMeta.duration > 0) {
+			duration = videoMeta.duration;
+		}
+
+		if (loadingVideoId === id) return;
+		loadingVideoId = id;
+
+		store.getVideoUrl(id).then(({ url, revoke }) => {
+			if (revokeUrl) revokeUrl();
+			videoSrc = url;
+			revokeUrl = revoke;
+		}).catch((err) => {
+			videoLoadError = String(err);
 		});
 
 		return () => {
-			if (videoSrc) URL.revokeObjectURL(videoSrc);
+			if (revokeUrl) revokeUrl();
 		};
 	});
 </script>
 
-{#if videoMeta && videoSrc && videoBlob}
+{#if videoMeta && videoSrc}
 	<div class="editor">
 		<div class="editor-main">
 			<div class="editor-header">
@@ -52,6 +112,34 @@
 					Back
 				</a>
 				<h2>{videoMeta.name}</h2>
+			</div>
+
+			<div class="video-meta">
+				<div class="meta-presets">
+					{#each couples as [l, f]}
+						<button
+							type="button"
+							class="meta-preset"
+							class:active={editLead === l && editFollow === f}
+							onclick={() => selectCouple(l, f)}
+						>{l} & {f}</button>
+					{/each}
+				</div>
+				<div class="meta-fields">
+					<Dropdown label="Lead" bind:value={editLead} options={leadOptions} placeholder="Select lead..." />
+					<Dropdown label="Follow" bind:value={editFollow} options={followOptions} placeholder="Select follow..." />
+					<Dropdown label="Dance" bind:value={editDance} options={danceOptions} placeholder="Select dance..." />
+				</div>
+				<div class="visibility-options">
+					<label class="check-option">
+						<input type="checkbox" checked={videoMeta.hidden} onchange={(e) => store.updateVideo(videoId, { hidden: (e.target as HTMLInputElement).checked })} />
+						Hide from home
+					</label>
+					<label class="check-option">
+						<input type="checkbox" checked={videoMeta.hiddenFromSearch} onchange={(e) => store.updateVideo(videoId, { hiddenFromSearch: (e.target as HTMLInputElement).checked })} />
+						Hide from search
+					</label>
+				</div>
 			</div>
 
 			<VideoPlayer
@@ -67,9 +155,9 @@
 				<ClipMarker
 					{videoId}
 					videoName={videoMeta.name}
-					videoLead={videoMeta.lead || ''}
-					videoFollow={videoMeta.follow || ''}
-					videoDance={videoMeta.dance || ''}
+					videoLead={editLead}
+					videoFollow={editFollow}
+					videoDance={editDance}
 					bind:inPoint
 					bind:outPoint
 				/>
@@ -83,8 +171,16 @@
 					<span class="clip-count">{clips.length}</span>
 				</div>
 				<div class="clips-list">
-					{#each clips as clip (clip.id)}
+					{#each clips.filter(c => !c.parentClipId) as clip (clip.id)}
 						<ClipCard {clip} />
+						{#each clips.filter(c => c.parentClipId === clip.id) as subClip (subClip.id)}
+							<div class="sub-clip-indent">
+								<ClipCard clip={subClip} />
+							</div>
+						{/each}
+					{/each}
+					{#each clips.filter(c => c.parentClipId && !clips.some(p => p.id === c.parentClipId)) as orphan (orphan.id)}
+						<ClipCard clip={orphan} />
 					{/each}
 				</div>
 			</div>
@@ -92,7 +188,18 @@
 	</div>
 {:else}
 	<div class="loading">
-		<div class="loading-spinner"></div>
+		{#if videoLoadError}
+			<p style="color: #ef4444; font-size: 13px; text-align: center;">
+				Failed to load video: {videoLoadError}
+			</p>
+		{:else}
+			<div class="loading-spinner"></div>
+		{/if}
+		{#if videoMeta}
+			<p style="color: #52525b; font-size: 11px; text-align: center; margin-top: 12px;">
+				{videoMeta.name} | duration: {videoMeta.duration}s | id: {videoMeta.id}
+			</p>
+		{/if}
 	</div>
 {/if}
 
@@ -138,6 +245,76 @@
 		white-space: nowrap;
 	}
 
+	.video-meta {
+		background: #18181b;
+		border-radius: 10px;
+		padding: 14px;
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		margin-bottom: 16px;
+	}
+
+	.meta-presets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+		margin-bottom: 10px;
+	}
+
+	.meta-preset {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #71717a;
+		padding: 4px 9px;
+		border-radius: 12px;
+		font-size: 11px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
+	}
+
+	.meta-preset:hover {
+		background: rgba(255, 255, 255, 0.06);
+		color: #a1a1aa;
+	}
+
+	.meta-preset.active {
+		background: rgba(99, 102, 241, 0.12);
+		color: #818cf8;
+		border-color: rgba(99, 102, 241, 0.25);
+	}
+
+	.meta-fields {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 8px;
+	}
+
+	@media (max-width: 640px) {
+		.meta-fields {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.visibility-options {
+		display: flex;
+		gap: 16px;
+		margin-top: 10px;
+	}
+
+	.check-option {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		color: #71717a;
+		cursor: pointer;
+	}
+
+	.check-option input[type="checkbox"] {
+		accent-color: #818cf8;
+	}
+
 	.marker-section {
 		margin-top: 16px;
 	}
@@ -170,6 +347,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+	}
+
+	.sub-clip-indent {
+		margin-left: 16px;
+		border-left: 2px solid rgba(99, 102, 241, 0.2);
+		padding-left: 10px;
 	}
 
 	.loading {

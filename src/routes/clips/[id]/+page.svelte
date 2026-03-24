@@ -5,10 +5,56 @@
 	import { extractClip } from '$lib/ffmpeg';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import MultiSelect from '$lib/components/MultiSelect.svelte';
+	import ClipMarker from '$lib/components/ClipMarker.svelte';
+	import ClipCard from '$lib/components/ClipCard.svelte';
 	import { getMovesForDance } from '$lib/moves';
+	import VideoPlayer from '$lib/components/VideoPlayer.svelte';
 
 	let clipId = $derived($page.params.id);
 	let clip = $derived(store.getClips().find(c => c.id === clipId));
+
+	// Sub-clips
+	let subClips = $derived(store.getSubClips(clipId));
+	let showSubClipForm = $state(false);
+	let subClipIn = $state<number | null>(null);
+	let subClipOut = $state<number | null>(null);
+	let subClipCurrentTime = $state(0);
+	let subClipDuration = $state(0);
+
+	// Parent clip
+	let parentClip = $derived(clip?.parentClipId ? store.getClips().find(c => c.id === clip!.parentClipId) : null);
+
+	// Links
+	let clipLinks = $derived(store.getLinksForClip(clipId));
+	let showLinkPicker = $state(false);
+	let linkPickerTab = $state<'clips' | 'videos'>('clips');
+	let linkPickerSearch = $state('');
+	let linkPickerLabel = $state('related');
+	const linkLabels = ['breakdown', 'variation', 'tutorial', 'related'];
+
+	let linkableClips = $derived(() => {
+		const q = linkPickerSearch.toLowerCase();
+		return store.getClips()
+			.filter(c => c.id !== clipId && !clipLinks.some(l => l.id === c.id))
+			.filter(c => !q || c.label.toLowerCase().includes(q) || c.videoName.toLowerCase().includes(q));
+	});
+
+	let linkableVideos = $derived(() => {
+		const q = linkPickerSearch.toLowerCase();
+		return store.getVideos()
+			.filter(v => !clipLinks.some(l => l.id === v.id))
+			.filter(v => !q || v.name.toLowerCase().includes(q));
+	});
+
+	async function addLinkTo(targetId: string, targetType: 'clip' | 'video') {
+		await store.addLink(clipId, targetId, targetType, linkPickerLabel);
+		showLinkPicker = false;
+		linkPickerSearch = '';
+	}
+
+	async function removeLinkFrom(targetId: string) {
+		await store.removeLink(clipId, targetId);
+	}
 
 	let videoUrl = $state<string | null>(null);
 	let videoEl: HTMLVideoElement | undefined = $state();
@@ -25,16 +71,22 @@
 	let mastery = $state('');
 	let clipType = $state('');
 	let tags = $state<string[]>([]);
+	let editHidden = $state(false);
+	let editHiddenFromSearch = $state(false);
 	let dirty = $state(false);
 	let saving = $state(false);
 
 	const couples: [string, string][] = [
+		['Anthony', 'Katie'],
 		['Cornel', 'Rithika'],
 		['Emilien', 'Tehina'],
 		['Gero', 'Migle'],
 		['Irakli', 'Maria'],
 		['Luis', 'Andrea'],
 		['Marcus', 'Bianca'],
+		['Melvin', 'Gatica'],
+		['Miguel', 'Sunsire'],
+		['Ofir', 'Ofri'],
 	];
 	const extraLeads = ['Favian'];
 	const leadOptions = [...new Set([...couples.map(c => c[0]), ...extraLeads])].sort().map(n => ({ value: n, label: n }));
@@ -67,9 +119,11 @@
 			return;
 		}
 
-		// Load source video blob
-		store.getVideoBlob(clip.videoId).then((blob) => {
-			videoUrl = URL.createObjectURL(blob);
+		// Load source video URL
+		let revokeVideoUrl: (() => void) | null = null;
+		store.getVideoUrl(clip.videoId).then(({ url, revoke }) => {
+			videoUrl = url;
+			revokeVideoUrl = revoke;
 		});
 
 		// Populate form fields
@@ -81,24 +135,30 @@
 		mastery = clip.mastery || '';
 		clipType = clip.clipType || '';
 		tags = [...(clip.tags || [])];
+		editHidden = clip.hidden ?? false;
+		editHiddenFromSearch = clip.hiddenFromSearch ?? false;
 		dirty = false;
 
 		return () => {
-			if (videoUrl) URL.revokeObjectURL(videoUrl);
+			if (revokeVideoUrl) revokeVideoUrl();
 		};
 	});
 
-	function markDirty() {
-		dirty = true;
-	}
+	let initialized = $state(false);
 
-	// Watch for field changes
+	// Mark dirty on any field change, but skip the initial population
 	$effect(() => {
-		// Access all fields to track them
-		label; lead; follow; dance; style; mastery; clipType; tags;
-		// Skip the initial population
-		if (clip && store.getState() === 'ready') {
+		label; lead; follow; dance; style; mastery; clipType; tags; editHidden; editHiddenFromSearch;
+		if (initialized) {
 			dirty = true;
+		}
+	});
+
+	// Set initialized after first render tick so the effect above skips initial values
+	$effect(() => {
+		if (clip && store.getState() === 'ready' && !initialized) {
+			// Use a timeout to let the initial field population settle
+			setTimeout(() => { initialized = true; }, 100);
 		}
 	});
 
@@ -113,10 +173,14 @@
 			style,
 			mastery,
 			clipType,
-			tags
+			tags,
+			hidden: editHidden,
+			hiddenFromSearch: editHiddenFromSearch
 		});
 		dirty = false;
 		saving = false;
+		// Reset so next changes are tracked
+		initialized = true;
 	}
 
 	async function deleteClip() {
@@ -187,12 +251,18 @@
 		return `${m}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
 	}
 
+	let fakeFullscreen = $state(false);
+
 	function toggleFullscreen() {
 		if (!playerEl) return;
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
+		} else if (typeof playerEl.requestFullscreen === 'function') {
+			playerEl.requestFullscreen().catch(() => {
+				fakeFullscreen = !fakeFullscreen;
+			});
 		} else {
-			playerEl.requestFullscreen();
+			fakeFullscreen = !fakeFullscreen;
 		}
 	}
 
@@ -257,92 +327,57 @@
 		</div>
 
 		<div class="layout">
-			<div class="player-section" bind:this={playerEl}>
-				<div class="player-wrapper">
-					<!-- svelte-ignore a11y_media_has_caption -->
-					<video
-						bind:this={videoEl}
-						src={videoUrl}
-						onclick={togglePlay}
-						onplay={() => playing = true}
-						onpause={() => playing = false}
-						ontimeupdate={() => {
-							if (!videoEl || !clip) return;
-							if (videoEl.currentTime >= clip.endTime) {
-								if (looping) {
-									videoEl.currentTime = clip.startTime;
-									videoEl.play();
-								} else {
-									videoEl.pause();
-									videoEl.currentTime = clip.endTime;
-								}
-							}
-							currentTime = videoEl.currentTime - clip.startTime;
-						}}
-						onloadedmetadata={() => {
-							if (videoEl && clip) {
-								clipDuration = clip.endTime - clip.startTime;
-								videoEl.currentTime = clip.startTime;
-							}
-						}}
+			<div class="editor-main">
+				<VideoPlayer
+					src={videoUrl}
+					bind:currentTime={currentTime}
+					bind:duration={subClipDuration}
+					clipStart={clip.startTime}
+					clipEnd={clip.endTime}
+					clips={subClips}
+					onSetIn={(t) => subClipIn = t}
+					onSetOut={(t) => subClipOut = t}
+				/>
+
+				<div class="marker-section">
+					<ClipMarker
+						videoId={clip.videoId}
+						videoName={clip.videoName}
+						videoLead={clip.lead}
+						videoFollow={clip.follow}
+						videoDance={clip.dance}
+						bind:inPoint={subClipIn}
+						bind:outPoint={subClipOut}
+						parentClipId={clip.id}
+						parentClipLabel={clip.label}
+						onClipSaved={() => { subClipIn = null; subClipOut = null; }}
+					/>
+				</div>
+
+				<!-- hidden video for download extraction -->
+				<video
+					bind:this={videoEl}
+					style="display:none"
+					src={videoUrl}
+					onloadedmetadata={() => {
+						if (videoEl && clip) {
+							clipDuration = clip.endTime - clip.startTime;
+						}
+					}}
 					></video>
-				</div>
-
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<div class="timeline" role="slider" tabindex="0" aria-valuenow={currentTime} aria-valuemin={0} aria-valuemax={clipDuration} onclick={handleTimelineClick}>
-					<div class="timeline-track">
-						<div class="timeline-progress" style="width: {clipDuration > 0 ? (currentTime / clipDuration) * 100 : 0}%"></div>
-						<div class="timeline-head" style="left: {clipDuration > 0 ? (currentTime / clipDuration) * 100 : 0}%"></div>
-					</div>
-				</div>
-
-				<div class="player-controls">
-					<div class="controls-left">
-						<button class="ctrl-btn play-btn" onclick={togglePlay}>
-							{#if playing}
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
-							{:else}
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-							{/if}
-						</button>
-
-						<button
-							class="ctrl-btn loop-toggle"
-							class:active={looping}
-							onclick={() => looping = !looping}
-							title={looping ? 'Looping on' : 'Looping off'}
-						>
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
-								<polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
-							</svg>
-						</button>
-
-						<span class="clip-time">{formatTimeCode(currentTime)}<span class="time-sep">/</span>{formatTimeCode(clipDuration)}</span>
-					</div>
-
-					<div class="rate-group">
-						{#each rates as rate}
-							<button
-								class="rate-btn"
-								class:active={playbackRate === rate}
-								onclick={() => setRate(rate)}
-							>{rate}x</button>
-						{/each}
-					</div>
-
-					<button class="ctrl-btn" onclick={toggleFullscreen} title="Fullscreen (f)">
-						<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" />
-							<line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
-						</svg>
-					</button>
-				</div>
 			</div>
 
 			<div class="edit-section">
 				<div class="edit-header">
 					<h1>{clip.label}</h1>
+					{#if parentClip}
+						<a href="/clips/{parentClip.id}" class="parent-link">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<polyline points="15 18 9 12 15 6" />
+							</svg>
+							Part of: {parentClip.label}
+						</a>
+					{/if}
 					<a href="/videos/{clip.videoId}" class="source-link">
 						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 							<polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
@@ -357,7 +392,6 @@
 						type="text"
 						placeholder="Move name"
 						bind:value={label}
-						oninput={markDirty}
 					/>
 
 					<div class="form-row">
@@ -397,7 +431,18 @@
 						<Dropdown label="Dance" bind:value={dance} options={[{ value: 'bachata', label: 'Bachata' }, { value: 'salsa', label: 'Salsa' }]} />
 					</div>
 
-					<button class="save-btn" onclick={save} disabled={!dirty || saving}>
+					<div class="visibility-options">
+						<label class="check-option">
+							<input type="checkbox" bind:checked={editHidden} />
+							Hide from home
+						</label>
+						<label class="check-option">
+							<input type="checkbox" bind:checked={editHiddenFromSearch} />
+							Hide from search
+						</label>
+					</div>
+
+					<button class="save-btn" onclick={save} disabled={saving}>
 						{#if saving}
 							<span class="spinner"></span>
 							Saving...
@@ -405,6 +450,104 @@
 							Save Changes
 						{/if}
 					</button>
+				</div>
+
+				{#if subClips.length > 0}
+					<!-- Sub-clips section -->
+					<div class="section-block">
+						<div class="section-block-header">
+							<span class="form-section-label">Sub-clips</span>
+							<span class="section-count">{subClips.length}</span>
+						</div>
+						<div class="sub-clips-grid">
+							{#each subClips as subClip (subClip.id)}
+								<ClipCard clip={subClip} />
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Related / Links section -->
+				<div class="section-block">
+					<div class="section-block-header">
+						<span class="form-section-label">Related</span>
+						{#if clipLinks.length > 0}
+							<span class="section-count">{clipLinks.length}</span>
+						{/if}
+					</div>
+
+					{#if clipLinks.length > 0}
+						<div class="links-list">
+							{#each clipLinks as link}
+								<div class="link-item">
+									<a href="/{link.type === 'clip' ? 'clips' : 'videos'}/{link.id}" class="link-item-info">
+										<span class="link-label-badge">{link.label}</span>
+										<span class="link-name">
+											{#if link.type === 'clip'}
+												{@const targetClip = store.getClips().find(c => c.id === link.id)}
+												{targetClip?.label ?? 'Unknown clip'}
+											{:else}
+												{@const targetVideo = store.getVideos().find(v => v.id === link.id)}
+												{targetVideo?.name ?? 'Unknown video'}
+											{/if}
+										</span>
+									</a>
+									<button class="link-remove" onclick={() => removeLinkFrom(link.id)} title="Remove link">
+										<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
+					{#if showLinkPicker}
+						<div class="link-picker">
+							<div class="link-picker-header">
+								<div class="link-picker-tabs">
+									<button class="picker-tab" class:active={linkPickerTab === 'clips'} onclick={() => linkPickerTab = 'clips'}>Clips</button>
+									<button class="picker-tab" class:active={linkPickerTab === 'videos'} onclick={() => linkPickerTab = 'videos'}>Videos</button>
+								</div>
+								<button class="link-picker-close" title="Close" onclick={() => { showLinkPicker = false; linkPickerSearch = ''; }}>
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+								</button>
+							</div>
+							<input type="text" class="link-picker-search" placeholder="Search..." bind:value={linkPickerSearch} />
+							<div class="link-picker-label-row">
+								<span class="link-picker-label-text">Relationship:</span>
+								{#each linkLabels as lbl}
+									<button class="link-label-option" class:active={linkPickerLabel === lbl} onclick={() => linkPickerLabel = lbl}>{lbl}</button>
+								{/each}
+							</div>
+							<div class="link-picker-results">
+								{#if linkPickerTab === 'clips'}
+									{#each linkableClips() as c}
+										<button class="link-picker-item" onclick={() => addLinkTo(c.id, 'clip')}>
+											<span class="picker-item-name">{c.label}</span>
+											<span class="picker-item-meta">{c.videoName}</span>
+										</button>
+									{:else}
+										<p class="picker-empty">No clips to link</p>
+									{/each}
+								{:else}
+									{#each linkableVideos() as v}
+										<button class="link-picker-item" onclick={() => addLinkTo(v.id, 'video')}>
+											<span class="picker-item-name">{v.name}</span>
+										</button>
+									{:else}
+										<p class="picker-empty">No videos to link</p>
+									{/each}
+								{/if}
+							</div>
+						</div>
+					{:else}
+						<button class="section-action-btn" onclick={() => showLinkPicker = true}>
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+								<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+							</svg>
+							Link video or clip
+						</button>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -510,21 +653,32 @@
 		background: #000;
 	}
 
-	:global(.player-section:fullscreen) {
+	:global(.player-section:fullscreen),
+	.fake-fullscreen {
 		background: #000;
 		display: flex;
 		flex-direction: column;
 	}
 
-	:global(.player-section:fullscreen .player-wrapper) {
+	:global(.player-section:fullscreen .player-wrapper),
+	.fake-fullscreen .player-wrapper {
 		flex: 1;
 		display: flex;
 		align-items: center;
+		justify-content: center;
 	}
 
-	:global(.player-section:fullscreen video) {
-		max-height: none;
-		flex: 1;
+	:global(.player-section:fullscreen video),
+	.fake-fullscreen video {
+		max-height: 100vh;
+		max-width: 100vw;
+		object-fit: contain;
+	}
+
+	.fake-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
 	}
 
 	.timeline {
@@ -679,6 +833,30 @@
 	.rate-btn.active {
 		color: #e4e4e7;
 		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.mark-group {
+		display: flex;
+		gap: 4px;
+	}
+
+	.mark-btn {
+		background: rgba(99, 102, 241, 0.1);
+		color: #818cf8;
+		border: 1px solid rgba(99, 102, 241, 0.2);
+		padding: 5px 12px;
+		border-radius: 6px;
+		cursor: pointer;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
+	}
+
+	.mark-btn:hover {
+		background: rgba(99, 102, 241, 0.18);
+		border-color: rgba(99, 102, 241, 0.35);
 	}
 
 	.edit-section {
@@ -836,6 +1014,25 @@
 		}
 	}
 
+	.visibility-options {
+		display: flex;
+		gap: 16px;
+		margin-bottom: 12px;
+	}
+
+	.check-option {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		color: #71717a;
+		cursor: pointer;
+	}
+
+	.check-option input[type="checkbox"] {
+		accent-color: #818cf8;
+	}
+
 	.save-btn {
 		display: flex;
 		align-items: center;
@@ -889,5 +1086,333 @@
 		border-top-color: #818cf8;
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
+	}
+
+	/* Parent link */
+	.parent-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		color: #818cf8;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		padding: 6px 12px;
+		background: rgba(99, 102, 241, 0.06);
+		border: 1px solid rgba(99, 102, 241, 0.15);
+		border-radius: 8px;
+		margin-top: 6px;
+		transition: all 0.15s;
+	}
+
+	.parent-link:hover {
+		background: rgba(99, 102, 241, 0.12);
+		border-color: rgba(99, 102, 241, 0.3);
+	}
+
+	/* Section blocks (sub-clips, links) */
+	.section-block {
+		margin-top: 20px;
+		padding-top: 16px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.section-block-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+
+	.section-count {
+		background: rgba(255, 255, 255, 0.06);
+		color: #71717a;
+		font-size: 11px;
+		font-weight: 600;
+		padding: 2px 7px;
+		border-radius: 10px;
+	}
+
+	.section-action-btn {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		background: rgba(255, 255, 255, 0.03);
+		color: #71717a;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		padding: 8px 14px;
+		border-radius: 8px;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
+		width: 100%;
+		justify-content: center;
+	}
+
+	.section-action-btn:hover {
+		background: rgba(255, 255, 255, 0.06);
+		color: #a1a1aa;
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+
+	/* Sub-clips grid */
+	.sub-clips-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 10px;
+		margin-bottom: 12px;
+	}
+
+	.sub-clip-editor {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 12px;
+	}
+
+	/* Links list */
+	.links-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		margin-bottom: 12px;
+	}
+
+	.link-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 8px;
+		padding: 8px 10px;
+		transition: border-color 0.15s;
+	}
+
+	.link-item:hover {
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+
+	.link-item-info {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		text-decoration: none;
+		color: inherit;
+		min-width: 0;
+	}
+
+	.link-label-badge {
+		background: rgba(99, 102, 241, 0.1);
+		color: #818cf8;
+		padding: 2px 7px;
+		border-radius: 4px;
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		flex-shrink: 0;
+	}
+
+	.link-name {
+		font-size: 13px;
+		color: #a1a1aa;
+		font-weight: 500;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		transition: color 0.15s;
+	}
+
+	.link-item-info:hover .link-name {
+		color: #e4e4e7;
+	}
+
+	.link-remove {
+		background: none;
+		border: none;
+		color: #3f3f46;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: color 0.15s, background 0.15s;
+		flex-shrink: 0;
+	}
+
+	.link-remove:hover {
+		color: #ef4444;
+		background: rgba(239, 68, 68, 0.08);
+	}
+
+	/* Link picker */
+	.link-picker {
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 10px;
+		padding: 12px;
+	}
+
+	.link-picker-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 10px;
+	}
+
+	.link-picker-tabs {
+		display: flex;
+		gap: 2px;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 6px;
+		padding: 2px;
+	}
+
+	.picker-tab {
+		background: none;
+		border: none;
+		color: #52525b;
+		padding: 5px 12px;
+		border-radius: 5px;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
+	}
+
+	.picker-tab.active {
+		background: rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+	}
+
+	.picker-tab:hover:not(.active) {
+		color: #a1a1aa;
+	}
+
+	.link-picker-close {
+		background: none;
+		border: none;
+		color: #52525b;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		transition: color 0.15s;
+	}
+
+	.link-picker-close:hover {
+		color: #a1a1aa;
+	}
+
+	.link-picker-search {
+		width: 100%;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #e4e4e7;
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 12px;
+		font-family: 'Inter', sans-serif;
+		margin-bottom: 8px;
+		box-sizing: border-box;
+	}
+
+	.link-picker-search::placeholder {
+		color: #3f3f46;
+	}
+
+	.link-picker-search:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.4);
+	}
+
+	.link-picker-label-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-bottom: 10px;
+		flex-wrap: wrap;
+	}
+
+	.link-picker-label-text {
+		font-size: 11px;
+		color: #52525b;
+		font-weight: 500;
+	}
+
+	.link-label-option {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #71717a;
+		padding: 3px 8px;
+		border-radius: 4px;
+		font-size: 11px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
+	}
+
+	.link-label-option.active {
+		background: rgba(99, 102, 241, 0.12);
+		color: #818cf8;
+		border-color: rgba(99, 102, 241, 0.25);
+	}
+
+	.link-label-option:hover:not(.active) {
+		color: #a1a1aa;
+	}
+
+	.link-picker-results {
+		max-height: 200px;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.link-picker-item {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		background: none;
+		border: none;
+		color: inherit;
+		padding: 8px 10px;
+		border-radius: 6px;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		text-align: left;
+		transition: background 0.15s;
+	}
+
+	.link-picker-item:hover {
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.picker-item-name {
+		font-size: 13px;
+		color: #e4e4e7;
+		font-weight: 500;
+	}
+
+	.picker-item-meta {
+		font-size: 11px;
+		color: #52525b;
+	}
+
+	.picker-empty {
+		color: #3f3f46;
+		font-size: 12px;
+		text-align: center;
+		padding: 16px;
+		margin: 0;
 	}
 </style>

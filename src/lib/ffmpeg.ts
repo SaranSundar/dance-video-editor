@@ -2,9 +2,21 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 let ffmpeg: FFmpeg | null = null;
+let loading: Promise<FFmpeg> | null = null;
+
+// Preload ffmpeg.wasm in the background so it's ready when needed
+export function preload(): void {
+	if (!ffmpeg && !loading) {
+		loading = getFFmpeg().catch(() => {
+			loading = null;
+			return null as any;
+		});
+	}
+}
 
 export async function getFFmpeg(): Promise<FFmpeg> {
 	if (ffmpeg && ffmpeg.loaded) return ffmpeg;
+	if (loading && !ffmpeg) return loading;
 
 	ffmpeg = new FFmpeg();
 	ffmpeg.on('log', ({ message }) => {

@@ -5,12 +5,13 @@ const HANDLE_KEY = 'root';
 interface VideoMeta {
 	id: string;
 	name: string;
-	filename: string;
-	thumbnailFilename: string | null;
+	fingerprint: string;
 	duration: number;
 	lead: string;
 	follow: string;
 	dance: string;
+	hidden: boolean;
+	hiddenFromSearch: boolean;
 	addedAt: string;
 }
 
@@ -28,6 +29,10 @@ interface ClipMeta {
 	startTime: number;
 	endTime: number;
 	tags: string[];
+	parentClipId: string | null;
+	links: { id: string; type: 'clip' | 'video'; label: string }[];
+	hidden: boolean;
+	hiddenFromSearch: boolean;
 	createdAt: string;
 }
 
@@ -153,22 +158,33 @@ async function saveMetadata(meta: Metadata): Promise<void> {
 	const writable = await fileHandle.createWritable();
 	await writable.write(JSON.stringify(meta, null, 2));
 	await writable.close();
+	metaCache = meta;
+	metaCacheTime = Date.now();
 }
 
 // Videos
 
 export async function getVideos(): Promise<VideoMeta[]> {
 	const meta = await readMetadata();
-	return meta.videos;
+	return meta.videos.map(v => ({
+		...v,
+		fingerprint: v.fingerprint ?? '',
+		hidden: v.hidden ?? false,
+		hiddenFromSearch: v.hiddenFromSearch ?? false
+	}));
 }
 
-export async function addVideo(file: File, duration: number, thumbnailBlob: Blob | null, info: { lead: string; follow: string; dance: string }): Promise<VideoMeta> {
+export async function addVideo(file: File, duration: number, thumbnailBlob: Blob | null, info: { lead: string; follow: string; dance: string }, fingerprint: string = ''): Promise<VideoMeta> {
 	if (!dirHandle) throw new Error('No directory selected');
 
-	const id = crypto.randomUUID();
+	const meta = await readMetadata();
+
+	// Check for existing video with same fingerprint
+	const existing = fingerprint ? meta.videos.find(v => v.fingerprint === fingerprint) : null;
+	const id = existing ? existing.id : crypto.randomUUID();
 	const ext = file.name.split('.').pop() || 'mp4';
 	const filename = `${id}.${ext}`;
-	const thumbnailFilename = thumbnailBlob ? `${id}-thumb.jpg` : null;
+	const thumbFilename = thumbnailBlob ? `${id}-thumb.jpg` : null;
 
 	const videosDir = await dirHandle.getDirectoryHandle('videos');
 	const fileHandle = await videosDir.getFileHandle(filename, { create: true });
@@ -176,18 +192,26 @@ export async function addVideo(file: File, duration: number, thumbnailBlob: Blob
 	await writable.write(file);
 	await writable.close();
 
-	if (thumbnailBlob && thumbnailFilename) {
-		const thumbHandle = await videosDir.getFileHandle(thumbnailFilename, { create: true });
+	if (thumbnailBlob && thumbFilename) {
+		const thumbHandle = await videosDir.getFileHandle(thumbFilename, { create: true });
 		const thumbWritable = await thumbHandle.createWritable();
 		await thumbWritable.write(thumbnailBlob);
 		await thumbWritable.close();
 	}
 
+	if (existing) {
+		// Update existing entry
+		existing.name = file.name;
+		existing.duration = duration || existing.duration;
+		existing.fingerprint = fingerprint;
+		await saveMetadata(meta);
+		return existing;
+	}
+
 	const videoMeta: VideoMeta = {
 		id,
 		name: file.name,
-		filename,
-		thumbnailFilename,
+		fingerprint,
 		duration,
 		lead: info.lead,
 		follow: info.follow,
@@ -195,22 +219,37 @@ export async function addVideo(file: File, duration: number, thumbnailBlob: Blob
 		addedAt: new Date().toISOString()
 	};
 
-	const meta = await readMetadata();
 	meta.videos.push(videoMeta);
 	await saveMetadata(meta);
 
 	return videoMeta;
 }
 
+// Cache metadata to avoid re-reading the JSON file on every call
+let metaCache: Metadata | null = null;
+let metaCacheTime = 0;
+
+async function getCachedMetadata(): Promise<Metadata> {
+	const now = Date.now();
+	if (metaCache && now - metaCacheTime < 5000) return metaCache;
+	metaCache = await readMetadata();
+	metaCacheTime = now;
+	return metaCache;
+}
+
+export function invalidateMetaCache() {
+	metaCache = null;
+}
+
 export async function getVideoThumbnail(videoId: string): Promise<Blob | null> {
 	if (!dirHandle) throw new Error('No directory selected');
-	const meta = await readMetadata();
+	const meta = await getCachedMetadata();
 	const video = meta.videos.find(v => v.id === videoId);
-	if (!video || !video.thumbnailFilename) return null;
+	if (!video) return null;
 
 	const videosDir = await dirHandle.getDirectoryHandle('videos');
 	try {
-		const fileHandle = await videosDir.getFileHandle(video.thumbnailFilename);
+		const fileHandle = await videosDir.getFileHandle(`${videoId}-thumb.jpg`);
 		return await fileHandle.getFile();
 	} catch {
 		return null;
@@ -224,8 +263,14 @@ export async function getVideoBlob(videoId: string): Promise<Blob> {
 	if (!video) throw new Error('Video not found');
 
 	const videosDir = await dirHandle.getDirectoryHandle('videos');
-	const fileHandle = await videosDir.getFileHandle(video.filename);
-	return await fileHandle.getFile();
+	// Try common extensions
+	for (const ext of ['mp4', 'webm', 'mov']) {
+		try {
+			const fileHandle = await videosDir.getFileHandle(`${videoId}.${ext}`);
+			return await fileHandle.getFile();
+		} catch { /* try next */ }
+	}
+	throw new Error('Video file not found');
 }
 
 export async function deleteVideo(videoId: string): Promise<void> {
@@ -235,9 +280,11 @@ export async function deleteVideo(videoId: string): Promise<void> {
 	if (!video) return;
 
 	const videosDir = await dirHandle.getDirectoryHandle('videos');
-	try {
-		await videosDir.removeEntry(video.filename);
-	} catch { /* file may already be gone */ }
+	// Try to remove video file with common extensions
+	for (const ext of ['mp4', 'webm', 'mov']) {
+		try { await videosDir.removeEntry(`${videoId}.${ext}`); } catch { /* skip */ }
+	}
+	try { await videosDir.removeEntry(`${videoId}-thumb.jpg`); } catch { /* skip */ }
 
 	// Also delete associated clips (they depend on the source video)
 	meta.clips = meta.clips.filter(c => c.videoId !== videoId);
@@ -245,7 +292,7 @@ export async function deleteVideo(videoId: string): Promise<void> {
 	await saveMetadata(meta);
 }
 
-export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string }): Promise<void> {
+export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean }): Promise<void> {
 	const meta = await readMetadata();
 	const video = meta.videos.find(v => v.id === videoId);
 	if (!video) return;
@@ -253,6 +300,8 @@ export async function updateVideo(videoId: string, updates: { name?: string; lea
 	if (updates.lead !== undefined) video.lead = updates.lead;
 	if (updates.follow !== undefined) video.follow = updates.follow;
 	if (updates.dance !== undefined) video.dance = updates.dance;
+	if (updates.hidden !== undefined) video.hidden = updates.hidden;
+	if (updates.hiddenFromSearch !== undefined) video.hiddenFromSearch = updates.hiddenFromSearch;
 	// Also update videoName on clips if name changed
 	if (updates.name !== undefined) {
 		for (const clip of meta.clips) {
@@ -279,16 +328,24 @@ export async function renameVideo(videoId: string, newName: string): Promise<voi
 
 export async function getClips(): Promise<ClipMeta[]> {
 	const meta = await readMetadata();
-	return meta.clips;
+	return meta.clips.map(c => ({
+		...c,
+		parentClipId: c.parentClipId ?? null,
+		links: c.links ?? [],
+		hidden: c.hidden ?? false,
+		hiddenFromSearch: c.hiddenFromSearch ?? false
+	}));
 }
 
 export async function getClipsByVideo(videoId: string): Promise<ClipMeta[]> {
 	const meta = await readMetadata();
-	return meta.clips.filter(c => c.videoId === videoId);
+	return meta.clips
+		.filter(c => c.videoId === videoId)
+		.map(c => ({ ...c, parentClipId: c.parentClipId ?? null, links: c.links ?? [] }));
 }
 
 export async function addClip(
-	input: { videoId: string; videoName: string; label: string; lead: string; follow: string; dance: string; style: string; mastery: string; clipType: string; startTime: number; endTime: number; tags: string[] }
+	input: { videoId: string; videoName: string; label: string; lead: string; follow: string; dance: string; style: string; mastery: string; clipType: string; startTime: number; endTime: number; tags: string[]; parentClipId?: string | null }
 ): Promise<ClipMeta> {
 	const id = crypto.randomUUID();
 
@@ -306,6 +363,8 @@ export async function addClip(
 		startTime: input.startTime,
 		endTime: input.endTime,
 		tags: input.tags,
+		parentClipId: input.parentClipId ?? null,
+		links: [],
 		createdAt: new Date().toISOString()
 	};
 
@@ -316,7 +375,7 @@ export async function addClip(
 	return clipMeta;
 }
 
-export async function updateClip(clipId: string, updates: { label?: string; lead?: string; follow?: string; dance?: string; style?: string; mastery?: string; clipType?: string; tags?: string[] }): Promise<void> {
+export async function updateClip(clipId: string, updates: { label?: string; lead?: string; follow?: string; dance?: string; style?: string; mastery?: string; clipType?: string; tags?: string[]; parentClipId?: string | null; links?: { id: string; type: 'clip' | 'video'; label: string }[]; hidden?: boolean; hiddenFromSearch?: boolean }): Promise<void> {
 	const meta = await readMetadata();
 	const clip = meta.clips.find(c => c.id === clipId);
 	if (!clip) return;
@@ -329,6 +388,53 @@ export async function updateClip(clipId: string, updates: { label?: string; lead
 	if (updates.mastery !== undefined) clip.mastery = updates.mastery;
 	if (updates.clipType !== undefined) clip.clipType = updates.clipType;
 	if (updates.tags !== undefined) clip.tags = updates.tags;
+	if (updates.parentClipId !== undefined) clip.parentClipId = updates.parentClipId;
+	if (updates.links !== undefined) clip.links = updates.links;
+	if (updates.hidden !== undefined) clip.hidden = updates.hidden;
+	if (updates.hiddenFromSearch !== undefined) clip.hiddenFromSearch = updates.hiddenFromSearch;
+	await saveMetadata(meta);
+}
+
+export async function addLink(clipId: string, targetId: string, targetType: 'clip' | 'video', label: string): Promise<void> {
+	const meta = await readMetadata();
+	const clip = meta.clips.find(c => c.id === clipId);
+	if (!clip) return;
+
+	// Initialize links if missing (backward compat)
+	if (!clip.links) clip.links = [];
+
+	// Avoid duplicates
+	if (!clip.links.some(l => l.id === targetId)) {
+		clip.links.push({ id: targetId, type: targetType, label });
+	}
+
+	// Bidirectional: if target is a clip, add reverse link
+	if (targetType === 'clip') {
+		const target = meta.clips.find(c => c.id === targetId);
+		if (target) {
+			if (!target.links) target.links = [];
+			if (!target.links.some(l => l.id === clipId)) {
+				target.links.push({ id: clipId, type: 'clip', label });
+			}
+		}
+	}
+
+	await saveMetadata(meta);
+}
+
+export async function removeLink(clipId: string, targetId: string): Promise<void> {
+	const meta = await readMetadata();
+	const clip = meta.clips.find(c => c.id === clipId);
+	if (clip && clip.links) {
+		clip.links = clip.links.filter(l => l.id !== targetId);
+	}
+
+	// Remove reverse link if target is a clip
+	const target = meta.clips.find(c => c.id === targetId);
+	if (target && target.links) {
+		target.links = target.links.filter(l => l.id !== clipId);
+	}
+
 	await saveMetadata(meta);
 }
 
@@ -342,79 +448,92 @@ export function isReady(): boolean {
 	return dirHandle !== null;
 }
 
-// Export & Import
-
-async function addDirToZip(zip: any, dirHandle: FileSystemDirectoryHandle, path: string) {
-	for await (const [name, handle] of dirHandle.entries()) {
-		const fullPath = path ? `${path}/${name}` : name;
-		if (handle.kind === 'file') {
-			const file = await (handle as FileSystemFileHandle).getFile();
-			zip.file(fullPath, file);
-		} else {
-			const subDir = await dirHandle.getDirectoryHandle(name);
-			await addDirToZip(zip, subDir, fullPath);
-		}
-	}
-}
-
-export async function exportData(): Promise<Blob> {
+export async function nukeAll(): Promise<void> {
 	if (!dirHandle) throw new Error('No directory selected');
-	const JSZip = (await import('jszip')).default;
-	const zip = new JSZip();
-	await addDirToZip(zip, dirHandle, '');
-	return await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 1 } });
-}
-
-async function clearDir(dir: FileSystemDirectoryHandle) {
+	// Clear all entries in the directory
 	const entries: [string, 'file' | 'directory'][] = [];
-	for await (const [name, handle] of dir.entries()) {
+	for await (const [name, handle] of dirHandle.entries()) {
 		entries.push([name, handle.kind]);
 	}
 	for (const [name, kind] of entries) {
 		try {
 			if (kind === 'directory') {
-				// Recursively clear subdirectory first, then remove it
-				const subDir = await dir.getDirectoryHandle(name);
-				await clearDir(subDir);
-				await dir.removeEntry(name);
+				await dirHandle.removeEntry(name, { recursive: true });
 			} else {
-				await dir.removeEntry(name);
+				await dirHandle.removeEntry(name);
 			}
-		} catch {
-			// Some platforms may fail on certain entries, skip
-		}
+		} catch { /* skip */ }
 	}
+	await ensureStructure();
 }
 
-export async function importData(zipBlob: Blob): Promise<void> {
+// Export & Import
+
+export async function exportMetadata(): Promise<string> {
 	if (!dirHandle) throw new Error('No directory selected');
-	const JSZip = (await import('jszip')).default;
-	const zip = await JSZip.loadAsync(zipBlob);
+	const meta = await readMetadata();
+	return JSON.stringify(meta, null, 2);
+}
 
-	// Clear existing contents
-	await clearDir(dirHandle);
+export async function importMetadata(json: string): Promise<void> {
+	if (!dirHandle) throw new Error('No directory selected');
+	const imported: Metadata = JSON.parse(json);
+	const meta = await readMetadata();
 
-	// Sort entries so directories come before files
-	const entries = Object.entries(zip.files).sort(([a], [b]) => a.localeCompare(b));
+	// Clear clips
+	meta.clips = [];
 
-	// Extract all files
-	for (const [relativePath, zipEntry] of entries) {
-		const entry = zipEntry as any;
-		if (entry.dir) continue; // directories are created on demand below
-
-		const parts = relativePath.split('/');
-		const fileName = parts.pop()!;
-		if (!fileName) continue; // skip empty names
-
-		let current = dirHandle;
-		for (const part of parts) {
-			if (!part) continue;
-			current = await current.getDirectoryHandle(part, { create: true });
-		}
-		const fileHandle = await current.getFileHandle(fileName, { create: true });
-		const writable = await fileHandle.createWritable();
-		const data = await entry.async('blob');
-		await writable.write(data);
-		await writable.close();
+	// Build fingerprint map of existing videos
+	const existingByFingerprint = new Map<string, VideoMeta>();
+	for (const v of meta.videos) {
+		if (v.fingerprint) existingByFingerprint.set(v.fingerprint, v);
 	}
+	const existingById = new Map(meta.videos.map(v => [v.id, v]));
+
+	// Merge imported videos
+	for (const importedVideo of imported.videos) {
+		const fp = (importedVideo as any).fingerprint ?? '';
+		const matchByFp = fp ? existingByFingerprint.get(fp) : null;
+		const matchById = existingById.get(importedVideo.id);
+
+		if (matchByFp) {
+			// Update existing entry matched by fingerprint
+			matchByFp.name = importedVideo.name;
+			matchByFp.duration = importedVideo.duration || matchByFp.duration;
+			matchByFp.lead = importedVideo.lead;
+			matchByFp.follow = importedVideo.follow;
+			matchByFp.dance = importedVideo.dance;
+		} else if (matchById) {
+			// Update existing entry matched by id
+			matchById.name = importedVideo.name;
+			matchById.fingerprint = fp;
+			matchById.duration = importedVideo.duration || matchById.duration;
+			matchById.lead = importedVideo.lead;
+			matchById.follow = importedVideo.follow;
+			matchById.dance = importedVideo.dance;
+		} else {
+			// Create placeholder
+			meta.videos.push({
+				id: importedVideo.id,
+				name: importedVideo.name,
+				fingerprint: fp,
+				duration: importedVideo.duration,
+				lead: importedVideo.lead,
+				follow: importedVideo.follow,
+				dance: importedVideo.dance,
+				addedAt: importedVideo.addedAt
+			});
+		}
+	}
+
+	// Import all clips
+	for (const clip of imported.clips) {
+		meta.clips.push({
+			...clip,
+			parentClipId: clip.parentClipId ?? null,
+			links: clip.links ?? []
+		});
+	}
+
+	await saveMetadata(meta);
 }
