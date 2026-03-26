@@ -139,6 +139,7 @@
 		</a>
 		<div class="nav-links">
 			<a href="/" class:active={currentPath === '/'}>Home</a>
+			<a href="/levels" class:active={currentPath === '/levels'}>Levels</a>
 			{#if state === 'ready'}
 				<button class="nav-action-btn" onclick={handleExport} disabled={exporting} title="Export metadata as JSON">
 					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

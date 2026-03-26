@@ -22,9 +22,14 @@
 	} = $props();
 
 	// If clipStart/clipEnd are set, constrain playback to that range
+	// Optional 10s buffer before/after for finding the count in the song
+	const CLIP_BUFFER = 10;
 	let hasClipRange = $derived(clipEnd > clipStart);
-	let rangeStart = $derived(hasClipRange ? clipStart : 0);
-	let rangeDuration = $derived(hasClipRange ? clipEnd - clipStart : duration);
+	let showPreBuffer = $state(false);
+	let showPostBuffer = $state(false);
+	let rangeStart = $derived(hasClipRange ? (showPreBuffer ? Math.max(0, clipStart - CLIP_BUFFER) : clipStart) : 0);
+	let rangeEnd = $derived(hasClipRange ? (showPostBuffer ? Math.min(duration, clipEnd + CLIP_BUFFER) : clipEnd) : duration);
+	let rangeDuration = $derived(hasClipRange ? rangeEnd - rangeStart : duration);
 
 	let videoEl: HTMLVideoElement | undefined = $state();
 	let playerEl: HTMLElement | undefined = $state();
@@ -54,8 +59,8 @@
 	function togglePlay() {
 		if (!videoEl) return;
 		if (videoEl.paused) {
-			if (hasClipRange && (videoEl.currentTime < rangeStart || videoEl.currentTime >= clipEnd)) {
-				videoEl.currentTime = rangeStart;
+			if (hasClipRange && (videoEl.currentTime < rangeStart || videoEl.currentTime >= rangeEnd)) {
+				videoEl.currentTime = clipStart;
 			}
 			videoEl.play().catch(() => {});
 		} else {
@@ -66,7 +71,7 @@
 	function seek(delta: number) {
 		if (!videoEl) return;
 		const min = hasClipRange ? rangeStart : 0;
-		const max = hasClipRange ? clipEnd : duration;
+		const max = hasClipRange ? rangeEnd : duration;
 		videoEl.currentTime = Math.max(min, Math.min(max, videoEl.currentTime + delta));
 	}
 
@@ -77,12 +82,12 @@
 
 	function handleTimeUpdate() {
 		if (!videoEl) return;
-		if (hasClipRange && videoEl.currentTime >= clipEnd) {
+		if (hasClipRange && videoEl.currentTime >= rangeEnd) {
 			if (looping) {
 				videoEl.currentTime = rangeStart;
 			} else {
 				videoEl.pause();
-				videoEl.currentTime = clipEnd;
+				videoEl.currentTime = rangeEnd;
 			}
 		}
 		currentTime = videoEl.currentTime;
@@ -95,7 +100,7 @@
 			duration = videoEl.duration;
 		}
 		if (hasClipRange) {
-			videoEl.currentTime = rangeStart;
+			videoEl.currentTime = clipStart;
 		}
 	}
 
@@ -259,6 +264,12 @@
 		onmouseleave={() => { if (!dragging) hoverTime = null; }}
 	>
 		<div class="timeline-track">
+			{#if hasClipRange}
+				<div
+					class="timeline-clip-region"
+					style="left: {rangeDuration > 0 ? ((clipStart - rangeStart) / rangeDuration) * 100 : 0}%; width: {rangeDuration > 0 ? ((clipEnd - clipStart) / rangeDuration) * 100 : 0}%"
+				></div>
+			{/if}
 			{#each clips as clip}
 				<div
 					class="timeline-clip"
@@ -297,6 +308,11 @@
 					<polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
 				</svg>
 			</button>
+
+			{#if hasClipRange}
+				<button class="ctrl-btn buffer-btn" class:active={showPreBuffer} onclick={() => showPreBuffer = !showPreBuffer} title="Show 10s before clip">-10s</button>
+				<button class="ctrl-btn buffer-btn" class:active={showPostBuffer} onclick={() => showPostBuffer = !showPostBuffer} title="Show 10s after clip">+10s</button>
+			{/if}
 
 			<div class="seek-group">
 				<button class="ctrl-btn" onclick={() => seek(-5)} title="Back 5s">
@@ -423,6 +439,16 @@
 		opacity: 1;
 	}
 
+	.timeline-clip-region {
+		position: absolute;
+		top: 0;
+		height: 100%;
+		background: rgba(99, 102, 241, 0.12);
+		border-left: 2px solid rgba(99, 102, 241, 0.5);
+		border-right: 2px solid rgba(99, 102, 241, 0.5);
+		pointer-events: none;
+	}
+
 	.timeline-clip {
 		position: absolute;
 		top: -2px;
@@ -465,6 +491,20 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
+	}
+
+	.buffer-btn {
+		font-size: 11px !important;
+		padding: 4px 8px !important;
+		min-width: unset !important;
+		min-height: unset !important;
+		border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	}
+
+	.buffer-btn.active {
+		background: rgba(99, 102, 241, 0.2) !important;
+		color: #818cf8 !important;
+		border-color: rgba(99, 102, 241, 0.4) !important;
 	}
 
 	.ctrl-btn {

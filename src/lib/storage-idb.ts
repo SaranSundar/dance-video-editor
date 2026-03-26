@@ -66,16 +66,21 @@ function getWorker(): Worker {
 function workerWriteFile(dirPath: string, fileName: string, file: Blob): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const worker = getWorker();
+		const timeout = setTimeout(() => {
+			worker.removeEventListener('message', handler);
+			reject(new Error(`OPFS write timed out: ${dirPath}/${fileName}`));
+		}, 30000);
 
 		function handler(e: MessageEvent) {
 			if (e.data.action === 'done') {
+				clearTimeout(timeout);
 				worker.removeEventListener('message', handler);
 				resolve();
 			} else if (e.data.action === 'error') {
+				clearTimeout(timeout);
 				worker.removeEventListener('message', handler);
 				reject(new Error(e.data.error));
 			}
-			// 'progress' messages are ignored here but could be used
 		}
 
 		worker.addEventListener('message', handler);
@@ -90,6 +95,24 @@ async function writeToPath(dirPath: string, name: string, data: string | Blob): 
 	const blob = typeof data === 'string' ? new Blob([data]) : data;
 
 	if (isSafari) {
+		// Small files (metadata): try main-thread write first, fall back to worker
+		// Large files (videos): always use worker for chunked writing
+		if (blob.size < 1024 * 1024) {
+			try {
+				const root = await navigator.storage.getDirectory();
+				let dir = root;
+				for (const part of dirPath.split('/').filter(Boolean)) {
+					dir = await dir.getDirectoryHandle(part, { create: true });
+				}
+				const fileHandle = await dir.getFileHandle(name, { create: true });
+				const writable = await (fileHandle as any).createWritable();
+				await writable.write(blob);
+				await writable.close();
+				return;
+			} catch {
+				// createWritable not supported on this Safari version, use worker
+			}
+		}
 		await workerWriteFile(dirPath, name, blob);
 	} else {
 		const root = await navigator.storage.getDirectory();

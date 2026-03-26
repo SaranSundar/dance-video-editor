@@ -131,14 +131,8 @@
 					<Dropdown label="Dance" bind:value={editDance} options={danceOptions} placeholder="Select dance..." />
 				</div>
 				<div class="visibility-options">
-					<label class="check-option">
-						<input type="checkbox" checked={videoMeta.hidden} onchange={(e) => store.updateVideo(videoId, { hidden: (e.target as HTMLInputElement).checked })} />
-						Hide from home
-					</label>
-					<label class="check-option">
-						<input type="checkbox" checked={videoMeta.hiddenFromSearch} onchange={(e) => store.updateVideo(videoId, { hiddenFromSearch: (e.target as HTMLInputElement).checked })} />
-						Hide from search
-					</label>
+					<button class="vis-toggle" class:active={videoMeta.hidden} onclick={() => store.updateVideo(videoId, { hidden: !videoMeta.hidden })}>Hide from home</button>
+					<button class="vis-toggle" class:active={videoMeta.hiddenFromSearch} onclick={() => store.updateVideo(videoId, { hiddenFromSearch: !videoMeta.hiddenFromSearch })}>Hide from search</button>
 				</div>
 			</div>
 
@@ -298,21 +292,32 @@
 
 	.visibility-options {
 		display: flex;
-		gap: 16px;
+		gap: 6px;
 		margin-top: 10px;
 	}
 
-	.check-option {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 12px;
-		color: #71717a;
+	.vis-toggle {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #52525b;
+		padding: 5px 10px;
+		border-radius: 8px;
+		font-size: 11px;
+		font-weight: 500;
 		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		transition: all 0.15s;
 	}
 
-	.check-option input[type="checkbox"] {
-		accent-color: #818cf8;
+	.vis-toggle:hover {
+		background: rgba(255, 255, 255, 0.06);
+		color: #71717a;
+	}
+
+	.vis-toggle.active {
+		background: rgba(239, 68, 68, 0.1);
+		color: #f87171;
+		border-color: rgba(239, 68, 68, 0.25);
 	}
 
 	.marker-section {

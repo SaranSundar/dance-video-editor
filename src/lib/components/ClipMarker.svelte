@@ -36,6 +36,7 @@
 	const styles = ['', 'sensual', 'moderna', 'dominicana', 'fusion'];
 	let tags = $state<string[]>([]);
 	let saving = $state(false);
+	let saved = $state(false);
 	let error = $state('');
 
 	let moveOptions = $derived(getMovesForDance(videoDance));
@@ -100,6 +101,8 @@
 			tags = [];
 			inPoint = null;
 			outPoint = null;
+			saved = true;
+			setTimeout(() => { saved = false; }, 2000);
 			onClipSaved?.();
 		} catch (e) {
 			error = `Failed to save clip: ${e}`;
@@ -192,9 +195,11 @@
 			<p class="error">{error}</p>
 		{/if}
 
-		<button class="save-btn" onclick={saveClip} disabled={saving || !hasRange}>
+		<button class="save-btn" class:saved onclick={saveClip} disabled={saving || !hasRange}>
 			{#if saving}
 				Saving...
+			{:else if saved}
+				Saved!
 			{:else}
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -429,6 +434,11 @@
 	.save-btn:disabled {
 		opacity: 0.4;
 		cursor: not-allowed;
+	}
+
+	.save-btn.saved {
+		background: #22c55e;
+		opacity: 1;
 	}
 
 	.spinner {

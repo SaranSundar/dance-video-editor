@@ -1,5 +1,5 @@
 const CACHE = 'clipit-v3';
-const SHELL = ['/'];
+const SHELL = ['/', '/opfs-worker.js', '/manifest.json'];
 
 self.addEventListener('install', (e) => {
 	e.waitUntil(
@@ -24,15 +24,16 @@ self.addEventListener('fetch', (e) => {
 	if (url.protocol === 'blob:' || url.protocol === 'data:') return;
 
 	// Navigation: network-first, fall back to cached shell
+	// All routes serve the same SPA shell, so always cache as '/'
 	if (e.request.mode === 'navigate') {
 		e.respondWith(
 			fetch(e.request)
 				.then((res) => {
 					const clone = res.clone();
-					caches.open(CACHE).then((cache) => cache.put(e.request, clone));
+					caches.open(CACHE).then((cache) => cache.put('/', clone));
 					return res;
 				})
-				.catch(() => caches.match(e.request).then((r) => r || caches.match('/')))
+				.catch(() => caches.match('/'))
 		);
 		return;
 	}
