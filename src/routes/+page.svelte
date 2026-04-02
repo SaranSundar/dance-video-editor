@@ -126,6 +126,30 @@
 		return sortItems(result, sortBy);
 	});
 
+	const coupleProfiles = [
+		{ lead: 'Anthony', follow: 'Katie', img: '/couples/anthony-katie.jpg', label: 'Anthony & Katie' },
+		{ lead: 'Cornel', follow: 'Rithika', img: '/couples/cornel-rithika.jpg', label: 'Cornel & Rithika' },
+		{ lead: 'Emilien', follow: 'Tehina', img: '/couples/emilien-tehina.jpg', label: 'Emilien & Tehina' },
+		{ lead: 'Gero', follow: 'Migle', img: '/couples/gero-migle.jpg', label: 'Gero & Migle' },
+		{ lead: 'Irakli', follow: 'Maria', img: '/couples/irakli-maria.jpg', label: 'Irakli & Maria' },
+		{ lead: 'Luis', follow: 'Andrea', img: '/couples/luis-andrea.jpg', label: 'Luis & Andrea' },
+		{ lead: 'Marcus', follow: 'Bianca', img: '/couples/marcus-bianca.jpg', label: 'Marcus & Bianca' },
+		{ lead: 'Melvin', follow: 'Gatica', img: '/couples/melvin-gatica.jpg', label: 'Melvin & Gatica' },
+		{ lead: 'Miguel', follow: 'Sunsire', img: '/couples/miguel-sunsire.jpg', label: 'Miguel & Sunsire' },
+		{ lead: 'Ofir', follow: 'Ofri', img: '/couples/ofir-ofri.jpg', label: 'Ofir & Ofri' },
+		{ lead: 'Favian', follow: '', img: '/couples/favian.jpg', label: 'Favian' },
+	];
+
+	function selectCouple(lead: string, follow: string) {
+		if (filterLead === lead && filterFollow === follow) {
+			filterLead = '';
+			filterFollow = '';
+		} else {
+			filterLead = lead;
+			filterFollow = follow;
+		}
+	}
+
 	function clearFilters() {
 		searchQuery = '';
 		filterDance = '';
@@ -557,17 +581,21 @@
 					<button class="clear-filters-btn" onclick={clearFilters}>Clear</button>
 				{/if}
 			</div>
+			<div class="stories-row">
+				{#each coupleProfiles as profile}
+					<button
+						class="story-item"
+						class:active={filterLead === profile.lead && filterFollow === profile.follow}
+						onclick={() => selectCouple(profile.lead, profile.follow)}
+					>
+						<div class="story-ring">
+							<img src={profile.img} alt={profile.label} class="story-avatar" />
+						</div>
+						<span class="story-label">{profile.label}</span>
+					</button>
+				{/each}
+			</div>
 			<div class="filter-row">
-				<Dropdown
-					bind:value={filterLead}
-					options={allFilterLeads().map(l => ({ value: l, label: l }))}
-					placeholder="All leads"
-				/>
-				<Dropdown
-					bind:value={filterFollow}
-					options={allFilterFollows().map(f => ({ value: f, label: f }))}
-					placeholder="All follows"
-				/>
 				<Dropdown
 					bind:value={filterDance}
 					options={[{ value: 'bachata', label: 'Bachata' }, { value: 'salsa', label: 'Salsa' }]}
@@ -1504,5 +1532,79 @@
 		.video-grid {
 			grid-template-columns: 1fr;
 		}
+	}
+
+	.stories-row {
+		display: flex;
+		gap: 14px;
+		overflow-x: auto;
+		padding: 4px 2px 8px;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.stories-row::-webkit-scrollbar {
+		display: none;
+	}
+
+	.story-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		flex-shrink: 0;
+		font-family: 'Inter', sans-serif;
+	}
+
+	.story-ring {
+		width: 66px;
+		height: 66px;
+		border-radius: 50%;
+		padding: 3px;
+		background: rgba(255, 255, 255, 0.08);
+		transition: background 0.2s;
+	}
+
+	.story-item.active .story-ring {
+		background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+	}
+
+	.story-item:hover:not(.active) .story-ring {
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	.story-avatar {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 2.5px solid #09090b;
+		display: block;
+	}
+
+	.story-label {
+		font-size: 10px;
+		color: #71717a;
+		text-align: center;
+		max-width: 72px;
+		line-height: 1.3;
+		transition: color 0.2s;
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		word-break: break-word;
+	}
+
+	.story-item.active .story-label {
+		color: #e4e4e7;
+	}
+
+	.story-item:hover .story-label {
+		color: #a1a1aa;
 	}
 </style>
