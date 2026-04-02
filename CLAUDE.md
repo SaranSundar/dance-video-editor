@@ -160,18 +160,17 @@ npm run dev -- --host --port 5180
 
 ## Deploying to Vercel
 
-Uses the Vercel CLI. The project is linked to `saransundars-projects/video-editor` on Vercel with alias `dance-video-editor.vercel.app`.
+Deployments are triggered automatically by pushing to GitHub. Vercel is connected to `SaranSundar/dance-video-editor` and deploys `main` to production.
 
 ```bash
-# Login (first time only - opens browser)
-vercel login
-
-# Always build first, then deploy
-npm run build && vercel --prod
+# Deploy to production
+git push origin main
 ```
 
+**GitHub repo:** https://github.com/SaranSundar/dance-video-editor
+**Live:** https://dance-video-editor.vercel.app
+
 **Important config:**
-- `.npmrc` has `registry=https://registry.npmjs.org/` - required because the default npm wrapper on this machine points to a private registry that Vercel can't access
 - `vercel.json` sets `outputDirectory: "build"` and SPA rewrites (excluding `_app/`)
 - `svelte.config.js` uses `@sveltejs/adapter-static` with `fallback: 'index.html'` for SPA routing
 
