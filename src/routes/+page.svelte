@@ -785,6 +785,11 @@
 							</svg>
 						</div>
 						<span class="vid-duration">{formatDuration(video.duration)}</span>
+						{#if store.isVideoLocal(video.id)}
+							<span class="vid-source local">Local</span>
+						{:else if video.cdnUrl}
+							<span class="vid-source stream">Stream</span>
+						{/if}
 					</div>
 					<div class="video-info">
 						{#if editingId === video.id}
@@ -1457,6 +1462,28 @@
 		font-family: 'Inter', monospace;
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;
+	}
+
+	.vid-source {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		font-size: 10px;
+		font-weight: 600;
+		padding: 2px 7px;
+		border-radius: 4px;
+		font-family: 'Inter', sans-serif;
+		letter-spacing: 0.03em;
+	}
+
+	.vid-source.local {
+		background: rgba(99, 102, 241, 0.85);
+		color: #fff;
+	}
+
+	.vid-source.stream {
+		background: rgba(52, 211, 153, 0.85);
+		color: #fff;
 	}
 
 	.video-info {

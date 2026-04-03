@@ -13,6 +13,7 @@ let folderName = $state<string | null>(null);
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
 let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') ?? '') : '');
+let localVideoIds = $state<Set<string>>(new Set());
 
 function hasFileSystemAccess(): boolean {
 	return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
@@ -29,6 +30,7 @@ export function getFolderName() { return folderName; }
 export function getVideos() { return videos; }
 export function getClips() { return clips; }
 export function getCdnBaseUrl() { return cdnBaseUrl; }
+export function isVideoLocal(videoId: string) { return localVideoIds.has(videoId); }
 export function setCdnBaseUrl(url: string) {
 	cdnBaseUrl = url.trim();
 	localStorage.setItem('bunny_cdn_base_url', cdnBaseUrl);
@@ -40,14 +42,39 @@ export function getCdnUrlForVideo(videoId: string): string | null {
 	return null;
 }
 
+async function seedDefaultMetadata() {
+	if (videos.length > 0) return;
+	try {
+		const res = await fetch('/default-metadata.json');
+		if (!res.ok) return;
+		const json = await res.text();
+		await storage().importMetadata(json);
+		await refresh();
+	} catch { /* ignore */ }
+}
+
+async function checkLocalAvailability() {
+	const ids = new Set<string>();
+	await Promise.allSettled(
+		videos.map(async v => {
+			try {
+				await storage().getVideoBlob(v.id);
+				ids.add(v.id);
+			} catch { /* not local */ }
+		})
+	);
+	localVideoIds = ids;
+}
+
 export async function init() {
 	state = 'loading';
 
 	if (!hasFileSystemAccess()) {
-		// Use IndexedDB fallback - skip folder picker entirely
 		storageType = 'indexeddb';
 		await refresh();
+		await seedDefaultMetadata();
 		state = 'ready';
+		checkLocalAvailability();
 		return;
 	}
 
@@ -57,7 +84,9 @@ export async function init() {
 	if (restored) {
 		folderName = fsStorage.getFolderName();
 		await refresh();
+		await seedDefaultMetadata();
 		state = 'ready';
+		checkLocalAvailability();
 		return;
 	}
 
@@ -74,9 +103,10 @@ export async function grantPermission() {
 	if (granted) {
 		folderName = fsStorage.getFolderName();
 		await refresh();
+		await seedDefaultMetadata();
 		state = 'ready';
+		checkLocalAvailability();
 	} else {
-		// Permission granted but folder is gone
 		state = 'no-folder';
 	}
 }
@@ -85,7 +115,9 @@ export async function pickFolder() {
 	await fsStorage.pickFolder();
 	folderName = fsStorage.getFolderName();
 	await refresh();
+	await seedDefaultMetadata();
 	state = 'ready';
+	checkLocalAvailability();
 }
 
 function stripExt(name: string): string {
