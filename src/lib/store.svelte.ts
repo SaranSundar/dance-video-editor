@@ -21,9 +21,7 @@ function isAndroidMobile(): boolean {
 }
 
 function hasFileSystemAccess(): boolean {
-	// Android Chrome supports showDirectoryPicker but never persists permissions
-	// across page loads (queryPermission always returns 'prompt'). Use OPFS instead.
-	return typeof window !== 'undefined' && 'showDirectoryPicker' in window && !isAndroidMobile();
+	return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 }
 
 // Pick the right storage module based on detected type
@@ -98,7 +96,11 @@ export async function init() {
 	}
 
 	const hasHandle = await fsStorage.hasStoredHandle();
-	if (hasHandle) {
+	if (hasHandle && !isAndroidMobile()) {
+		// Desktop Chrome can restore permissions via requestPermission()
+		// Android Chrome cannot — permissions are always session-scoped, so
+		// requestPermission() on a stale handle always fails. Skip straight to
+		// folder re-picker to avoid a dead-end "Grant Access" screen.
 		state = 'need-permission';
 	} else {
 		state = 'no-folder';
