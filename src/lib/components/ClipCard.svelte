@@ -17,11 +17,13 @@
 	let thumbSrc = $state<string | null>(null);
 	let thumbVideoEl = $state<HTMLVideoElement | undefined>();
 	let videoUrl = $state<string | null>(null);
+	let prefetchedUrl = $state<{ url: string; revoke: () => void } | null>(null);
 	let showVideo = $state(false);
 	let looping = $state(true);
 	let playing = $state(false);
 	let videoEl: HTMLVideoElement | undefined = $state();
 	let downloading = $state(false);
+	let cardEl = $state<HTMLElement | undefined>();
 
 	function togglePlay(e: Event) {
 		e.preventDefault();
@@ -51,19 +53,35 @@
 	let editLabel = $state(clip.label);
 	let editTags = $state(clip.tags.join(', '));
 
-	// Get video URL for thumbnail — video element seeks to startTime without canvas/CORS issues
+	// Lazy-load thumbnail: only fetch video URL when card enters viewport
 	let thumbRevoke: (() => void) | null = null;
 	$effect(() => {
-		store.getVideoUrl(clip.videoId).then(({ url, revoke }) => {
-			thumbSrc = url;
-			thumbRevoke = revoke;
-		}).catch(() => {});
-
+		const el = cardEl;
+		if (!el) return;
+		const observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting) {
+				observer.disconnect();
+				store.getVideoUrl(clip.videoId).then(({ url, revoke }) => {
+					thumbSrc = url;
+					thumbRevoke = revoke;
+				}).catch(() => {});
+			}
+		}, { rootMargin: '200px' });
+		observer.observe(el);
 		return () => {
+			observer.disconnect();
 			thumbSrc = null;
 			if (thumbRevoke) { thumbRevoke(); thumbRevoke = null; }
 		};
 	});
+
+	// Prefetch play URL on hover so click feels instant
+	async function prefetchVideoUrl() {
+		if (prefetchedUrl || showVideo) return;
+		try {
+			prefetchedUrl = await store.getVideoUrl(clip.videoId);
+		} catch { /* ignore */ }
+	}
 
 	function formatTime(seconds: number): string {
 		const m = Math.floor(seconds / 60);
@@ -74,9 +92,13 @@
 	let revokeVideoUrl: (() => void) | null = null;
 
 	async function play() {
-		const { url, revoke } = await store.getVideoUrl(clip.videoId);
-		videoUrl = url;
-		revokeVideoUrl = revoke;
+		let resolved = prefetchedUrl;
+		prefetchedUrl = null; // claim it
+		if (!resolved) {
+			resolved = await store.getVideoUrl(clip.videoId);
+		}
+		videoUrl = resolved.url;
+		revokeVideoUrl = resolved.revoke;
 		showVideo = true;
 	}
 
@@ -109,6 +131,7 @@
 		showVideo = false;
 		playing = false;
 		if (revokeVideoUrl) { revokeVideoUrl(); revokeVideoUrl = null; }
+		if (prefetchedUrl) { prefetchedUrl.revoke(); prefetchedUrl = null; }
 		videoUrl = null;
 	}
 
@@ -142,7 +165,7 @@
 	}
 </script>
 
-<a href="/clips/{clip.id}" class="clip-card">
+<a href="/clips/{clip.id}" class="clip-card" bind:this={cardEl} onmouseenter={prefetchVideoUrl}>
 	{#if showVideo && videoUrl}
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->

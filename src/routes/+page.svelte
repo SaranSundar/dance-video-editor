@@ -5,6 +5,24 @@
 	import { computeFingerprint } from '$lib/fingerprint';
 	import { getMp4Duration, checkVideoCodec } from '$lib/mp4-duration';
 
+	// Svelte action: sets video/img src only when element enters viewport
+	function lazySrc(node: HTMLVideoElement | HTMLImageElement, src: string) {
+		let disconnected = false;
+		const observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting && !disconnected) {
+				node.src = src;
+				observer.disconnect();
+			}
+		}, { rootMargin: '300px' });
+		observer.observe(node);
+		return {
+			destroy() {
+				disconnected = true;
+				observer.disconnect();
+			}
+		};
+	}
+
 	let videos = $derived(store.getVideos());
 	let allClips = $derived(store.getClips());
 	let dragOver = $state(false);
@@ -781,7 +799,7 @@
 						{:else if store.getCdnUrlForVideo(video.id)}
 							<!-- svelte-ignore a11y_media_has_caption -->
 							<video
-								src="{store.getCdnUrlForVideo(video.id)}#t=1"
+								use:lazySrc={`${store.getCdnUrlForVideo(video.id)}#t=1`}
 								muted
 								preload="metadata"
 								playsinline
