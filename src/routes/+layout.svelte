@@ -198,35 +198,6 @@
 			<div class="gate">
 				<div class="gate-spinner"></div>
 			</div>
-		{:else if state === 'no-folder' && storageType === 'filesystem'}
-			<div class="gate">
-				<div class="gate-icon">
-					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-					</svg>
-				</div>
-				<h2>Choose a folder</h2>
-				<p>ClipIt stores your videos and clips as real files on your device. Pick a folder to get started.</p>
-				<button class="gate-btn" onclick={() => store.pickFolder()}>
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-					</svg>
-					Select Folder
-				</button>
-			</div>
-		{:else if state === 'need-permission' && storageType === 'filesystem'}
-			<div class="gate">
-				<div class="gate-icon">
-					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-						<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-						<path d="M7 11V7a5 5 0 0 1 10 0v4" />
-					</svg>
-				</div>
-				<h2>Permission needed</h2>
-				<p>ClipIt needs access to your folder to read and save files. Click below to grant permission.</p>
-				<button class="gate-btn" onclick={() => store.grantPermission()}>Grant Access</button>
-				<button class="gate-btn-secondary" onclick={() => store.pickFolder()}>Choose Different Folder</button>
-			</div>
 		{:else}
 			{@render children()}
 		{/if}
