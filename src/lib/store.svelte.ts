@@ -100,14 +100,20 @@ export async function init() {
 }
 
 export async function grantPermission() {
-	const granted = await fsStorage.requestPermission();
-	if (granted) {
-		folderName = fsStorage.getFolderName();
-		await refresh();
-		await seedDefaultMetadata();
-		state = 'ready';
-		checkLocalAvailability();
-	} else {
+	try {
+		const granted = await fsStorage.requestPermission();
+		if (granted) {
+			folderName = fsStorage.getFolderName();
+			await refresh();
+			await seedDefaultMetadata();
+			state = 'ready';
+			checkLocalAvailability();
+		} else {
+			// requestPermission returned false (e.g. Android stale handle) — re-pick
+			state = 'no-folder';
+		}
+	} catch {
+		// handle.requestPermission() can throw on Android Chrome with stale handles
 		state = 'no-folder';
 	}
 }

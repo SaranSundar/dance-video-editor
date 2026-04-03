@@ -101,15 +101,17 @@ export async function requestPermission(): Promise<boolean> {
 	const handle = await loadHandle();
 	if (!handle) return false;
 
-	const perm = await handle.requestPermission({ mode: 'readwrite' });
-	if (perm === 'granted') {
-		if (await verifyFolder(handle)) {
+	try {
+		const perm = await handle.requestPermission({ mode: 'readwrite' });
+		if (perm === 'granted') {
 			dirHandle = handle;
 			return true;
 		}
 		return false;
+	} catch {
+		// requestPermission can throw on Android Chrome with stale/invalid handles
+		return false;
 	}
-	return false;
 }
 
 async function verifyFolder(handle: FileSystemDirectoryHandle): Promise<boolean> {
