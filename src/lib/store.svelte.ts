@@ -16,8 +16,14 @@ const DEFAULT_CDN_BASE_URL = 'https://dance-videos.b-cdn.net';
 let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') || DEFAULT_CDN_BASE_URL) : DEFAULT_CDN_BASE_URL);
 let localVideoIds = $state<Set<string>>(new Set());
 
+function isAndroidMobile(): boolean {
+	return typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+}
+
 function hasFileSystemAccess(): boolean {
-	return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
+	// Android Chrome supports showDirectoryPicker but never persists permissions
+	// across page loads (queryPermission always returns 'prompt'). Use OPFS instead.
+	return typeof window !== 'undefined' && 'showDirectoryPicker' in window && !isAndroidMobile();
 }
 
 // Pick the right storage module based on detected type
