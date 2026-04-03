@@ -119,22 +119,21 @@ export async function init() {
 		return;
 	}
 
-	const hasHandle = await fsStorage.hasStoredHandle();
-	if (hasHandle && !isAndroidMobile()) {
-		// Desktop Chrome can restore permissions via requestPermission()
-		// Android Chrome cannot — permissions are always session-scoped, so
-		// requestPermission() on a stale handle always fails. Skip straight to
-		// folder re-picker to avoid a dead-end "Grant Access" screen.
-		state = 'need-permission';
-	} else {
-		state = 'no-folder';
-	}
+	// No folder available — fall back to OPFS so CDN content loads immediately
+	// without blocking on folder selection. storageType switches to 'filesystem'
+	// when the user picks a folder (e.g. on first video upload).
+	storageType = 'indexeddb';
+	await refresh();
+	await seedDefaultMetadata();
+	state = 'ready';
+	checkLocalAvailability();
 }
 
 export async function grantPermission() {
 	try {
 		const granted = await fsStorage.requestPermission();
 		if (granted) {
+			storageType = 'filesystem';
 			folderName = fsStorage.getFolderName();
 			await refresh();
 			await seedDefaultMetadata();
@@ -152,6 +151,7 @@ export async function grantPermission() {
 
 export async function pickFolder() {
 	await fsStorage.pickFolder();
+	storageType = 'filesystem';
 	folderName = fsStorage.getFolderName();
 	await refresh();
 	await seedDefaultMetadata();
