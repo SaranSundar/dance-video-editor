@@ -507,6 +507,7 @@ export async function importMetadata(json: string): Promise<void> {
 			matchByFp.lead = importedVideo.lead;
 			matchByFp.follow = importedVideo.follow;
 			matchByFp.dance = importedVideo.dance;
+			if (importedVideo.cdnUrl) matchByFp.cdnUrl = importedVideo.cdnUrl;
 		} else if (matchById) {
 			// Update existing entry matched by id
 			matchById.name = importedVideo.name;
@@ -515,6 +516,7 @@ export async function importMetadata(json: string): Promise<void> {
 			matchById.lead = importedVideo.lead;
 			matchById.follow = importedVideo.follow;
 			matchById.dance = importedVideo.dance;
+			if (importedVideo.cdnUrl) matchById.cdnUrl = importedVideo.cdnUrl;
 		} else {
 			// Create placeholder
 			meta.videos.push({

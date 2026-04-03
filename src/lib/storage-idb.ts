@@ -407,6 +407,7 @@ export async function importMetadata(json: string): Promise<void> {
 			matchByFp.lead = importedVideo.lead;
 			matchByFp.follow = importedVideo.follow;
 			matchByFp.dance = importedVideo.dance;
+			if (importedVideo.cdnUrl) matchByFp.cdnUrl = importedVideo.cdnUrl;
 		} else if (matchById) {
 			matchById.name = importedVideo.name;
 			matchById.fingerprint = fp;
@@ -414,6 +415,7 @@ export async function importMetadata(json: string): Promise<void> {
 			matchById.lead = importedVideo.lead;
 			matchById.follow = importedVideo.follow;
 			matchById.dance = importedVideo.dance;
+			if (importedVideo.cdnUrl) matchById.cdnUrl = importedVideo.cdnUrl;
 		} else {
 			meta.videos.push({
 				id: importedVideo.id,

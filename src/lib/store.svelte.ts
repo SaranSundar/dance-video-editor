@@ -48,13 +48,37 @@ export function getCdnUrlForVideo(videoId: string): string | null {
 }
 
 async function seedDefaultMetadata() {
-	if (videos.length > 0) return;
 	try {
 		const res = await fetch('/default-metadata.json');
 		if (!res.ok) return;
-		const json = await res.text();
-		await storage().importMetadata(json);
-		await refresh();
+		const defaultData = await res.json();
+
+		if (videos.length === 0) {
+			// First launch: seed everything
+			await storage().importMetadata(JSON.stringify(defaultData));
+			await refresh();
+			return;
+		}
+
+		// Already have data: only backfill missing cdnUrls (don't overwrite user data)
+		const missing = videos.filter(v => !v.cdnUrl);
+		if (missing.length === 0) return;
+
+		const defaultById = new Map<string, string>(
+			defaultData.videos
+				.filter((v: { id: string; cdnUrl?: string }) => v.cdnUrl)
+				.map((v: { id: string; cdnUrl: string }) => [v.id, v.cdnUrl])
+		);
+
+		let updated = false;
+		for (const v of missing) {
+			const cdnUrl = defaultById.get(v.id);
+			if (cdnUrl) {
+				await storage().updateVideo(v.id, { cdnUrl });
+				updated = true;
+			}
+		}
+		if (updated) await refresh();
 	} catch { /* ignore */ }
 }
 
