@@ -246,18 +246,6 @@
       "hiddenFromSearch": false,
       "addedAt": "2026-03-18T18:53:35.553Z",
       "cdnUrl": "https://dance-videos.b-cdn.net/8ad86c64-6d31-4697-89d4-8862eaadf15b.mp4"
-    },
-    {
-      "id": "6bdf3a76-5900-4f41-b91b-29c5b37bfe22",
-      "name": "anthony and katie - madrid shadow",
-      "fingerprint": "",
-      "duration": 43.537144,
-      "lead": "Anthony",
-      "follow": "Katie",
-      "dance": "bachata",
-      "hidden": false,
-      "hiddenFromSearch": false,
-      "addedAt": "2026-03-18T19:03:58.307Z"
     }
   ],
   "clips": [
@@ -518,26 +506,6 @@
       "endTime": 78.787326,
       "tags": [],
       "createdAt": "2026-03-18T18:56:39.201Z",
-      "parentClipId": null,
-      "links": [],
-      "hidden": false,
-      "hiddenFromSearch": false
-    },
-    {
-      "id": "55991d01-b952-4c11-b5d3-02bbee7fb1c7",
-      "videoId": "6bdf3a76-5900-4f41-b91b-29c5b37bfe22",
-      "videoName": "anthony and katie - madrid shadow",
-      "label": "madrid to cuddle to shadow",
-      "lead": "Anthony",
-      "follow": "Katie",
-      "dance": "bachata",
-      "style": "moderna",
-      "mastery": "seen",
-      "clipType": "pattern",
-      "startTime": 10.692953,
-      "endTime": 32.864962,
-      "tags": [],
-      "createdAt": "2026-03-18T19:05:02.755Z",
       "parentClipId": null,
       "links": [],
       "hidden": false,
