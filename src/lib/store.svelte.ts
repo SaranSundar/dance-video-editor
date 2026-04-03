@@ -12,7 +12,8 @@ let state = $state<StorageState>('loading');
 let folderName = $state<string | null>(null);
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
-let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') ?? '') : '');
+const DEFAULT_CDN_BASE_URL = 'https://dance-videos.b-cdn.net';
+let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') || DEFAULT_CDN_BASE_URL) : DEFAULT_CDN_BASE_URL);
 let localVideoIds = $state<Set<string>>(new Set());
 
 function hasFileSystemAccess(): boolean {
