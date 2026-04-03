@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.css';
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
@@ -10,6 +11,13 @@
 	let folderName = $derived(store.getFolderName());
 	let storageType = $derived(store.getStorageType());
 	let isPwa = $state(false);
+	let showCdnSettings = $state(false);
+	let cdnBaseUrlInput = $state(store.getCdnBaseUrl());
+
+	function saveCdnBaseUrl() {
+		store.setCdnBaseUrl(cdnBaseUrlInput);
+		showCdnSettings = false;
+	}
 	let exporting = $state(false);
 	let importing = $state(false);
 	let progressPct = $state(0);
@@ -183,9 +191,31 @@
 						Browser storage
 					</span>
 				{/if}
+				<button class="nav-action-btn cdn-btn" class:cdn-active={store.getCdnBaseUrl()} onclick={() => { cdnBaseUrlInput = store.getCdnBaseUrl(); showCdnSettings = !showCdnSettings; }} title="Bunny CDN settings">
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+						<path d="M12 12v9"/><path d="m8 17 4 4 4-4"/>
+					</svg>
+					CDN
+				</button>
 			{/if}
 		</div>
 	</nav>
+	{#if showCdnSettings}
+		<div class="cdn-settings-bar">
+			<label class="cdn-label">Bunny CDN base URL</label>
+			<input
+				type="text"
+				class="cdn-input"
+				placeholder="https://yourzone.b-cdn.net"
+				bind:value={cdnBaseUrlInput}
+				onkeydown={(e) => { if (e.key === 'Enter') saveCdnBaseUrl(); if (e.key === 'Escape') showCdnSettings = false; }}
+			/>
+			<button class="cdn-save-btn" onclick={saveCdnBaseUrl}>Save</button>
+			<button class="cdn-cancel-btn" onclick={() => showCdnSettings = false}>Cancel</button>
+			<span class="cdn-hint">Videos stream from <code>{cdnBaseUrlInput || 'yourzone.b-cdn.net'}/{'{videoId}'}.mp4</code> when not available locally</span>
+		</div>
+	{/if}
 	{#if exporting || importing}
 		<div class="progress-bar-container">
 			<div class="progress-bar" style="width: {progressPct}%"></div>
@@ -609,5 +639,81 @@
 		main {
 			padding: 20px 16px;
 		}
+	}
+
+	.cdn-btn {
+		color: #52525b;
+	}
+
+	.cdn-btn.cdn-active {
+		color: #34d399;
+	}
+
+	.cdn-settings-bar {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 24px;
+		background: #111113;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		flex-wrap: wrap;
+	}
+
+	.cdn-label {
+		font-size: 12px;
+		color: #71717a;
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	.cdn-input {
+		flex: 1;
+		min-width: 240px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+		padding: 6px 10px;
+		border-radius: 6px;
+		font-size: 12px;
+		font-family: 'Inter', sans-serif;
+		outline: none;
+	}
+
+	.cdn-input:focus {
+		border-color: rgba(52, 211, 153, 0.4);
+	}
+
+	.cdn-save-btn {
+		background: rgba(52, 211, 153, 0.12);
+		color: #34d399;
+		border: 1px solid rgba(52, 211, 153, 0.2);
+		padding: 6px 14px;
+		border-radius: 6px;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+	}
+
+	.cdn-cancel-btn {
+		background: none;
+		color: #52525b;
+		border: none;
+		padding: 6px 10px;
+		border-radius: 6px;
+		font-size: 12px;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+	}
+
+	.cdn-hint {
+		font-size: 11px;
+		color: #3f3f46;
+		width: 100%;
+	}
+
+	.cdn-hint code {
+		color: #52525b;
+		font-family: 'SF Mono', monospace;
 	}
 </style>

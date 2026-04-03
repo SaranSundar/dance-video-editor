@@ -62,6 +62,7 @@
 	}
 
 	let videoSrc = $state<string | null>(null);
+	let videoSource = $state<'local' | 'cdn' | null>(null);
 	let videoLoadError = $state('');
 	let currentTime = $state(0);
 	let duration = $state(0);
@@ -69,6 +70,23 @@
 	let outPoint = $state<number | null>(null);
 	let revokeUrl: (() => void) | null = null;
 	let loadingVideoId = '';
+
+	let effectiveCdnUrl = $derived(store.getCdnUrlForVideo(videoId));
+	let editCdnUrl = $state('');
+	let cdnUrlInitialized = $state(false);
+
+	$effect(() => {
+		if (videoMeta && !cdnUrlInitialized) {
+			editCdnUrl = videoMeta.cdnUrl ?? '';
+			cdnUrlInitialized = true;
+		}
+	});
+
+	async function saveCdnUrl() {
+		await store.updateVideo(videoId, { cdnUrl: editCdnUrl.trim() });
+		// Reload video with new URL
+		loadingVideoId = '';
+	}
 
 	$effect(() => {
 		const id = videoId;
@@ -87,9 +105,10 @@
 		if (loadingVideoId === id) return;
 		loadingVideoId = id;
 
-		store.getVideoUrl(id).then(({ url, revoke }) => {
+		store.getVideoUrl(id).then(({ url, revoke, source }) => {
 			if (revokeUrl) revokeUrl();
 			videoSrc = url;
+			videoSource = source;
 			revokeUrl = revoke;
 		}).catch((err) => {
 			videoLoadError = String(err);
@@ -133,6 +152,34 @@
 				<div class="visibility-options">
 					<button class="vis-toggle" class:active={videoMeta.hidden} onclick={() => store.updateVideo(videoId, { hidden: !videoMeta.hidden })}>Hide from home</button>
 					<button class="vis-toggle" class:active={videoMeta.hiddenFromSearch} onclick={() => store.updateVideo(videoId, { hiddenFromSearch: !videoMeta.hiddenFromSearch })}>Hide from search</button>
+				</div>
+				<div class="cdn-section">
+					<div class="cdn-status">
+						{#if videoSource === 'local'}
+							<span class="cdn-badge local">Local file</span>
+						{:else if videoSource === 'cdn'}
+							<span class="cdn-badge cdn">Streaming CDN</span>
+						{:else if effectiveCdnUrl}
+							<span class="cdn-badge cdn">CDN ready</span>
+						{:else}
+							<span class="cdn-badge none">No CDN</span>
+						{/if}
+					</div>
+					<div class="cdn-url-row">
+						<input
+							type="text"
+							class="cdn-url-input"
+							placeholder={effectiveCdnUrl ?? 'Paste Bunny CDN URL override...'}
+							bind:value={editCdnUrl}
+							onkeydown={(e) => { if (e.key === 'Enter') saveCdnUrl(); }}
+						/>
+						{#if editCdnUrl !== (videoMeta.cdnUrl ?? '')}
+							<button class="cdn-url-save" onclick={saveCdnUrl}>Save</button>
+						{/if}
+					</div>
+					{#if effectiveCdnUrl && !videoMeta.cdnUrl}
+						<p class="cdn-auto-hint">Auto URL: <code>{effectiveCdnUrl}</code></p>
+					{/if}
 				</div>
 			</div>
 
@@ -377,5 +424,90 @@
 
 	@keyframes spin {
 		to { transform: rotate(360deg); }
+	}
+
+	.cdn-section {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding-top: 10px;
+		border-top: 1px solid rgba(255, 255, 255, 0.04);
+	}
+
+	.cdn-status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.cdn-badge {
+		font-size: 11px;
+		font-weight: 500;
+		padding: 3px 8px;
+		border-radius: 10px;
+	}
+
+	.cdn-badge.local {
+		background: rgba(99, 102, 241, 0.1);
+		color: #818cf8;
+		border: 1px solid rgba(99, 102, 241, 0.2);
+	}
+
+	.cdn-badge.cdn {
+		background: rgba(52, 211, 153, 0.1);
+		color: #34d399;
+		border: 1px solid rgba(52, 211, 153, 0.2);
+	}
+
+	.cdn-badge.none {
+		background: rgba(255, 255, 255, 0.03);
+		color: #52525b;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.cdn-url-row {
+		display: flex;
+		gap: 6px;
+	}
+
+	.cdn-url-input {
+		flex: 1;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #a1a1aa;
+		padding: 6px 10px;
+		border-radius: 6px;
+		font-size: 11px;
+		font-family: 'SF Mono', monospace;
+		outline: none;
+	}
+
+	.cdn-url-input:focus {
+		border-color: rgba(52, 211, 153, 0.3);
+		color: #e4e4e7;
+	}
+
+	.cdn-url-save {
+		background: rgba(52, 211, 153, 0.1);
+		color: #34d399;
+		border: 1px solid rgba(52, 211, 153, 0.2);
+		padding: 6px 12px;
+		border-radius: 6px;
+		font-size: 11px;
+		font-weight: 500;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		white-space: nowrap;
+	}
+
+	.cdn-auto-hint {
+		font-size: 10px;
+		color: #3f3f46;
+		margin: 0;
+	}
+
+	.cdn-auto-hint code {
+		color: #52525b;
+		font-family: 'SF Mono', monospace;
 	}
 </style>

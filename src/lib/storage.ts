@@ -13,6 +13,7 @@ interface VideoMeta {
 	hidden: boolean;
 	hiddenFromSearch: boolean;
 	addedAt: string;
+	cdnUrl?: string;
 }
 
 interface ClipMeta {
@@ -292,7 +293,7 @@ export async function deleteVideo(videoId: string): Promise<void> {
 	await saveMetadata(meta);
 }
 
-export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean }): Promise<void> {
+export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string }): Promise<void> {
 	const meta = await readMetadata();
 	const video = meta.videos.find(v => v.id === videoId);
 	if (!video) return;
@@ -302,6 +303,7 @@ export async function updateVideo(videoId: string, updates: { name?: string; lea
 	if (updates.dance !== undefined) video.dance = updates.dance;
 	if (updates.hidden !== undefined) video.hidden = updates.hidden;
 	if (updates.hiddenFromSearch !== undefined) video.hiddenFromSearch = updates.hiddenFromSearch;
+	if (updates.cdnUrl !== undefined) video.cdnUrl = updates.cdnUrl || undefined;
 	// Also update videoName on clips if name changed
 	if (updates.name !== undefined) {
 		for (const clip of meta.clips) {

@@ -232,7 +232,7 @@ export async function deleteVideo(videoId: string): Promise<void> {
 
 export async function updateVideo(
 	videoId: string,
-	updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean }
+	updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string }
 ): Promise<void> {
 	const meta = await readMetadata();
 	const video = meta.videos.find(v => v.id === videoId);
@@ -243,6 +243,7 @@ export async function updateVideo(
 	if (updates.dance !== undefined) video.dance = updates.dance;
 	if (updates.hidden !== undefined) video.hidden = updates.hidden;
 	if (updates.hiddenFromSearch !== undefined) video.hiddenFromSearch = updates.hiddenFromSearch;
+	if (updates.cdnUrl !== undefined) video.cdnUrl = updates.cdnUrl || undefined;
 	if (updates.name !== undefined) {
 		for (const clip of meta.clips) {
 			if (clip.videoId === videoId) clip.videoName = updates.name;

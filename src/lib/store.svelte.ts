@@ -12,6 +12,7 @@ let state = $state<StorageState>('loading');
 let folderName = $state<string | null>(null);
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
+let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') ?? '') : '');
 
 function hasFileSystemAccess(): boolean {
 	return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
@@ -27,6 +28,17 @@ export function getState() { return state; }
 export function getFolderName() { return folderName; }
 export function getVideos() { return videos; }
 export function getClips() { return clips; }
+export function getCdnBaseUrl() { return cdnBaseUrl; }
+export function setCdnBaseUrl(url: string) {
+	cdnBaseUrl = url.trim();
+	localStorage.setItem('bunny_cdn_base_url', cdnBaseUrl);
+}
+export function getCdnUrlForVideo(videoId: string): string | null {
+	const video = videos.find(v => v.id === videoId);
+	if (video?.cdnUrl) return video.cdnUrl;
+	if (cdnBaseUrl) return `${cdnBaseUrl.replace(/\/$/, '')}/${videoId}.mp4`;
+	return null;
+}
 
 export async function init() {
 	state = 'loading';
@@ -98,7 +110,7 @@ export async function addVideo(file: File, duration: number, thumbnailBlob: Blob
 	return video;
 }
 
-export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean }) {
+export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string }) {
 	await storage().updateVideo(videoId, updates);
 	videos = videos.map(v => v.id === videoId ? { ...v, ...updates } : v);
 	if (updates.name !== undefined) {
@@ -126,10 +138,20 @@ export async function getVideoBlob(videoId: string) {
 	return storage().getVideoBlob(videoId);
 }
 
-export async function getVideoUrl(videoId: string): Promise<{ url: string; revoke: () => void }> {
-	const blob = await storage().getVideoBlob(videoId);
-	const url = URL.createObjectURL(blob);
-	return { url, revoke: () => URL.revokeObjectURL(url) };
+export async function getVideoUrl(videoId: string): Promise<{ url: string; revoke: () => void; source: 'local' | 'cdn' }> {
+	// Try local file first
+	try {
+		const blob = await storage().getVideoBlob(videoId);
+		const url = URL.createObjectURL(blob);
+		return { url, revoke: () => URL.revokeObjectURL(url), source: 'local' };
+	} catch {
+		// Fall back to CDN URL
+		const cdnUrl = getCdnUrlForVideo(videoId);
+		if (cdnUrl) {
+			return { url: cdnUrl, revoke: () => {}, source: 'cdn' };
+		}
+		throw new Error('Video not available locally or via CDN. Upload to Bunny or import the file.');
+	}
 }
 
 export async function addClip(
