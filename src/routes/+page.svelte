@@ -778,6 +778,15 @@
 					<div class="video-thumb">
 						{#if thumbnailUrls[video.id]}
 							<img src={thumbnailUrls[video.id]} alt={video.name} />
+						{:else if store.getCdnUrlForVideo(video.id)}
+							<!-- svelte-ignore a11y_media_has_caption -->
+							<video
+								src="{store.getCdnUrlForVideo(video.id)}#t=1"
+								muted
+								preload="metadata"
+								playsinline
+								class="video-thumb-vid"
+							></video>
 						{/if}
 						<div class="play-overlay">
 							<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
@@ -1416,16 +1425,19 @@
 		overflow: hidden;
 	}
 
-	.video-thumb img {
+	.video-thumb img,
+	.video-thumb-vid {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		transition: transform 0.3s;
+		pointer-events: none;
 	}
 
-	.video-card:hover .video-thumb img {
+	.video-card:hover .video-thumb img,
+	.video-card:hover .video-thumb-vid {
 		transform: scale(1.03);
 	}
 

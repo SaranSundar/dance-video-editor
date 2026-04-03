@@ -14,7 +14,8 @@
 	let subClipCount = $derived(store.getSubClips(clip.id).length);
 	let parentClip = $derived(clip.parentClipId ? store.getClips().find(c => c.id === clip.parentClipId) : null);
 
-	let thumbnailUrl = $state<string | null>(null);
+	let thumbSrc = $state<string | null>(null);
+	let thumbVideoEl = $state<HTMLVideoElement | undefined>();
 	let videoUrl = $state<string | null>(null);
 	let showVideo = $state(false);
 	let looping = $state(true);
@@ -50,45 +51,17 @@
 	let editLabel = $state(clip.label);
 	let editTags = $state(clip.tags.join(', '));
 
-	// Generate thumbnail by seeking a hidden video to startTime
+	// Get video URL for thumbnail — video element seeks to startTime without canvas/CORS issues
+	let thumbRevoke: (() => void) | null = null;
 	$effect(() => {
-		let cancelled = false;
-		let thumbUrl: string | null = null;
-		let revokeVideoSrc: (() => void) | null = null;
-
-		store.getVideoUrl(clip.videoId).then(({ url: videoSrcUrl, revoke }) => {
-			if (cancelled) { revoke(); return; }
-			revokeVideoSrc = revoke;
-			const video = document.createElement('video');
-			video.muted = true;
-			video.preload = 'metadata';
-			video.onloadedmetadata = () => { video.currentTime = clip.startTime; };
-			video.onseeked = () => {
-				const canvas = document.createElement('canvas');
-				canvas.width = video.videoWidth;
-				canvas.height = video.videoHeight;
-				const ctx = canvas.getContext('2d');
-				if (ctx && !cancelled) {
-					ctx.drawImage(video, 0, 0);
-					canvas.toBlob((b) => {
-						revoke();
-						if (b && !cancelled) {
-							thumbUrl = URL.createObjectURL(b);
-							thumbnailUrl = thumbUrl;
-						}
-					}, 'image/jpeg', 0.8);
-				} else {
-					revoke();
-				}
-			};
-			video.onerror = () => revoke();
-			video.src = videoSrcUrl;
+		store.getVideoUrl(clip.videoId).then(({ url, revoke }) => {
+			thumbSrc = url;
+			thumbRevoke = revoke;
 		}).catch(() => {});
 
 		return () => {
-			cancelled = true;
-			if (thumbUrl) URL.revokeObjectURL(thumbUrl);
-			if (revokeVideoSrc) revokeVideoSrc();
+			thumbSrc = null;
+			if (thumbRevoke) { thumbRevoke(); thumbRevoke = null; }
 		};
 	});
 
@@ -212,8 +185,17 @@
 		</div>
 	{:else}
 		<button class="thumbnail" onclick={(e) => { e.preventDefault(); play(); }}>
-			{#if thumbnailUrl}
-				<img src={thumbnailUrl} alt={clip.label} />
+			{#if thumbSrc}
+				<!-- svelte-ignore a11y_media_has_caption -->
+				<video
+					bind:this={thumbVideoEl}
+					src={thumbSrc}
+					muted
+					preload="metadata"
+					playsinline
+					onloadedmetadata={() => { if (thumbVideoEl) thumbVideoEl.currentTime = clip.startTime; }}
+					class="thumb-video"
+				></video>
 			{:else}
 				<div class="no-thumb">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
@@ -305,14 +287,17 @@
 		overflow: hidden;
 	}
 
-	.thumbnail img {
+	.thumbnail img,
+	.thumb-video {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		transition: transform 0.3s;
+		pointer-events: none;
 	}
 
-	.thumbnail:hover img {
+	.thumbnail:hover img,
+	.thumbnail:hover .thumb-video {
 		transform: scale(1.03);
 	}
 
