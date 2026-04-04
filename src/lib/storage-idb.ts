@@ -425,6 +425,7 @@ export async function importMetadata(json: string): Promise<void> {
 				lead: importedVideo.lead,
 				follow: importedVideo.follow,
 				dance: importedVideo.dance,
+				cdnUrl: importedVideo.cdnUrl,
 				addedAt: importedVideo.addedAt
 			});
 		}
