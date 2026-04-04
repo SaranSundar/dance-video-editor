@@ -98,35 +98,32 @@ async function checkLocalAvailability() {
 export async function init() {
 	state = 'loading';
 
-	if (!hasFileSystemAccess()) {
+	try {
+		if (hasFileSystemAccess()) {
+			storageType = 'filesystem';
+			const restored = await fsStorage.tryRestoreHandle();
+			if (restored) {
+				folderName = fsStorage.getFolderName();
+				await refresh();
+				await seedDefaultMetadata();
+				state = 'ready';
+				checkLocalAvailability();
+				return;
+			}
+		}
+
+		// OPFS path: Safari/iOS/Firefox, or Chrome/Edge without a folder
 		storageType = 'indexeddb';
 		await refresh();
 		await seedDefaultMetadata();
-		state = 'ready';
-		checkLocalAvailability();
-		return;
-	}
-
-	storageType = 'filesystem';
-
-	const restored = await fsStorage.tryRestoreHandle();
-	if (restored) {
-		folderName = fsStorage.getFolderName();
-		await refresh();
+	} catch (e) {
+		console.error('Storage init failed:', e);
+		// Seed in-memory from defaults even if storage is broken
 		await seedDefaultMetadata();
+	} finally {
 		state = 'ready';
 		checkLocalAvailability();
-		return;
 	}
-
-	// No folder available — fall back to OPFS so CDN content loads immediately
-	// without blocking on folder selection. storageType switches to 'filesystem'
-	// when the user picks a folder (e.g. on first video upload).
-	storageType = 'indexeddb';
-	await refresh();
-	await seedDefaultMetadata();
-	state = 'ready';
-	checkLocalAvailability();
 }
 
 export async function grantPermission() {

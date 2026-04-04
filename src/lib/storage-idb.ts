@@ -40,8 +40,8 @@ async function ensureStructure(): Promise<void> {
 }
 
 async function readMetadata(): Promise<Metadata> {
-	const root = await getDir();
 	try {
+		const root = await getDir();
 		const fileHandle = await root.getFileHandle('metadata.json');
 		const file = await fileHandle.getFile();
 		const text = await file.text();
@@ -50,7 +50,8 @@ async function readMetadata(): Promise<Metadata> {
 		}
 		return JSON.parse(text);
 	} catch {
-		return { videos: [], clips: [] };
+		// Return in-memory cache if OPFS is unavailable, else empty
+		return metaCache ?? { videos: [], clips: [] };
 	}
 }
 
@@ -128,9 +129,14 @@ async function writeToPath(dirPath: string, name: string, data: string | Blob): 
 }
 
 async function saveMetadata(meta: Metadata): Promise<void> {
-	await writeToPath('', 'metadata.json', JSON.stringify(meta, null, 2));
+	// Update in-memory cache first so reads work even if OPFS write fails
 	metaCache = meta;
 	metaCacheTime = Date.now();
+	try {
+		await writeToPath('', 'metadata.json', JSON.stringify(meta, null, 2));
+	} catch (e) {
+		console.error('Failed to persist metadata to OPFS:', e);
+	}
 }
 
 // Videos
