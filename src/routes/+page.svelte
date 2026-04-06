@@ -801,7 +801,7 @@
 
 	{#if filteredVideos().length > 0}
 		<div class="video-grid">
-			{#each filteredVideos() as video}
+			{#each filteredVideos() as video (video.id)}
 				<a href="/videos/{video.id}" class="video-card">
 					<div class="video-thumb">
 						{#if thumbnailUrls[video.id]}
