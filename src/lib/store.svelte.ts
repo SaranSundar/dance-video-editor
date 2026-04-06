@@ -60,10 +60,7 @@ async function seedDefaultMetadata() {
 			return;
 		}
 
-		// Already have data: only backfill missing cdnUrls (don't overwrite user data)
-		const missing = videos.filter(v => !v.cdnUrl);
-		if (missing.length === 0) return;
-
+		// Sync cdnUrls from defaults (fixes stale/wrong values from older sessions)
 		const defaultById = new Map<string, string>(
 			defaultData.videos
 				.filter((v: { id: string; cdnUrl?: string }) => v.cdnUrl)
@@ -71,9 +68,9 @@ async function seedDefaultMetadata() {
 		);
 
 		let updated = false;
-		for (const v of missing) {
+		for (const v of videos) {
 			const cdnUrl = defaultById.get(v.id);
-			if (cdnUrl) {
+			if (cdnUrl && v.cdnUrl !== cdnUrl) {
 				await storage().updateVideo(v.id, { cdnUrl });
 				updated = true;
 			}
