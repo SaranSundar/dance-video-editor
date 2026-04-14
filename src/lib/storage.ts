@@ -37,12 +37,21 @@ interface ClipMeta {
 	createdAt: string;
 }
 
+interface PracticeMeta {
+	id: string;
+	name: string;
+	clipIds: string[];
+	loop: boolean;
+	createdAt: string;
+}
+
 interface Metadata {
 	videos: VideoMeta[];
 	clips: ClipMeta[];
+	practices?: PracticeMeta[];
 }
 
-export type { VideoMeta, ClipMeta, Metadata };
+export type { VideoMeta, ClipMeta, PracticeMeta, Metadata };
 
 let dirHandle: FileSystemDirectoryHandle | null = null;
 
@@ -448,6 +457,47 @@ export async function deleteClip(clipId: string): Promise<void> {
 	await saveMetadata(meta);
 }
 
+// Practices
+
+export async function getPractices(): Promise<PracticeMeta[]> {
+	const meta = await readMetadata();
+	return (meta.practices ?? []).map(p => ({ ...p }));
+}
+
+export async function addPractice(input: { name: string; clipIds: string[]; loop?: boolean }): Promise<PracticeMeta> {
+	const id = crypto.randomUUID();
+	const practice: PracticeMeta = {
+		id,
+		name: input.name,
+		clipIds: [...input.clipIds],
+		loop: input.loop ?? false,
+		createdAt: new Date().toISOString()
+	};
+	const meta = await readMetadata();
+	if (!meta.practices) meta.practices = [];
+	meta.practices.push(practice);
+	await saveMetadata(meta);
+	return practice;
+}
+
+export async function updatePractice(practiceId: string, updates: { name?: string; clipIds?: string[]; loop?: boolean }): Promise<void> {
+	const meta = await readMetadata();
+	if (!meta.practices) return;
+	const practice = meta.practices.find(p => p.id === practiceId);
+	if (!practice) return;
+	if (updates.name !== undefined) practice.name = updates.name;
+	if (updates.clipIds !== undefined) practice.clipIds = [...updates.clipIds];
+	if (updates.loop !== undefined) practice.loop = updates.loop;
+	await saveMetadata(meta);
+}
+
+export async function deletePractice(practiceId: string): Promise<void> {
+	const meta = await readMetadata();
+	if (!meta.practices) return;
+	meta.practices = meta.practices.filter(p => p.id !== practiceId);
+	await saveMetadata(meta);
+}
+
 export function isReady(): boolean {
 	return dirHandle !== null;
 }
@@ -540,6 +590,11 @@ export async function importMetadata(json: string): Promise<void> {
 			parentClipId: clip.parentClipId ?? null,
 			links: clip.links ?? []
 		});
+	}
+
+	// Import practices
+	if ((imported as any).practices) {
+		meta.practices = (imported as any).practices;
 	}
 
 	await saveMetadata(meta);

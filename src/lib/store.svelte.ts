@@ -1,8 +1,8 @@
 import * as fsStorage from './storage';
 import * as idbStorage from './storage-idb';
-import type { VideoMeta, ClipMeta } from './storage';
+import type { VideoMeta, ClipMeta, PracticeMeta } from './storage';
 
-export type { VideoMeta, ClipMeta };
+export type { VideoMeta, ClipMeta, PracticeMeta };
 
 type StorageType = 'filesystem' | 'indexeddb';
 type StorageState = 'loading' | 'no-folder' | 'need-permission' | 'ready';
@@ -12,6 +12,7 @@ let state = $state<StorageState>('loading');
 let folderName = $state<string | null>(null);
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
+let practices = $state<PracticeMeta[]>([]);
 const DEFAULT_CDN_BASE_URL = 'https://dance-videos.b-cdn.net';
 let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') || DEFAULT_CDN_BASE_URL) : DEFAULT_CDN_BASE_URL);
 let localVideoIds = $state<Set<string>>(new Set());
@@ -34,6 +35,7 @@ export function getState() { return state; }
 export function getFolderName() { return folderName; }
 export function getVideos() { return videos; }
 export function getClips() { return clips; }
+export function getPractices() { return practices; }
 export function getCdnBaseUrl() { return cdnBaseUrl; }
 export function isVideoLocal(videoId: string) { return localVideoIds.has(videoId); }
 export function setCdnBaseUrl(url: string) {
@@ -160,8 +162,10 @@ function stripExt(name: string): string {
 export async function refresh() {
 	const allVideos = await storage().getVideos();
 	const allClips = await storage().getClips();
+	const allPractices = await storage().getPractices();
 	videos = allVideos.map(v => ({ ...v, name: stripExt(v.name) }));
 	clips = allClips.filter(c => c.endTime > c.startTime).map(c => ({ ...c, videoName: stripExt(c.videoName) }));
+	practices = allPractices;
 }
 
 export async function addVideo(file: File, duration: number, thumbnailBlob: Blob | null, info: { lead: string; follow: string; dance: string } = { lead: '', follow: '', dance: '' }, fingerprint: string = '') {
@@ -276,4 +280,22 @@ export async function removeLink(clipId: string, targetId: string) {
 	// Refresh in-memory state
 	const allClips = await storage().getClips();
 	clips = allClips.filter(c => c.endTime > c.startTime);
+}
+
+// Practices
+
+export async function addPractice(input: { name: string; clipIds: string[]; loop?: boolean }) {
+	const practice = await storage().addPractice(input);
+	practices = [...practices, practice];
+	return practice;
+}
+
+export async function updatePractice(practiceId: string, updates: { name?: string; clipIds?: string[]; loop?: boolean }) {
+	await storage().updatePractice(practiceId, updates);
+	practices = practices.map(p => p.id === practiceId ? { ...p, ...updates } : p);
+}
+
+export async function deletePractice(practiceId: string) {
+	await storage().deletePractice(practiceId);
+	practices = practices.filter(p => p.id !== practiceId);
 }

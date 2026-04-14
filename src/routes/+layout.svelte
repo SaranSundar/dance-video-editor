@@ -140,6 +140,7 @@
 		</a>
 		<div class="nav-links">
 			<a href="/" class:active={currentPath === '/'}>Home</a>
+			<a href="/practice" class:active={currentPath.startsWith('/practice')}>Practice</a>
 			<a href="/levels" class:active={currentPath === '/levels'}>Levels</a>
 			{#if state === 'ready'}
 				<button class="nav-action-btn" onclick={handleExport} disabled={exporting} title="Export metadata as JSON">
