@@ -4,6 +4,7 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import { computeFingerprint } from '$lib/fingerprint';
 	import { getMp4Duration, checkVideoCodec } from '$lib/mp4-duration';
+	import { uploadVideo, uploadThumbnail } from '$lib/bunny';
 
 	// Svelte action: sets video/img src only when element enters viewport
 	function lazySrc(node: HTMLVideoElement | HTMLImageElement, src: string) {
@@ -408,8 +409,27 @@
 			}
 
 			log(`[import] ${entry.file.name}: duration=${duration}, fp=${fingerprint.substring(0, 20)}...`);
-			await store.addVideo(entry.file, duration, thumbnail, { lead: entry.lead, follow: entry.follow, dance: entry.dance }, fingerprint);
-			log(`[import] ${entry.file.name}: saved`);
+			const video = await store.addVideo(entry.file, duration, thumbnail, { lead: entry.lead, follow: entry.follow, dance: entry.dance }, fingerprint);
+			log(`[import] ${entry.file.name}: saved locally`);
+
+			// Upload to Bunny Storage
+			importProgress = `Uploading ${i + 1} of ${total}: ${entry.file.name}`;
+			try {
+				const cdnUrl = await uploadVideo(video.id, entry.file, (loaded, totalBytes) => {
+					const pct = Math.round((loaded / totalBytes) * 100);
+					importProgress = `Uploading ${i + 1} of ${total}: ${entry.file.name} (${pct}%)`;
+				});
+				await store.updateVideo(video.id, { cdnUrl });
+				log(`[import] ${entry.file.name}: uploaded to Bunny → ${cdnUrl}`);
+
+				if (thumbnail) {
+					await uploadThumbnail(video.id, thumbnail);
+					log(`[import] ${entry.file.name}: thumbnail uploaded to Bunny`);
+				}
+			} catch (err) {
+				log(`[import] ${entry.file.name}: Bunny upload failed — ${err}`);
+				console.error('Bunny upload failed:', err);
+			}
 			if (i < toImport.length - 1) {
 				await new Promise(r => setTimeout(r, 300));
 			}
