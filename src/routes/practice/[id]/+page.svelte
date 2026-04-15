@@ -160,10 +160,15 @@
 
 	const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
+	let pendingPlay = $state(false);
+	let userHasInteracted = $state(false);
+
 	async function startPlayback(fromIndex = 0) {
 		if (sessionClips.length === 0) return;
 		currentIndex = fromIndex;
 		playerVisible = true;
+		userHasInteracted = true;
+		pendingPlay = true;
 		await loadClip(fromIndex);
 	}
 
@@ -185,13 +190,14 @@
 		// If same video, just seek — don't reload
 		if (currentVideoId === clip.videoId && videoEl) {
 			videoEl.currentTime = clip.startTime;
-			videoEl.play();
+			videoEl.play().catch(() => { pendingPlay = true; });
 			playing = true;
 			return;
 		}
 
 		// Different video — load new source
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
+		pendingPlay = true;
 		try {
 			const result = await store.getVideoUrl(clip.videoId);
 			currentVideoId = clip.videoId;
@@ -202,14 +208,16 @@
 		}
 	}
 
-	function handlePlayerLoaded() {
+	function handlePlayerCanPlay() {
 		if (!videoEl) return;
 		const clip = sessionClips[currentIndex];
 		if (clip) {
 			videoEl.currentTime = clip.startTime;
 			videoEl.playbackRate = playbackSpeed;
-			videoEl.play();
-			playing = true;
+			if (pendingPlay) {
+				videoEl.play().catch(() => {});
+				pendingPlay = false;
+			}
 		}
 	}
 
@@ -229,8 +237,9 @@
 
 	function togglePlayPause() {
 		if (!videoEl) return;
+		userHasInteracted = true;
 		if (videoEl.paused) {
-			videoEl.play();
+			videoEl.play().catch(() => {});
 		} else {
 			videoEl.pause();
 		}
@@ -257,6 +266,8 @@
 		playerVisible = false;
 		currentVideoId = null;
 		clipProgress = 0;
+		pendingPlay = false;
+		userHasInteracted = false;
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		videoUrl = null;
 	}
@@ -348,7 +359,7 @@
 						bind:this={videoEl}
 						src={videoUrl}
 						playsinline
-						onloadedmetadata={handlePlayerLoaded}
+						oncanplay={handlePlayerCanPlay}
 						ontimeupdate={handleTimeUpdate}
 						onplay={() => playing = true}
 						onpause={() => playing = false}
