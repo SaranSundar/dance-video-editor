@@ -145,19 +145,31 @@
 		return sortItems(result, sortBy);
 	});
 
-	const coupleProfiles = [
+	const coupleProfilesBase = [
 		{ lead: 'Anthony', follow: 'Katie', img: '/couples/anthony-katie.jpg', label: 'Anthony & Katie' },
 		{ lead: 'Cornel', follow: 'Rithika', img: '/couples/cornel-rithika.jpg', label: 'Cornel & Rithika' },
+		{ lead: 'Daniel', follow: 'Desiree', img: '', label: 'Daniel & Desiree' },
 		{ lead: 'Emilien', follow: 'Tehina', img: '/couples/emilien-tehina.jpg', label: 'Emilien & Tehina' },
 		{ lead: 'Gero', follow: 'Migle', img: '/couples/gero-migle.jpg', label: 'Gero & Migle' },
 		{ lead: 'Irakli', follow: 'Maria', img: '/couples/irakli-maria.jpg', label: 'Irakli & Maria' },
+		{ lead: 'Jes', follow: 'Jenny', img: '', label: 'Jes & Jenny' },
 		{ lead: 'Luis', follow: 'Andrea', img: '/couples/luis-andrea.jpg', label: 'Luis & Andrea' },
 		{ lead: 'Marcus', follow: 'Bianca', img: '/couples/marcus-bianca.jpg', label: 'Marcus & Bianca' },
 		{ lead: 'Melvin', follow: 'Gatica', img: '/couples/melvin-gatica.jpg', label: 'Melvin & Gatica' },
+		{ lead: 'Micka', follow: 'Laura', img: '', label: 'Micka & Laura' },
 		{ lead: 'Miguel', follow: 'Sunsire', img: '/couples/miguel-sunsire.jpg', label: 'Miguel & Sunsire' },
 		{ lead: 'Ofir', follow: 'Ofri', img: '/couples/ofir-ofri.jpg', label: 'Ofir & Ofri' },
 		{ lead: 'Favian', follow: '', img: '/couples/favian.jpg', label: 'Favian' },
 	];
+
+	// Sort by video count (descending)
+	let coupleProfiles = $derived(
+		[...coupleProfilesBase].sort((a, b) => {
+			const countA = videos.filter(v => v.lead === a.lead || v.follow === a.follow).length;
+			const countB = videos.filter(v => v.lead === b.lead || v.follow === b.follow).length;
+			return countB - countA;
+		})
+	);
 
 	function selectCouple(lead: string, follow: string) {
 		if (filterLead === lead && filterFollow === follow) {
@@ -202,12 +214,15 @@
 	const couples: [string, string][] = [
 		['Anthony', 'Katie'],
 		['Cornel', 'Rithika'],
+		['Daniel', 'Desiree'],
 		['Emilien', 'Tehina'],
 		['Gero', 'Migle'],
 		['Irakli', 'Maria'],
+		['Jes', 'Jenny'],
 		['Luis', 'Andrea'],
 		['Marcus', 'Bianca'],
 		['Melvin', 'Gatica'],
+		['Micka', 'Laura'],
 		['Miguel', 'Sunsire'],
 		['Ofir', 'Ofri'],
 	];
@@ -629,7 +644,13 @@
 						onclick={() => selectCouple(profile.lead, profile.follow)}
 					>
 						<div class="story-ring">
-							<img src={profile.img} alt={profile.label} class="story-avatar" />
+							{#if profile.img}
+								<img src={profile.img} alt={profile.label} class="story-avatar" />
+							{:else}
+								<div class="story-avatar story-initials" style="--hue: {(profile.lead.charCodeAt(0) * 37 + (profile.follow?.charCodeAt(0) ?? 0) * 53) % 360}">
+									{profile.lead[0]}{profile.follow?.[0] ?? ''}
+								</div>
+							{/if}
 						</div>
 						<span class="story-label">{profile.label}</span>
 					</button>
@@ -1658,6 +1679,18 @@
 		object-fit: cover;
 		border: 2.5px solid #09090b;
 		display: block;
+	}
+
+	.story-initials {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, hsl(var(--hue), 50%, 30%), hsl(calc(var(--hue) + 40), 50%, 20%));
+		color: hsl(var(--hue), 60%, 75%);
+		font-size: 16px;
+		font-weight: 700;
+		letter-spacing: 1px;
+		text-transform: uppercase;
 	}
 
 	.story-label {

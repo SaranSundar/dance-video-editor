@@ -20,12 +20,15 @@
 	const couples: [string, string][] = [
 		['Anthony', 'Katie'],
 		['Cornel', 'Rithika'],
+		['Daniel', 'Desiree'],
 		['Emilien', 'Tehina'],
 		['Gero', 'Migle'],
 		['Irakli', 'Maria'],
+		['Jes', 'Jenny'],
 		['Luis', 'Andrea'],
 		['Marcus', 'Bianca'],
 		['Melvin', 'Gatica'],
+		['Micka', 'Laura'],
 		['Miguel', 'Sunsire'],
 		['Ofir', 'Ofri'],
 	];
