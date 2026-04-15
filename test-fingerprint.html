@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video Fingerprint Test</title>
+	<style>
+		body { font-family: monospace; background: #111; color: #eee; padding: 20px; }
+		h1 { font-size: 18px; }
+		.drop { border: 2px dashed #444; padding: 40px; text-align: center; margin: 20px 0; border-radius: 8px; }
+		.drop.active { border-color: #6366f1; }
+		table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+		th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #333; }
+		th { color: #888; font-size: 12px; }
+		.hash { color: #818cf8; font-size: 11px; }
+		.size { color: #888; }
+		.time { color: #34d399; }
+		.dup { color: #ef4444; font-weight: bold; }
+		.ok { color: #34d399; }
+		#status { margin: 10px 0; color: #fbbf24; }
+		input[type=file] { margin: 10px 0; }
+	</style>
+</head>
+<body>
+	<h1>Video Fingerprint Uniqueness Test</h1>
+	<p>Select video files or drop a folder to test that each gets a unique fingerprint.</p>
+
+	<input type="file" id="picker" multiple accept="video/*" webkitdirectory />
+	<input type="file" id="picker2" multiple accept="video/*" />
+
+	<div class="drop" id="dropzone">Drop video files here</div>
+	<div id="status"></div>
+
+	<table>
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Filename</th>
+				<th>Size</th>
+				<th>Time (ms)</th>
+				<th>Fingerprint</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody id="results"></tbody>
+	</table>
+
+	<div id="summary" style="margin-top: 20px; font-size: 14px;"></div>
+
+	<script>
+		async function computeFingerprint(file) {
+			const size = file.size;
+			const chunk = file.slice(0, Math.min(size, 1024 * 1024));
+			const buffer = await chunk.arrayBuffer();
+			const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+			return `${size}:${hashHex}`;
+		}
+
+		function formatSize(bytes) {
+			if (bytes < 1024) return bytes + ' B';
+			if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+			return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+		}
+
+		const results = document.getElementById('results');
+		const status = document.getElementById('status');
+		const summary = document.getElementById('summary');
+		const fingerprints = new Map(); // fingerprint -> filename
+
+		async function processFiles(files) {
+			const videoFiles = Array.from(files).filter(f =>
+				f.type.startsWith('video/') || f.name.match(/\.(mp4|mov|webm|mkv|avi)$/i)
+			);
+
+			if (videoFiles.length === 0) {
+				status.textContent = 'No video files found.';
+				return;
+			}
+
+			status.textContent = `Processing ${videoFiles.length} files...`;
+			results.innerHTML = '';
+			fingerprints.clear();
+
+			let duplicates = 0;
+
+			for (let i = 0; i < videoFiles.length; i++) {
+				const file = videoFiles[i];
+				status.textContent = `Processing ${i + 1}/${videoFiles.length}: ${file.name}`;
+
+				const start = performance.now();
+				const fp = await computeFingerprint(file);
+				const elapsed = (performance.now() - start).toFixed(1);
+
+				const isDup = fingerprints.has(fp);
+				if (isDup) duplicates++;
+
+				const existing = fingerprints.get(fp);
+				fingerprints.set(fp, file.name);
+
+				const row = document.createElement('tr');
+				row.innerHTML = `
+					<td>${i + 1}</td>
+					<td>${file.name}</td>
+					<td class="size">${formatSize(file.size)}</td>
+					<td class="time">${elapsed}</td>
+					<td class="hash">${fp.substring(0, 20)}...${fp.substring(fp.length - 8)}</td>
+					<td class="${isDup ? 'dup' : 'ok'}">${isDup ? 'DUPLICATE of ' + existing : 'Unique'}</td>
+				`;
+				results.appendChild(row);
+			}
+
+			const uniqueCount = fingerprints.size;
+			status.textContent = '';
+			summary.innerHTML = `
+				<strong>Results:</strong> ${videoFiles.length} files, ${uniqueCount} unique fingerprints, ${duplicates} duplicates.
+				${duplicates === 0
+					? '<span class="ok">All files have unique fingerprints.</span>'
+					: '<span class="dup">Some files have duplicate fingerprints (same content, different names).</span>'
+				}
+			`;
+		}
+
+		// File picker (folder)
+		document.getElementById('picker').addEventListener('change', e => processFiles(e.target.files));
+		// File picker (individual)
+		document.getElementById('picker2').addEventListener('change', e => processFiles(e.target.files));
+
+		// Drag and drop
+		const dropzone = document.getElementById('dropzone');
+		dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('active'); });
+		dropzone.addEventListener('dragleave', () => dropzone.classList.remove('active'));
+		dropzone.addEventListener('drop', e => {
+			e.preventDefault();
+			dropzone.classList.remove('active');
+			processFiles(e.dataTransfer.files);
+		});
+	</script>
+</body>
+</html>

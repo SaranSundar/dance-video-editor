@@ -3,7 +3,7 @@
  * Reads go directly to CDN. Writes go through /api/bunny proxy (CORS).
  */
 
-const CDN_BASE = 'https://dance-videos-ss.b-cdn.net';
+const CDN_BASE = 'https://dance-videos.b-cdn.net';
 
 // Metadata
 

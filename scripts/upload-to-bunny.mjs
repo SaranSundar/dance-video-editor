@@ -14,7 +14,7 @@ import { Readable } from 'stream';
 const STORAGE_ZONE = 'dance-videos-ss';
 const API_KEY = 'e23def33-c1e6-4b94-b7ffa764825a-b295-44be';
 const STORAGE_HOST = 'la.storage.bunnycdn.com';
-const CDN_BASE = 'https://dance-videos-ss.b-cdn.net';
+const CDN_BASE = 'https://dance-videos.b-cdn.net';
 const DIR = '/Users/saran/Downloads/bachata-demos';
 const OUT = '/Users/saran/Downloads/clipit-bunny-metadata.json';
 

@@ -282,7 +282,7 @@ export async function getVideoBlob(_videoId: string): Promise<Blob> {
 export function getStorageType() { return 'cloud' as const; }
 export function getFolderName() { return null; }
 export function isVideoLocal() { return false; }
-export function getCdnBaseUrl() { return 'https://dance-videos-ss.b-cdn.net'; }
+export function getCdnBaseUrl() { return 'https://dance-videos.b-cdn.net'; }
 export async function pickFolder() { /* no-op */ }
 export async function grantPermission() { /* no-op */ }
 export async function refresh() {
