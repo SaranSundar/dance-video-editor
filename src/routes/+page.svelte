@@ -833,11 +833,6 @@
 							</svg>
 						</div>
 						<span class="vid-duration">{formatDuration(video.duration)}</span>
-						{#if store.isVideoLocal(video.id)}
-							<span class="vid-source local">Local</span>
-						{:else if video.cdnUrl}
-							<span class="vid-source stream">Stream</span>
-						{/if}
 					</div>
 					<div class="video-info">
 						{#if editingId === video.id}
