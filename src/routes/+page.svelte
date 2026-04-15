@@ -290,8 +290,8 @@
 		thumbsLoading = true;
 		Promise.allSettled(
 			missing.map(async (video) => {
-				const blob = await store.getVideoThumbnail(video.id);
-				return blob ? { id: video.id, url: URL.createObjectURL(blob) } : null;
+				const url = await store.getVideoThumbnail(video.id);
+				return url ? { id: video.id, url } : null;
 			})
 		).then(results => {
 			const updates: Record<string, string> = {};
@@ -312,15 +312,6 @@
 	async function stageFiles(files: FileList | null) {
 		if (!files) return;
 
-		// On filesystem mode, ensure a folder is selected before staging videos
-		if (store.getStorageType() === 'filesystem' && store.getState() !== 'ready') {
-			try {
-				await store.pickFolder();
-			} catch {
-				return; // User cancelled folder picker
-			}
-			if (store.getState() !== 'ready') return;
-		}
 		const existingNames = new Set(videos.map(v => v.name));
 		const videoFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.mp4') || f.type === 'video/mp4');
 		const duplicates = videoFiles.filter(f => existingNames.has(f.name));

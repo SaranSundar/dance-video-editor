@@ -8,8 +8,6 @@
 	let { children }: { children: Snippet } = $props();
 	let currentPath = $derived($page.url.pathname);
 	let state = $derived(store.getState());
-	let folderName = $derived(store.getFolderName());
-	let storageType = $derived(store.getStorageType());
 	let isPwa = $state(false);
 	let exporting = $state(false);
 	let importing = $state(false);
@@ -163,27 +161,6 @@
 						</svg>
 						{updating ? 'Updating...' : 'Update'}
 					</button>
-				{/if}
-				<button class="nav-action-btn nuke-btn" onclick={handleNuke} title="Delete all data">
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-					</svg>
-					Nuke
-				</button>
-				{#if storageType === 'filesystem'}
-					<button class="folder-btn" onclick={() => store.pickFolder()} title="Change storage folder">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-						</svg>
-						{folderName ?? 'Folder'}
-					</button>
-				{:else}
-					<span class="storage-badge" title="Data stored in browser (IndexedDB)">
-						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-						</svg>
-						Browser storage
-					</span>
 				{/if}
 				{/if}
 		</div>

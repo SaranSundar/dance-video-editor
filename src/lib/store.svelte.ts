@@ -1,216 +1,124 @@
-import * as fsStorage from './storage';
-import * as idbStorage from './storage-idb';
-import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud } from './bunny';
+import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl } from './bunny';
 import type { VideoMeta, ClipMeta, PracticeMeta } from './storage';
 
 export type { VideoMeta, ClipMeta, PracticeMeta };
 
-type StorageType = 'filesystem' | 'indexeddb';
-type StorageState = 'loading' | 'no-folder' | 'need-permission' | 'ready';
+type StorageState = 'loading' | 'ready';
 
-let storageType = $state<StorageType>('filesystem');
 let state = $state<StorageState>('loading');
-let folderName = $state<string | null>(null);
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
 let practices = $state<PracticeMeta[]>([]);
-const DEFAULT_CDN_BASE_URL = 'https://dance-videos.b-cdn.net';
-let cdnBaseUrl = $state<string>(typeof localStorage !== 'undefined' ? (localStorage.getItem('bunny_cdn_base_url') || DEFAULT_CDN_BASE_URL) : DEFAULT_CDN_BASE_URL);
-let localVideoIds = $state<Set<string>>(new Set());
 
-function isAndroidMobile(): boolean {
-	return typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
-}
-
-function hasFileSystemAccess(): boolean {
-	return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
-}
-
-// Pick the right storage module based on detected type
-function storage() {
-	return storageType === 'filesystem' ? fsStorage : idbStorage;
-}
-
-export function getStorageType(): StorageType { return storageType; }
 export function getState() { return state; }
-export function getFolderName() { return folderName; }
 export function getVideos() { return videos; }
 export function getClips() { return clips; }
 export function getPractices() { return practices; }
-export function getCdnBaseUrl() { return cdnBaseUrl; }
-export function isVideoLocal(videoId: string) { return localVideoIds.has(videoId); }
-export function setCdnBaseUrl(url: string) {
-	cdnBaseUrl = url.trim();
-	localStorage.setItem('bunny_cdn_base_url', cdnBaseUrl);
-}
 export function getCdnUrlForVideo(videoId: string): string | null {
 	const video = videos.find(v => v.id === videoId);
 	if (video?.cdnUrl) return video.cdnUrl;
-	if (cdnBaseUrl) return `${cdnBaseUrl.replace(/\/$/, '')}/${videoId}.mp4`;
-	return null;
-}
-
-// Sync metadata to Bunny Storage after every mutation
-async function syncToBunny() {
-	try {
-		const json = await storage().exportMetadata();
-		await saveMetadataToCloud(json);
-	} catch (e) {
-		console.error('Bunny metadata sync failed:', e);
-	}
-}
-
-// Load metadata from Bunny (source of truth), import into local storage
-async function loadFromBunny() {
-	try {
-		const bunnyMeta = await fetchBunnyMetadata();
-		const hasData = bunnyMeta.videos?.length > 0 || bunnyMeta.clips?.length > 0 || bunnyMeta.practices?.length > 0;
-		if (hasData) {
-			await storage().importMetadata(JSON.stringify(bunnyMeta));
-			await refresh();
-			return true;
-		}
-	} catch (e) {
-		console.warn('Could not load from Bunny, using local:', e);
-	}
-	return false;
-}
-
-async function seedDefaultMetadata() {
-	try {
-		const res = await fetch('/default-metadata.json');
-		if (!res.ok) return;
-		const defaultData = await res.json();
-
-		if (videos.length === 0) {
-			// First launch: seed everything
-			await storage().importMetadata(JSON.stringify(defaultData));
-			await refresh();
-			return;
-		}
-
-		// Sync cdnUrls from defaults (fixes stale/wrong values from older sessions)
-		const defaultById = new Map<string, string>(
-			defaultData.videos
-				.filter((v: { id: string; cdnUrl?: string }) => v.cdnUrl)
-				.map((v: { id: string; cdnUrl: string }) => [v.id, v.cdnUrl])
-		);
-
-		let updated = false;
-		for (const v of videos) {
-			const cdnUrl = defaultById.get(v.id);
-			if (cdnUrl && v.cdnUrl !== cdnUrl) {
-				await storage().updateVideo(v.id, { cdnUrl });
-				updated = true;
-			}
-		}
-		if (updated) await refresh();
-	} catch { /* ignore */ }
-}
-
-async function checkLocalAvailability() {
-	const ids = new Set<string>();
-	await Promise.allSettled(
-		videos.map(async v => {
-			try {
-				await storage().getVideoBlob(v.id);
-				ids.add(v.id);
-			} catch { /* not local */ }
-		})
-	);
-	localVideoIds = ids;
-}
-
-export async function init() {
-	state = 'loading';
-
-	try {
-		if (hasFileSystemAccess()) {
-			storageType = 'filesystem';
-			const restored = await fsStorage.tryRestoreHandle();
-			if (restored) {
-				folderName = fsStorage.getFolderName();
-				await refresh();
-			}
-		}
-
-		if (storageType !== 'filesystem' || !folderName) {
-			// OPFS path: Safari/iOS/Firefox, or Chrome/Edge without a folder
-			storageType = 'indexeddb';
-			await refresh();
-		}
-
-		// Load from Bunny (source of truth for metadata)
-		const loaded = await loadFromBunny();
-		if (!loaded) {
-			await seedDefaultMetadata();
-		}
-	} catch (e) {
-		console.error('Storage init failed:', e);
-		await seedDefaultMetadata();
-	} finally {
-		state = 'ready';
-		checkLocalAvailability();
-	}
-}
-
-export async function grantPermission() {
-	try {
-		const granted = await fsStorage.requestPermission();
-		if (granted) {
-			storageType = 'filesystem';
-			folderName = fsStorage.getFolderName();
-			await refresh();
-			const loaded = await loadFromBunny();
-			if (!loaded) await seedDefaultMetadata();
-			state = 'ready';
-			checkLocalAvailability();
-		} else {
-			state = 'no-folder';
-		}
-	} catch {
-		state = 'no-folder';
-	}
-}
-
-export async function pickFolder() {
-	await fsStorage.pickFolder();
-	storageType = 'filesystem';
-	folderName = fsStorage.getFolderName();
-	await refresh();
-	const loaded = await loadFromBunny();
-	if (!loaded) await seedDefaultMetadata();
-	state = 'ready';
-	checkLocalAvailability();
+	return getCdnUrl(videoId);
 }
 
 function stripExt(name: string): string {
 	return name.replace(/\.mp4$/i, '');
 }
 
-export async function refresh() {
-	const allVideos = await storage().getVideos();
-	const allClips = await storage().getClips();
-	const allPractices = await storage().getPractices();
-	videos = allVideos.map(v => ({ ...v, name: stripExt(v.name) }));
-	clips = allClips.filter(c => c.endTime > c.startTime).map(c => ({ ...c, videoName: stripExt(c.videoName) }));
-	practices = allPractices;
+// Build metadata JSON from in-memory state and save to Bunny
+async function syncToBunny() {
+	try {
+		// Use raw names (already stripped on load, addVideo strips too)
+		const meta = {
+			videos: videos.map(v => ({ ...v })),
+			clips: clips.map(c => ({ ...c })),
+			practices: practices.map(p => ({ ...p })),
+		};
+		await saveMetadataToCloud(JSON.stringify(meta, null, 2));
+	} catch (e) {
+		console.error('Bunny metadata sync failed:', e);
+	}
 }
 
-export async function addVideo(file: File, duration: number, thumbnailBlob: Blob | null, info: { lead: string; follow: string; dance: string } = { lead: '', follow: '', dance: '' }, fingerprint: string = '') {
-	const video = await storage().addVideo(file, duration, thumbnailBlob, info, fingerprint);
-	const existingIdx = videos.findIndex(v => v.id === video.id);
-	if (existingIdx >= 0) {
-		videos = videos.map(v => v.id === video.id ? video : v);
-	} else {
-		videos = [...videos, video];
+function loadMeta(meta: any) {
+	videos = (meta.videos ?? []).map((v: VideoMeta) => ({
+		...v,
+		name: stripExt(v.name),
+		fingerprint: v.fingerprint ?? '',
+		hidden: v.hidden ?? false,
+		hiddenFromSearch: v.hiddenFromSearch ?? false,
+	}));
+	clips = (meta.clips ?? [])
+		.filter((c: ClipMeta) => c.endTime > c.startTime)
+		.map((c: ClipMeta) => ({
+			...c,
+			videoName: stripExt(c.videoName),
+			parentClipId: c.parentClipId ?? null,
+			links: c.links ?? [],
+			hidden: c.hidden ?? false,
+			hiddenFromSearch: c.hiddenFromSearch ?? false,
+		}));
+	practices = (meta.practices ?? []).map((p: PracticeMeta) => ({ ...p }));
+}
+
+export async function init() {
+	state = 'loading';
+	try {
+		const meta = await fetchBunnyMetadata();
+		const hasData = meta.videos?.length > 0 || meta.clips?.length > 0 || meta.practices?.length > 0;
+		if (hasData) {
+			loadMeta(meta);
+		} else {
+			// Fallback to default-metadata.json for first launch
+			const res = await fetch('/default-metadata.json');
+			if (res.ok) {
+				const defaultData = await res.json();
+				loadMeta(defaultData);
+				syncToBunny(); // push defaults to Bunny
+			}
+		}
+	} catch (e) {
+		console.error('Failed to load from Bunny:', e);
+		try {
+			const res = await fetch('/default-metadata.json');
+			if (res.ok) loadMeta(await res.json());
+		} catch { /* truly offline, empty state */ }
+	} finally {
+		state = 'ready';
 	}
+}
+
+export async function addVideo(_file: File, duration: number, _thumbnailBlob: Blob | null, info: { lead: string; follow: string; dance: string } = { lead: '', follow: '', dance: '' }, fingerprint: string = '') {
+	// Check for existing video with same fingerprint
+	const existing = fingerprint ? videos.find(v => v.fingerprint === fingerprint) : null;
+	const id = existing ? existing.id : crypto.randomUUID();
+
+	if (existing) {
+		existing.duration = duration || existing.duration;
+		existing.fingerprint = fingerprint;
+		videos = videos.map(v => v.id === id ? { ...existing } : v);
+		syncToBunny();
+		return existing;
+	}
+
+	const video: VideoMeta = {
+		id,
+		name: stripExt(_file.name),
+		fingerprint,
+		duration,
+		lead: info.lead,
+		follow: info.follow,
+		dance: info.dance,
+		hidden: false,
+		hiddenFromSearch: false,
+		addedAt: new Date().toISOString(),
+	};
+
+	videos = [...videos, video];
 	syncToBunny();
 	return video;
 }
 
 export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string }) {
-	await storage().updateVideo(videoId, updates);
 	videos = videos.map(v => v.id === videoId ? { ...v, ...updates } : v);
 	if (updates.name !== undefined) {
 		clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: updates.name! } : c);
@@ -218,78 +126,82 @@ export async function updateVideo(videoId: string, updates: { name?: string; lea
 	syncToBunny();
 }
 
-export async function getVideoThumbnail(videoId: string) {
-	return storage().getVideoThumbnail(videoId);
+export async function getVideoThumbnail(videoId: string): Promise<string | null> {
+	return getThumbnailCdnUrl(videoId);
 }
 
 export async function deleteVideo(videoId: string) {
-	await storage().deleteVideo(videoId);
 	videos = videos.filter(v => v.id !== videoId);
 	clips = clips.filter(c => c.videoId !== videoId);
 	syncToBunny();
 }
 
 export async function renameVideo(videoId: string, newName: string) {
-	await storage().renameVideo(videoId, newName);
 	videos = videos.map(v => v.id === videoId ? { ...v, name: newName } : v);
 	clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: newName } : c);
 	syncToBunny();
 }
 
-export async function getVideoBlob(videoId: string) {
-	return storage().getVideoBlob(videoId);
-}
-
 export async function getVideoUrl(videoId: string): Promise<{ url: string; revoke: () => void; source: 'local' | 'cdn' }> {
-	// Try local file first
-	try {
-		const blob = await storage().getVideoBlob(videoId);
-		const url = URL.createObjectURL(blob);
-		return { url, revoke: () => URL.revokeObjectURL(url), source: 'local' };
-	} catch {
-		// Fall back to CDN URL
-		const cdnUrl = getCdnUrlForVideo(videoId);
-		if (cdnUrl) {
-			return { url: cdnUrl, revoke: () => {}, source: 'cdn' };
-		}
-		throw new Error('Video not available locally or via CDN. Upload to Bunny or import the file.');
+	const cdnUrl = getCdnUrlForVideo(videoId);
+	if (cdnUrl) {
+		return { url: cdnUrl, revoke: () => {}, source: 'cdn' };
 	}
+	throw new Error('Video not available via CDN.');
 }
 
 export async function addClip(
 	input: { videoId: string; videoName: string; label: string; lead: string; follow: string; dance: string; style: string; mastery: string; clipType: string; startTime: number; endTime: number; tags: string[]; parentClipId?: string | null }
 ) {
-	const clip = await storage().addClip(input);
+	const clip: ClipMeta = {
+		id: crypto.randomUUID(),
+		videoId: input.videoId,
+		videoName: input.videoName,
+		label: input.label,
+		lead: input.lead,
+		follow: input.follow,
+		dance: input.dance,
+		style: input.style,
+		mastery: input.mastery,
+		clipType: input.clipType,
+		startTime: input.startTime,
+		endTime: input.endTime,
+		tags: [...input.tags],
+		parentClipId: input.parentClipId ?? null,
+		links: [],
+		hidden: false,
+		hiddenFromSearch: false,
+		createdAt: new Date().toISOString(),
+	};
 	clips = [...clips, clip];
 	syncToBunny();
 	return clip;
 }
 
 export async function updateClip(clipId: string, updates: { label?: string; lead?: string; follow?: string; dance?: string; style?: string; mastery?: string; clipType?: string; tags?: string[]; parentClipId?: string | null; links?: { id: string; type: 'clip' | 'video'; label: string }[]; hidden?: boolean; hiddenFromSearch?: boolean }) {
-	await storage().updateClip(clipId, updates);
 	clips = clips.map(c => c.id === clipId ? { ...c, ...updates } : c);
 	syncToBunny();
 }
 
 export async function deleteClip(clipId: string) {
-	await storage().deleteClip(clipId);
 	clips = clips.filter(c => c.id !== clipId);
 	syncToBunny();
 }
 
 export async function exportMetadata(): Promise<string> {
-	return storage().exportMetadata();
+	return JSON.stringify({ videos, clips, practices }, null, 2);
 }
 
 export async function importMetadata(json: string): Promise<void> {
-	await storage().importMetadata(json);
-	await refresh();
+	const imported = JSON.parse(json);
+	loadMeta(imported);
 	syncToBunny();
 }
 
 export async function nukeAll() {
-	await storage().nukeAll();
-	await refresh();
+	videos = [];
+	clips = [];
+	practices = [];
 	syncToBunny();
 }
 
@@ -307,36 +219,78 @@ export function getLinksForClip(clipId: string): { id: string; type: 'clip' | 'v
 }
 
 export async function addLink(clipId: string, targetId: string, targetType: 'clip' | 'video', label: string) {
-	await storage().addLink(clipId, targetId, targetType, label);
-	const allClips = await storage().getClips();
-	clips = allClips.filter(c => c.endTime > c.startTime);
+	clips = clips.map(c => {
+		if (c.id === clipId) {
+			const links = c.links ?? [];
+			if (!links.some(l => l.id === targetId)) {
+				return { ...c, links: [...links, { id: targetId, type: targetType, label }] };
+			}
+		}
+		// Bidirectional for clips
+		if (targetType === 'clip' && c.id === targetId) {
+			const links = c.links ?? [];
+			if (!links.some(l => l.id === clipId)) {
+				return { ...c, links: [...links, { id: clipId, type: 'clip' as const, label }] };
+			}
+		}
+		return c;
+	});
 	syncToBunny();
 }
 
 export async function removeLink(clipId: string, targetId: string) {
-	await storage().removeLink(clipId, targetId);
-	const allClips = await storage().getClips();
-	clips = allClips.filter(c => c.endTime > c.startTime);
+	clips = clips.map(c => {
+		if (c.id === clipId || c.id === targetId) {
+			const otherId = c.id === clipId ? targetId : clipId;
+			return { ...c, links: (c.links ?? []).filter(l => l.id !== otherId) };
+		}
+		return c;
+	});
 	syncToBunny();
 }
 
 // Practices
 
 export async function addPractice(input: { name: string; clipIds: string[]; loop?: boolean }) {
-	const practice = await storage().addPractice(input);
+	const practice: PracticeMeta = {
+		id: crypto.randomUUID(),
+		name: input.name,
+		clipIds: [...input.clipIds],
+		loop: input.loop ?? false,
+		createdAt: new Date().toISOString(),
+	};
 	practices = [...practices, practice];
 	syncToBunny();
 	return practice;
 }
 
 export async function updatePractice(practiceId: string, updates: { name?: string; clipIds?: string[]; loop?: boolean }) {
-	await storage().updatePractice(practiceId, updates);
 	practices = practices.map(p => p.id === practiceId ? { ...p, ...updates } : p);
 	syncToBunny();
 }
 
 export async function deletePractice(practiceId: string) {
-	await storage().deletePractice(practiceId);
 	practices = practices.filter(p => p.id !== practiceId);
 	syncToBunny();
+}
+
+export async function getVideoBlob(_videoId: string): Promise<Blob> {
+	throw new Error('Local video blobs not available in cloud mode');
+}
+
+// Stubs for backward compatibility with UI components that reference these
+export function getStorageType() { return 'cloud' as const; }
+export function getFolderName() { return null; }
+export function isVideoLocal() { return false; }
+export function getCdnBaseUrl() { return 'https://dance-videos-ss.b-cdn.net'; }
+export async function pickFolder() { /* no-op */ }
+export async function grantPermission() { /* no-op */ }
+export async function refresh() {
+	// Re-fetch from Bunny
+	try {
+		const meta = await fetchBunnyMetadata();
+		loadMeta(meta);
+	} catch (e) {
+		console.error('Refresh from Bunny failed:', e);
+	}
 }
