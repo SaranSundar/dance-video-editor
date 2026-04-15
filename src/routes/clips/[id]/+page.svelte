@@ -99,7 +99,7 @@
 		{ value: 'comfortable', label: 'Comfortable' },
 		{ value: 'mastered', label: 'Mastered' },
 	];
-	const clipTypes = ['move', 'pattern', 'styling', 'footwork'];
+	const clipTypes = ['move', 'pattern', 'styling', 'footwork', 'musicality'];
 
 	let moveOptions = $derived(getMovesForDance(dance));
 

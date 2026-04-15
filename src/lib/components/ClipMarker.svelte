@@ -48,7 +48,7 @@
 		{ value: 'comfortable', label: 'Comfortable' },
 		{ value: 'mastered', label: 'Mastered' },
 	];
-	const clipTypes = ['', 'move', 'pattern', 'styling', 'footwork'];
+	const clipTypes = ['', 'move', 'pattern', 'styling', 'footwork', 'musicality'];
 
 	let hasRange = $derived(inPoint !== null && outPoint !== null && outPoint > inPoint);
 

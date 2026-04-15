@@ -37,9 +37,12 @@
 	// Clip picker
 	let showPicker = $state(false);
 	let pickerSearch = $state('');
+	let pickerTypeFilter = $state('');
+	const clipTypes = ['move', 'pattern', 'styling', 'footwork', 'musicality'];
 	let pickerClips = $derived(
 		allClips
 			.filter(c => !c.hidden && !c.hiddenFromSearch)
+			.filter(c => !pickerTypeFilter || c.clipType === pickerTypeFilter)
 			.filter(c => {
 				if (!pickerSearch) return true;
 				const q = pickerSearch.toLowerCase();
@@ -325,6 +328,12 @@
 			<div class="picker">
 				<div class="picker-header">
 					<input type="text" bind:value={pickerSearch} placeholder="Search clips..." class="picker-search" />
+					<select bind:value={pickerTypeFilter} class="picker-type-filter">
+						<option value="">All types</option>
+						{#each clipTypes as t}
+							<option value={t}>{t[0].toUpperCase() + t.slice(1)}</option>
+						{/each}
+					</select>
 					<button class="picker-close" onclick={() => showPicker = false}>
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
 					</button>
@@ -681,6 +690,25 @@
 
 	.picker-search::placeholder {
 		color: #3f3f46;
+	}
+
+	.picker-type-filter {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #e4e4e7;
+		padding: 7px 10px;
+		border-radius: 6px;
+		font-size: 13px;
+		font-family: 'Inter', sans-serif;
+		cursor: pointer;
+		-webkit-appearance: none;
+		appearance: none;
+		min-width: 110px;
+	}
+
+	.picker-type-filter:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.4);
 	}
 
 	.picker-close {
