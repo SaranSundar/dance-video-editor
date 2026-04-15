@@ -2,6 +2,7 @@
 	import * as store from '$lib/store.svelte';
 	import ClipCard from '$lib/components/ClipCard.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
+	import MultiSelect from '$lib/components/MultiSelect.svelte';
 	import { computeFingerprint } from '$lib/fingerprint';
 	import { getMp4Duration, checkVideoCodec } from '$lib/mp4-duration';
 	import { uploadVideo, uploadThumbnail } from '$lib/bunny';
@@ -36,13 +37,13 @@
 	let filterDance = $state('');
 	let filterStyle = $state('');
 	let filterMastery = $state('');
-	let filterType = $state('');
+	let filterTypes = $state<string[]>(['move', 'pattern']);
 	let filterLead = $state('');
 	let filterFollow = $state('');
 	let selectedTags = $state<string[]>([]);
 	let sortBy = $state('newest');
 
-	let hasFilters = $derived(searchQuery || filterDance || filterStyle || filterMastery || filterType || filterLead || filterFollow || selectedTags.length > 0);
+	let hasFilters = $derived(searchQuery || filterDance || filterStyle || filterMastery || filterTypes.length > 0 || filterLead || filterFollow || selectedTags.length > 0);
 
 	let allTags = $derived(() => {
 		const tags = new Set<string>();
@@ -96,7 +97,7 @@
 		if (filterDance) result = result.filter(c => c.dance === filterDance);
 		if (filterStyle) result = result.filter(c => c.style === filterStyle);
 		if (filterMastery) result = result.filter(c => c.mastery === filterMastery);
-		if (filterType) result = result.filter(c => c.clipType === filterType);
+		if (filterTypes.length > 0) result = result.filter(c => filterTypes.includes(c.clipType));
 		if (filterLead) result = result.filter(c => c.lead === filterLead);
 		if (filterFollow) result = result.filter(c => c.follow === filterFollow);
 		if (selectedTags.length > 0) result = result.filter(c => selectedTags.every(t => c.tags.includes(t)));
@@ -186,7 +187,7 @@
 		filterDance = '';
 		filterStyle = '';
 		filterMastery = '';
-		filterType = '';
+		filterTypes = [];
 		filterLead = '';
 		filterFollow = '';
 		selectedTags = [];
@@ -673,10 +674,10 @@
 						options={[{ value: 'seen', label: 'Seen it' }, { value: 'learning', label: 'Learning' }, { value: 'can do', label: 'Can do' }, { value: 'comfortable', label: 'Comfortable' }, { value: 'mastered', label: 'Mastered' }]}
 						placeholder="All mastery"
 					/>
-					<Dropdown
-						bind:value={filterType}
-						options={[{ value: 'move', label: 'Move' }, { value: 'pattern', label: 'Pattern' }, { value: 'styling', label: 'Styling' }, { value: 'footwork', label: 'Footwork' }]}
-						placeholder="All types"
+					<MultiSelect
+						bind:selected={filterTypes}
+						options={['move', 'pattern', 'styling', 'footwork', 'musicality']}
+						placeholder="Types..."
 					/>
 				{/if}
 			</div>
