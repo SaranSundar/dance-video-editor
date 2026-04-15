@@ -8,6 +8,32 @@ const API_KEY = 'e23def33-c1e6-4b94-b7ffa764825a-b295-44be';
 const STORAGE_HOST = 'la.storage.bunnycdn.com';
 const CDN_BASE = 'https://dance-videos-ss.b-cdn.net';
 
+// Metadata
+
+export async function fetchMetadata(): Promise<any> {
+	const res = await fetch(`${CDN_BASE}/metadata.json`, { cache: 'no-store' });
+	if (!res.ok) return { videos: [], clips: [], practices: [] };
+	return res.json();
+}
+
+export async function saveMetadataToCloud(json: string): Promise<void> {
+	const url = `https://${STORAGE_HOST}/${STORAGE_ZONE}/metadata.json`;
+	const response = await fetch(url, {
+		method: 'PUT',
+		headers: {
+			'AccessKey': API_KEY,
+			'Content-Type': 'application/json',
+		},
+		body: json,
+	});
+	if (!response.ok) {
+		const text = await response.text();
+		throw new Error(`Bunny metadata save failed: HTTP ${response.status} — ${text}`);
+	}
+}
+
+// Videos
+
 export function getCdnUrl(videoId: string): string {
 	return `${CDN_BASE}/${videoId}.mp4`;
 }

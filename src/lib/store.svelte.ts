@@ -1,5 +1,6 @@
 import * as fsStorage from './storage';
 import * as idbStorage from './storage-idb';
+import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud } from './bunny';
 import type { VideoMeta, ClipMeta, PracticeMeta } from './storage';
 
 export type { VideoMeta, ClipMeta, PracticeMeta };
@@ -47,6 +48,32 @@ export function getCdnUrlForVideo(videoId: string): string | null {
 	if (video?.cdnUrl) return video.cdnUrl;
 	if (cdnBaseUrl) return `${cdnBaseUrl.replace(/\/$/, '')}/${videoId}.mp4`;
 	return null;
+}
+
+// Sync metadata to Bunny Storage after every mutation
+async function syncToBunny() {
+	try {
+		const json = await storage().exportMetadata();
+		await saveMetadataToCloud(json);
+	} catch (e) {
+		console.error('Bunny metadata sync failed:', e);
+	}
+}
+
+// Load metadata from Bunny (source of truth), import into local storage
+async function loadFromBunny() {
+	try {
+		const bunnyMeta = await fetchBunnyMetadata();
+		const hasData = bunnyMeta.videos?.length > 0 || bunnyMeta.clips?.length > 0 || bunnyMeta.practices?.length > 0;
+		if (hasData) {
+			await storage().importMetadata(JSON.stringify(bunnyMeta));
+			await refresh();
+			return true;
+		}
+	} catch (e) {
+		console.warn('Could not load from Bunny, using local:', e);
+	}
+	return false;
 }
 
 async function seedDefaultMetadata() {
@@ -104,20 +131,22 @@ export async function init() {
 			if (restored) {
 				folderName = fsStorage.getFolderName();
 				await refresh();
-				await seedDefaultMetadata();
-				state = 'ready';
-				checkLocalAvailability();
-				return;
 			}
 		}
 
-		// OPFS path: Safari/iOS/Firefox, or Chrome/Edge without a folder
-		storageType = 'indexeddb';
-		await refresh();
-		await seedDefaultMetadata();
+		if (storageType !== 'filesystem' || !folderName) {
+			// OPFS path: Safari/iOS/Firefox, or Chrome/Edge without a folder
+			storageType = 'indexeddb';
+			await refresh();
+		}
+
+		// Load from Bunny (source of truth for metadata)
+		const loaded = await loadFromBunny();
+		if (!loaded) {
+			await seedDefaultMetadata();
+		}
 	} catch (e) {
 		console.error('Storage init failed:', e);
-		// Seed in-memory from defaults even if storage is broken
 		await seedDefaultMetadata();
 	} finally {
 		state = 'ready';
@@ -132,15 +161,14 @@ export async function grantPermission() {
 			storageType = 'filesystem';
 			folderName = fsStorage.getFolderName();
 			await refresh();
-			await seedDefaultMetadata();
+			const loaded = await loadFromBunny();
+			if (!loaded) await seedDefaultMetadata();
 			state = 'ready';
 			checkLocalAvailability();
 		} else {
-			// requestPermission returned false (e.g. Android stale handle) — re-pick
 			state = 'no-folder';
 		}
 	} catch {
-		// handle.requestPermission() can throw on Android Chrome with stale handles
 		state = 'no-folder';
 	}
 }
@@ -150,7 +178,8 @@ export async function pickFolder() {
 	storageType = 'filesystem';
 	folderName = fsStorage.getFolderName();
 	await refresh();
-	await seedDefaultMetadata();
+	const loaded = await loadFromBunny();
+	if (!loaded) await seedDefaultMetadata();
 	state = 'ready';
 	checkLocalAvailability();
 }
@@ -176,6 +205,7 @@ export async function addVideo(file: File, duration: number, thumbnailBlob: Blob
 	} else {
 		videos = [...videos, video];
 	}
+	syncToBunny();
 	return video;
 }
 
@@ -185,6 +215,7 @@ export async function updateVideo(videoId: string, updates: { name?: string; lea
 	if (updates.name !== undefined) {
 		clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: updates.name! } : c);
 	}
+	syncToBunny();
 }
 
 export async function getVideoThumbnail(videoId: string) {
@@ -195,12 +226,14 @@ export async function deleteVideo(videoId: string) {
 	await storage().deleteVideo(videoId);
 	videos = videos.filter(v => v.id !== videoId);
 	clips = clips.filter(c => c.videoId !== videoId);
+	syncToBunny();
 }
 
 export async function renameVideo(videoId: string, newName: string) {
 	await storage().renameVideo(videoId, newName);
 	videos = videos.map(v => v.id === videoId ? { ...v, name: newName } : v);
 	clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: newName } : c);
+	syncToBunny();
 }
 
 export async function getVideoBlob(videoId: string) {
@@ -228,17 +261,20 @@ export async function addClip(
 ) {
 	const clip = await storage().addClip(input);
 	clips = [...clips, clip];
+	syncToBunny();
 	return clip;
 }
 
 export async function updateClip(clipId: string, updates: { label?: string; lead?: string; follow?: string; dance?: string; style?: string; mastery?: string; clipType?: string; tags?: string[]; parentClipId?: string | null; links?: { id: string; type: 'clip' | 'video'; label: string }[]; hidden?: boolean; hiddenFromSearch?: boolean }) {
 	await storage().updateClip(clipId, updates);
 	clips = clips.map(c => c.id === clipId ? { ...c, ...updates } : c);
+	syncToBunny();
 }
 
 export async function deleteClip(clipId: string) {
 	await storage().deleteClip(clipId);
 	clips = clips.filter(c => c.id !== clipId);
+	syncToBunny();
 }
 
 export async function exportMetadata(): Promise<string> {
@@ -248,11 +284,13 @@ export async function exportMetadata(): Promise<string> {
 export async function importMetadata(json: string): Promise<void> {
 	await storage().importMetadata(json);
 	await refresh();
+	syncToBunny();
 }
 
 export async function nukeAll() {
 	await storage().nukeAll();
 	await refresh();
+	syncToBunny();
 }
 
 export function getClipsByVideo(videoId: string): ClipMeta[] {
@@ -270,16 +308,16 @@ export function getLinksForClip(clipId: string): { id: string; type: 'clip' | 'v
 
 export async function addLink(clipId: string, targetId: string, targetType: 'clip' | 'video', label: string) {
 	await storage().addLink(clipId, targetId, targetType, label);
-	// Refresh in-memory state
 	const allClips = await storage().getClips();
 	clips = allClips.filter(c => c.endTime > c.startTime);
+	syncToBunny();
 }
 
 export async function removeLink(clipId: string, targetId: string) {
 	await storage().removeLink(clipId, targetId);
-	// Refresh in-memory state
 	const allClips = await storage().getClips();
 	clips = allClips.filter(c => c.endTime > c.startTime);
+	syncToBunny();
 }
 
 // Practices
@@ -287,15 +325,18 @@ export async function removeLink(clipId: string, targetId: string) {
 export async function addPractice(input: { name: string; clipIds: string[]; loop?: boolean }) {
 	const practice = await storage().addPractice(input);
 	practices = [...practices, practice];
+	syncToBunny();
 	return practice;
 }
 
 export async function updatePractice(practiceId: string, updates: { name?: string; clipIds?: string[]; loop?: boolean }) {
 	await storage().updatePractice(practiceId, updates);
 	practices = practices.map(p => p.id === practiceId ? { ...p, ...updates } : p);
+	syncToBunny();
 }
 
 export async function deletePractice(practiceId: string) {
 	await storage().deletePractice(practiceId);
 	practices = practices.filter(p => p.id !== practiceId);
+	syncToBunny();
 }
