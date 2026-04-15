@@ -636,6 +636,45 @@
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:02:04.208Z",
       "cdnUrl": "https://dance-videos.b-cdn.net/b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a.mp4"
+    },
+    {
+      "id": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "name": "Lejania - Miguel & Sunsire BACHATA Fusion Demo at BS Spain Benidorm",
+      "fingerprint": "285370846:31d7b14b150532136cf43bcee395f87579c54759765ee070a87b654f5aa70f40",
+      "duration": 209.301,
+      "lead": "Miguel",
+      "follow": "Sunsire",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:17:14.886Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/b64650a1-c9fb-4ad6-8151-4f23dcf5df8b.mp4"
+    },
+    {
+      "id": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "name": "Beautiful Things - Miguel & Sunsire BACHATA Fusion Demo at Bachatasia World Congress",
+      "fingerprint": "233379204:f66a2428b382c2984e4712d8304ef1e713c5e5d8bc9d8417da2fa37b80d1b161",
+      "duration": 206.421,
+      "lead": "Miguel",
+      "follow": "Sunsire",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:17:23.749Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/065a3909-77c3-48ad-aed9-3266095f134b.mp4"
+    },
+    {
+      "id": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "name": "In the Stars - Benson Boone by Melvin and Gatica",
+      "fingerprint": "324197556:205e2e15145fd541ebd80c74571c5eab11dcacfb1be755b6b3ff28d72e90b28d",
+      "duration": 266.241,
+      "lead": "Melvin",
+      "follow": "Gatica",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:17:36.512Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/5d8bf8dd-e749-45fb-bc8e-ede9a730e501.mp4"
     }
   ],
   "clips": [
