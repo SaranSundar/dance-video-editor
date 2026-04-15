@@ -675,6 +675,45 @@
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:17:36.512Z",
       "cdnUrl": "https://dance-videos.b-cdn.net/5d8bf8dd-e749-45fb-bc8e-ede9a730e501.mp4"
+    },
+    {
+      "id": "7b5d7739-7af0-46c4-9332-396b162f6511",
+      "name": "Micka y Laura - Bachata Demo - Ay San Miguel (Romeo Santos ft Prince Royce)",
+      "fingerprint": "283252313:aa8aa92ab35b379b41b87c17d53e8f2b306cc620671646f9cc04292f241517e1",
+      "duration": 242.961,
+      "lead": "Micka",
+      "follow": "Laura",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:33:00.948Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/7b5d7739-7af0-46c4-9332-396b162f6511.mp4"
+    },
+    {
+      "id": "6ca492b0-34d9-4334-8ab8-408e43c63a08",
+      "name": "You Broke Me First - Jes y Jenny Bachata Mestiza (DJ Tronky)",
+      "fingerprint": "78798519:ecd327af740891e19f375ed761ae7aa0d2639ef532116086f3f001ee43150bb1",
+      "duration": 183.081,
+      "lead": "Jes",
+      "follow": "Jenny",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:33:04.440Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/6ca492b0-34d9-4334-8ab8-408e43c63a08.mp4"
+    },
+    {
+      "id": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "name": "Daniel y Desiree Los Angeles - Don't Let Me Down (Bachata Dj Khalid)",
+      "fingerprint": "108425024:c49389887dbf2205deedd57dcd97fff4e861328808324f4b93c2336998450cbb",
+      "duration": 238.901,
+      "lead": "Daniel",
+      "follow": "Desiree",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:33:09.194Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/d7e4b209-e87f-495a-8fdb-3183a8904561.mp4"
     }
   ],
   "clips": [
@@ -1039,6 +1078,46 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "createdAt": "2026-04-15T18:10:18.863Z"
+    },
+    {
+      "id": "84034785-1724-4380-a7d2-7e5e51b9135a",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "videoName": "Lejania - Miguel & Sunsire BACHATA Fusion Demo at BS Spain Benidorm",
+      "label": "Lejania Middle Musicality",
+      "lead": "Miguel",
+      "follow": "Sunsire",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 47.773929,
+      "endTime": 78.932862,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-15T20:25:05.532Z"
+    },
+    {
+      "id": "9c08cccd-0978-4d89-90d9-55828d0e6eb2",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "videoName": "Lejania - Miguel & Sunsire BACHATA Fusion Demo at BS Spain Benidorm",
+      "label": "Lejania Intro",
+      "lead": "Miguel",
+      "follow": "Sunsire",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 0,
+      "endTime": 10.682218,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-15T20:25:34.941Z"
     }
   ],
   "practices": [
