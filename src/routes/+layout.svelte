@@ -141,19 +141,6 @@
 			<a href="/practice" class:active={currentPath.startsWith('/practice')}>Practice</a>
 			<a href="/levels" class:active={currentPath === '/levels'}>Levels</a>
 			{#if state === 'ready'}
-				<button class="nav-action-btn" onclick={handleExport} disabled={exporting} title="Export metadata as JSON">
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-					</svg>
-					{exporting ? 'Exporting...' : 'Export'}
-				</button>
-				<label class="nav-action-btn import-label" title="Import metadata JSON">
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-					</svg>
-					{importing ? 'Importing...' : 'Import'}
-					<input type="file" accept=".json" onchange={handleImport} style="position:absolute;width:0;height:0;overflow:hidden;opacity:0" />
-				</label>
 				{#if isPwa}
 					<button class="nav-action-btn" onclick={handleUpdate} disabled={updating} title="Check for updates and refresh">
 						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
