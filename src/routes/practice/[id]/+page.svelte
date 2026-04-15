@@ -154,6 +154,11 @@
 	let videoUrl = $state<string | null>(null);
 	let revokeUrl = $state<(() => void) | null>(null);
 	let playerVisible = $state(false);
+	let playbackSpeed = $state(1);
+	let clipProgress = $state(0);
+	let currentVideoId = $state<string | null>(null);
+
+	const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
 	async function startPlayback(fromIndex = 0) {
 		if (sessionClips.length === 0) return;
@@ -163,9 +168,6 @@
 	}
 
 	async function loadClip(index: number) {
-		// Clean up previous
-		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
-
 		if (index >= sessionClips.length) {
 			if (practice?.loop) {
 				currentIndex = 0;
@@ -177,13 +179,25 @@
 		}
 
 		currentIndex = index;
+		clipProgress = 0;
 		const clip = sessionClips[index];
+
+		// If same video, just seek — don't reload
+		if (currentVideoId === clip.videoId && videoEl) {
+			videoEl.currentTime = clip.startTime;
+			videoEl.play();
+			playing = true;
+			return;
+		}
+
+		// Different video — load new source
+		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		try {
 			const result = await store.getVideoUrl(clip.videoId);
+			currentVideoId = clip.videoId;
 			videoUrl = result.url;
 			revokeUrl = result.revoke;
 		} catch {
-			// Skip to next on error
 			await loadClip(index + 1);
 		}
 	}
@@ -193,6 +207,7 @@
 		const clip = sessionClips[currentIndex];
 		if (clip) {
 			videoEl.currentTime = clip.startTime;
+			videoEl.playbackRate = playbackSpeed;
 			videoEl.play();
 			playing = true;
 		}
@@ -201,9 +216,15 @@
 	function handleTimeUpdate() {
 		if (!videoEl) return;
 		const clip = sessionClips[currentIndex];
-		if (clip && videoEl.currentTime >= clip.endTime) {
+		if (!clip) return;
+		if (videoEl.currentTime >= clip.endTime) {
 			loadClip(currentIndex + 1);
+			return;
 		}
+		// Update progress
+		const elapsed = videoEl.currentTime - clip.startTime;
+		const duration = clip.endTime - clip.startTime;
+		clipProgress = duration > 0 ? (elapsed / duration) * 100 : 0;
 	}
 
 	function togglePlayPause() {
@@ -215,9 +236,27 @@
 		}
 	}
 
+	function seekClip(e: MouseEvent) {
+		if (!videoEl) return;
+		const clip = sessionClips[currentIndex];
+		if (!clip) return;
+		const bar = e.currentTarget as HTMLElement;
+		const rect = bar.getBoundingClientRect();
+		const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+		const duration = clip.endTime - clip.startTime;
+		videoEl.currentTime = clip.startTime + pct * duration;
+	}
+
+	function setSpeed(speed: number) {
+		playbackSpeed = speed;
+		if (videoEl) videoEl.playbackRate = speed;
+	}
+
 	function stopPlayback() {
 		playing = false;
 		playerVisible = false;
+		currentVideoId = null;
+		clipProgress = 0;
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		videoUrl = null;
 	}
@@ -319,6 +358,41 @@
 							<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
 						</div>
 					{/if}
+				</div>
+				<div class="player-controls" onclick={(e) => e.stopPropagation()}>
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div class="progress-bar" onclick={seekClip}>
+						<div class="progress-fill" style="width: {clipProgress}%"></div>
+					</div>
+					<div class="controls-row">
+						<div class="controls-left">
+							<button class="ctrl-btn" onclick={togglePlayPause}>
+								{#if playing}
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+								{:else}
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+								{/if}
+							</button>
+							{#if currentIndex > 0}
+								<button class="ctrl-btn" onclick={() => skipToClip(currentIndex - 1)} title="Previous clip">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="19 20 9 12 19 4" /><line x1="5" y1="4" x2="5" y2="20" /></svg>
+								</button>
+							{/if}
+							{#if currentIndex < sessionClips.length - 1}
+								<button class="ctrl-btn" onclick={() => skipToClip(currentIndex + 1)} title="Next clip">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="5 4 15 12 5 20" /><line x1="19" y1="4" x2="19" y2="20" /></svg>
+								</button>
+							{/if}
+						</div>
+						<div class="controls-right">
+							<select class="speed-select" value={playbackSpeed} onchange={(e) => setSpeed(Number((e.target as HTMLSelectElement).value))}>
+								{#each speeds as s}
+									<option value={s}>{s}x</option>
+								{/each}
+							</select>
+						</div>
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -654,6 +728,84 @@
 		background: rgba(0, 0, 0, 0.3);
 		color: #fff;
 		pointer-events: none;
+	}
+
+	/* Player controls */
+	.player-controls {
+		padding: 0 14px 12px;
+	}
+
+	.progress-bar {
+		height: 6px;
+		background: rgba(255, 255, 255, 0.08);
+		border-radius: 3px;
+		cursor: pointer;
+		margin-bottom: 10px;
+		overflow: hidden;
+	}
+
+	.progress-bar:hover {
+		height: 8px;
+	}
+
+	.progress-fill {
+		height: 100%;
+		background: #6366f1;
+		border-radius: 3px;
+		transition: width 0.1s linear;
+	}
+
+	.controls-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.controls-left {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.controls-right {
+		display: flex;
+		align-items: center;
+	}
+
+	.ctrl-btn {
+		background: none;
+		border: none;
+		color: #a1a1aa;
+		padding: 6px 8px;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: color 0.15s, background 0.15s;
+		display: flex;
+		align-items: center;
+	}
+
+	.ctrl-btn:hover {
+		color: #e4e4e7;
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.speed-select {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		color: #a1a1aa;
+		padding: 4px 8px;
+		border-radius: 6px;
+		font-size: 12px;
+		font-weight: 600;
+		font-family: 'Inter', sans-serif;
+		cursor: pointer;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	.speed-select:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.4);
 	}
 
 	/* Picker */
