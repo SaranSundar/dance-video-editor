@@ -1,29 +1,22 @@
 /**
- * Client-side upload to Bunny Storage.
- * Personal app — API key is safe to embed.
+ * Bunny CDN/Storage client.
+ * Reads go directly to CDN. Writes go through /api/bunny proxy (CORS).
  */
 
-const STORAGE_ZONE = 'dance-videos-ss';
-const API_KEY = 'e23def33-c1e6-4b94-b7ffa764825a-b295-44be';
-const STORAGE_HOST = 'la.storage.bunnycdn.com';
 const CDN_BASE = 'https://dance-videos-ss.b-cdn.net';
 
 // Metadata
 
 export async function fetchMetadata(): Promise<any> {
-	const res = await fetch(`${CDN_BASE}/metadata.json`, { cache: 'no-store' });
+	const res = await fetch(`${CDN_BASE}/metadata.json?t=${Date.now()}`);
 	if (!res.ok) return { videos: [], clips: [], practices: [] };
 	return res.json();
 }
 
 export async function saveMetadataToCloud(json: string): Promise<void> {
-	const url = `https://${STORAGE_HOST}/${STORAGE_ZONE}/metadata.json`;
-	const response = await fetch(url, {
+	const response = await fetch(`/api/bunny?path=metadata.json`, {
 		method: 'PUT',
-		headers: {
-			'AccessKey': API_KEY,
-			'Content-Type': 'application/json',
-		},
+		headers: { 'Content-Type': 'application/json' },
 		body: json,
 	});
 	if (!response.ok) {
@@ -48,14 +41,12 @@ export async function uploadVideo(
 	onProgress?: (loaded: number, total: number) => void
 ): Promise<string> {
 	const remoteName = `${videoId}.mp4`;
-	const url = `https://${STORAGE_HOST}/${STORAGE_ZONE}/${remoteName}`;
+	const proxyUrl = `/api/bunny?path=${encodeURIComponent(remoteName)}`;
 
 	if (onProgress) {
-		// Use XMLHttpRequest for progress tracking
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
-			xhr.open('PUT', url);
-			xhr.setRequestHeader('AccessKey', API_KEY);
+			xhr.open('PUT', proxyUrl);
 			xhr.setRequestHeader('Content-Type', 'video/mp4');
 
 			xhr.upload.onprogress = (e) => {
@@ -75,13 +66,9 @@ export async function uploadVideo(
 		});
 	}
 
-	// Simple fetch path (no progress)
-	const response = await fetch(url, {
+	const response = await fetch(proxyUrl, {
 		method: 'PUT',
-		headers: {
-			'AccessKey': API_KEY,
-			'Content-Type': 'video/mp4',
-		},
+		headers: { 'Content-Type': 'video/mp4' },
 		body: file,
 	});
 
@@ -98,14 +85,9 @@ export async function uploadThumbnail(
 	blob: Blob
 ): Promise<string> {
 	const remoteName = `${videoId}-thumb.jpg`;
-	const url = `https://${STORAGE_HOST}/${STORAGE_ZONE}/${remoteName}`;
-
-	const response = await fetch(url, {
+	const response = await fetch(`/api/bunny?path=${encodeURIComponent(remoteName)}`, {
 		method: 'PUT',
-		headers: {
-			'AccessKey': API_KEY,
-			'Content-Type': 'image/jpeg',
-		},
+		headers: { 'Content-Type': 'image/jpeg' },
 		body: blob,
 	});
 

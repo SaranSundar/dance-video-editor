@@ -1,6 +1,6 @@
 {
 	"outputDirectory": "build",
 	"rewrites": [
-		{ "source": "/((?!_app/|favicon|robots|manifest|sw\\.js|icon-).*)", "destination": "/index.html" }
+		{ "source": "/((?!_app/|api/|favicon|robots|manifest|sw\\.js|icon-).*)", "destination": "/index.html" }
 	]
 }
