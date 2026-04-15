@@ -623,6 +623,19 @@
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:27.768Z",
       "cdnUrl": "https://dance-videos.b-cdn.net/a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e.mp4"
+    },
+    {
+      "id": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
+      "name": "Barcelona - Miguel & Sunsire BACHATA Fusion Demo at Bachatasia",
+      "fingerprint": "215761102:46cb4196f17b1df99d6ee7cd79f4e844ad66fd4de30c147ecb1f865bb54f5e9a",
+      "duration": 208.661,
+      "lead": "Miguel",
+      "follow": "Sunsire",
+      "dance": "bachata",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-15T20:02:04.208Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a.mp4"
     }
   ],
   "clips": [
@@ -927,7 +940,79 @@
       "links": [],
       "hidden": false,
       "hiddenFromSearch": false
+    },
+    {
+      "id": "606892e7-66e9-4833-b1a2-c6190005eb42",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "videoName": "Emilien & Téhina – Demo Workshop ｜ Empire Sensual Movement 2025 [QerWHKjOKh0] [h265]",
+      "label": "La Culpa Middle Musicality",
+      "lead": "Emilien",
+      "follow": "Tehina",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 71.305983,
+      "endTime": 101.907809,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-15T18:07:59.200Z"
+    },
+    {
+      "id": "f0ae3837-acf1-4617-b72e-317305f2b59d",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "videoName": "Emilien & Téhina – Demo Workshop ｜ Empire Sensual Movement 2025 [QerWHKjOKh0] [h265]",
+      "label": "La Culpa Intro Musicality",
+      "lead": "Emilien",
+      "follow": "Tehina",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 13.899597,
+      "endTime": 29.702658,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-15T18:08:35.342Z"
+    },
+    {
+      "id": "22093679-8d57-407e-aca7-1b118c56fca2",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "videoName": "08 - Call_on_me_-_Johnny_Sky_Bachata_influence_by_Emilien_Tehina",
+      "label": "Call On Me Middle Musicality",
+      "lead": "Emilien",
+      "follow": "Tehina",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 72.559098,
+      "endTime": 103.188397,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-15T18:10:18.863Z"
     }
   ],
-  "practices": []
+  "practices": [
+    {
+      "id": "6dd143c7-f52e-4bad-b380-0a4423374bdf",
+      "name": "musicality",
+      "clipIds": [
+        "f0ae3837-acf1-4617-b72e-317305f2b59d",
+        "606892e7-66e9-4833-b1a2-c6190005eb42",
+        "22093679-8d57-407e-aca7-1b118c56fca2"
+      ],
+      "loop": false,
+      "createdAt": "2026-04-15T17:42:20.516Z"
+    }
+  ]
 }
