@@ -160,23 +160,21 @@
 
 	const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
-	let pendingPlay = $state(false);
-	let userHasInteracted = $state(false);
-
-	async function startPlayback(fromIndex = 0) {
+	// Set video URL synchronously from user gesture so Safari allows autoplay.
+	// getCdnUrlForVideo is sync (just a string), so no async needed.
+	function startPlayback(fromIndex = 0) {
 		if (sessionClips.length === 0) return;
 		currentIndex = fromIndex;
+		clipProgress = 0;
 		playerVisible = true;
-		userHasInteracted = true;
-		pendingPlay = true;
-		await loadClip(fromIndex);
+		setClipSource(fromIndex);
 	}
 
-	async function loadClip(index: number) {
+	function setClipSource(index: number) {
 		if (index >= sessionClips.length) {
 			if (practice?.loop) {
 				currentIndex = 0;
-				await loadClip(0);
+				setClipSource(0);
 			} else {
 				stopPlayback();
 			}
@@ -187,24 +185,21 @@
 		clipProgress = 0;
 		const clip = sessionClips[index];
 
-		// If same video, just seek — don't reload
+		// Same video — just seek, don't reload
 		if (currentVideoId === clip.videoId && videoEl) {
 			videoEl.currentTime = clip.startTime;
-			videoEl.play().catch(() => { pendingPlay = true; });
+			videoEl.playbackRate = playbackSpeed;
+			videoEl.play().catch(() => {});
 			playing = true;
 			return;
 		}
 
-		// Different video — load new source
+		// Different video — set src (sync)
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
-		pendingPlay = true;
-		try {
-			const result = await store.getVideoUrl(clip.videoId);
+		const cdnUrl = store.getCdnUrlForVideo(clip.videoId);
+		if (cdnUrl) {
 			currentVideoId = clip.videoId;
-			videoUrl = result.url;
-			revokeUrl = result.revoke;
-		} catch {
-			await loadClip(index + 1);
+			videoUrl = cdnUrl;
 		}
 	}
 
@@ -214,10 +209,7 @@
 		if (clip) {
 			videoEl.currentTime = clip.startTime;
 			videoEl.playbackRate = playbackSpeed;
-			if (pendingPlay) {
-				videoEl.play().catch(() => {});
-				pendingPlay = false;
-			}
+			videoEl.play().catch(() => {});
 		}
 	}
 
@@ -226,7 +218,7 @@
 		const clip = sessionClips[currentIndex];
 		if (!clip) return;
 		if (videoEl.currentTime >= clip.endTime) {
-			loadClip(currentIndex + 1);
+			setClipSource(currentIndex + 1);
 			return;
 		}
 		// Update progress
@@ -266,14 +258,12 @@
 		playerVisible = false;
 		currentVideoId = null;
 		clipProgress = 0;
-		pendingPlay = false;
-		userHasInteracted = false;
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		videoUrl = null;
 	}
 
 	function skipToClip(index: number) {
-		loadClip(index);
+		setClipSource(index);
 	}
 
 	function formatTime(seconds: number): string {
@@ -359,6 +349,7 @@
 						bind:this={videoEl}
 						src={videoUrl}
 						playsinline
+						autoplay
 						oncanplay={handlePlayerCanPlay}
 						ontimeupdate={handleTimeUpdate}
 						onplay={() => playing = true}
