@@ -528,7 +528,8 @@
 
 	function generateYtdlp() {
 		if (!youtubeUrl.trim()) return;
-		ytdlpCommand = `yt-dlp --no-playlist -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --merge-output-format mp4 "${youtubeUrl.trim()}"`;
+		const url = youtubeUrl.trim();
+		ytdlpCommand = `yt-dlp -f "bestvideo+bestaudio/best" --merge-output-format mp4 -o "%(title)s.%(ext)s" --restrict-filenames --exec "ffmpeg -i {} -c:v hevc_videotoolbox -q:v 55 -tag:v hvc1 -c:a aac -b:a 192k -movflags +faststart {}.h265.mp4 && rm {}" "${url}"`;
 	}
 
 	async function copyCommand() {
