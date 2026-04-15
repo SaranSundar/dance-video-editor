@@ -24,25 +24,42 @@
 		return `${m}:${s.toString().padStart(2, '0')}`;
 	}
 
-	async function createSession() {
-		const name = prompt('Practice session name:');
-		if (!name?.trim()) return;
-		const practice = await store.addPractice({ name: name.trim(), clipIds: [] });
+	let showCreateModal = $state(false);
+	let newSessionName = $state('');
+	let nameInputEl = $state<HTMLInputElement | undefined>();
+
+	function openCreateModal() {
+		newSessionName = '';
+		showCreateModal = true;
+		setTimeout(() => nameInputEl?.focus(), 50);
+	}
+
+	async function confirmCreate() {
+		if (!newSessionName.trim()) return;
+		const practice = await store.addPractice({ name: newSessionName.trim(), clipIds: [] });
+		showCreateModal = false;
 		goto(`/practice/${practice.id}`);
 	}
 
-	async function deleteSession(id: string, e: Event) {
+	let showDeleteId = $state<string | null>(null);
+
+	function askDelete(id: string, e: Event) {
 		e.preventDefault();
 		e.stopPropagation();
-		if (!confirm('Delete this practice session?')) return;
-		await store.deletePractice(id);
+		showDeleteId = id;
+	}
+
+	async function confirmDelete() {
+		if (!showDeleteId) return;
+		await store.deletePractice(showDeleteId);
+		showDeleteId = null;
 	}
 </script>
 
 <div class="page">
 	<div class="header">
 		<h1>Practice Sessions</h1>
-		<button class="create-btn" onclick={createSession}>
+		<button class="create-btn" onclick={openCreateModal}>
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
 				<line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
 			</svg>
@@ -71,7 +88,7 @@
 							{/if}
 						</div>
 					</div>
-					<button class="delete-btn" onclick={(e) => deleteSession(practice.id, e)} title="Delete">
+					<button class="delete-btn" onclick={(e) => askDelete(practice.id, e)} title="Delete">
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
 							<polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 						</svg>
@@ -81,6 +98,52 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Create session modal -->
+{#if showCreateModal}
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div class="modal-backdrop" onclick={() => showCreateModal = false}>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="modal" onclick={(e) => e.stopPropagation()}>
+			<h2>New Practice Session</h2>
+			<form onsubmit={(e) => { e.preventDefault(); confirmCreate(); }}>
+				<!-- svelte-ignore a11y_autofocus -->
+				<input
+					type="text"
+					bind:this={nameInputEl}
+					bind:value={newSessionName}
+					placeholder="Session name..."
+					class="modal-input"
+					autofocus
+				/>
+				<div class="modal-actions">
+					<button type="button" class="modal-btn cancel" onclick={() => showCreateModal = false}>Cancel</button>
+					<button type="submit" class="modal-btn confirm" disabled={!newSessionName.trim()}>Create</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- Delete confirmation modal -->
+{#if showDeleteId}
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div class="modal-backdrop" onclick={() => showDeleteId = null}>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="modal" onclick={(e) => e.stopPropagation()}>
+			<h2>Delete Session</h2>
+			<p class="modal-message">Are you sure you want to delete this practice session? This cannot be undone.</p>
+			<div class="modal-actions">
+				<button class="modal-btn cancel" onclick={() => showDeleteId = null}>Cancel</button>
+				<button class="modal-btn danger" onclick={confirmDelete}>Delete</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.page {
@@ -209,5 +272,113 @@
 	.delete-btn:hover {
 		color: #ef4444;
 		background: rgba(239, 68, 68, 0.08);
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+		padding: 24px;
+	}
+
+	.modal {
+		background: #18181b;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 14px;
+		padding: 24px;
+		width: 100%;
+		max-width: 400px;
+		box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+	}
+
+	.modal h2 {
+		margin: 0 0 16px;
+		font-size: 17px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+
+	.modal-message {
+		color: #71717a;
+		font-size: 14px;
+		line-height: 1.5;
+		margin: 0 0 20px;
+	}
+
+	.modal-input {
+		width: 100%;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+		padding: 11px 14px;
+		border-radius: 8px;
+		font-size: 15px;
+		font-family: 'Inter', sans-serif;
+		margin-bottom: 20px;
+		transition: border-color 0.15s;
+	}
+
+	.modal-input:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.5);
+	}
+
+	.modal-input::placeholder {
+		color: #3f3f46;
+	}
+
+	.modal-actions {
+		display: flex;
+		gap: 8px;
+		justify-content: flex-end;
+	}
+
+	.modal-btn {
+		padding: 9px 18px;
+		border-radius: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		font-family: 'Inter', sans-serif;
+		border: none;
+		transition: background 0.15s, opacity 0.15s;
+	}
+
+	.modal-btn.cancel {
+		background: rgba(255, 255, 255, 0.06);
+		color: #a1a1aa;
+	}
+
+	.modal-btn.cancel:hover {
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.modal-btn.confirm {
+		background: #6366f1;
+		color: #fff;
+	}
+
+	.modal-btn.confirm:hover {
+		background: #7c3aed;
+	}
+
+	.modal-btn.confirm:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	.modal-btn.danger {
+		background: #dc2626;
+		color: #fff;
+	}
+
+	.modal-btn.danger:hover {
+		background: #ef4444;
 	}
 </style>
