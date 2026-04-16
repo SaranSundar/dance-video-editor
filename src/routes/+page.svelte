@@ -128,9 +128,8 @@
 		return v.name.toLowerCase().includes(value.toLowerCase());
 	}
 
-	let filteredVideos = $derived(() => {
+	let filteredVideosAll = $derived(() => {
 		let result = videos;
-		// Apply visibility: hidden videos excluded from browse, hiddenFromSearch also excluded from search
 		if (hasSearch) {
 			result = result.filter(v => !v.hiddenFromSearch);
 		} else {
@@ -145,6 +144,10 @@
 		}
 		return sortItems(result, sortBy);
 	});
+
+	let demoVideos = $derived(() => filteredVideosAll().filter(v => (v.category ?? 'demo') === 'demo'));
+	let jnjVideos = $derived(() => filteredVideosAll().filter(v => v.category === 'jack-and-jill'));
+	let otherVideos = $derived(() => filteredVideosAll().filter(v => v.category && !['demo', 'jack-and-jill'].includes(v.category)));
 
 	const coupleProfilesBase = [
 		{ lead: 'Anthony', follow: 'Katie', img: '/couples/anthony-katie.jpg', label: 'Anthony & Katie' },
@@ -716,7 +719,7 @@
 	<div class="header">
 		<h1>Videos</h1>
 		{#if videos.length > 0}
-			<span class="count">{filteredVideos().length}{hasFilters ? ` of ${videos.length}` : ''} video{filteredVideos().length === 1 ? '' : 's'}</span>
+			<span class="count">{filteredVideosAll().length}{hasFilters ? ` of ${videos.length}` : ''} video{filteredVideosAll().length === 1 ? '' : 's'}</span>
 		{/if}
 	</div>
 
@@ -833,9 +836,9 @@
 		</div>
 	{/if}
 
-	{#if filteredVideos().length > 0}
+	{#snippet videoGrid(videoList: typeof videos)}
 		<div class="video-grid">
-			{#each filteredVideos() as video (video.id)}
+			{#each videoList as video (video.id)}
 				<a href="/videos/{video.id}" class="video-card">
 					<div class="video-thumb">
 						{#if thumbnailUrls[video.id]}
@@ -882,6 +885,28 @@
 				</a>
 			{/each}
 		</div>
+	{/snippet}
+
+	{#if demoVideos().length > 0}
+		{@render videoGrid(demoVideos())}
+	{/if}
+
+	{#if jnjVideos().length > 0}
+		<div class="section-divider"></div>
+		<div class="header">
+			<h2>Jack & Jill</h2>
+			<span class="count">{jnjVideos().length} video{jnjVideos().length === 1 ? '' : 's'}</span>
+		</div>
+		{@render videoGrid(jnjVideos())}
+	{/if}
+
+	{#if otherVideos().length > 0}
+		<div class="section-divider"></div>
+		<div class="header">
+			<h2>Other</h2>
+			<span class="count">{otherVideos().length} video{otherVideos().length === 1 ? '' : 's'}</span>
+		</div>
+		{@render videoGrid(otherVideos())}
 	{/if}
 </div>
 

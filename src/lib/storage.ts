@@ -10,6 +10,7 @@ interface VideoMeta {
 	lead: string;
 	follow: string;
 	dance: string;
+	category?: 'demo' | 'jack-and-jill' | 'workshop' | 'social';
 	hidden: boolean;
 	hiddenFromSearch: boolean;
 	addedAt: string;

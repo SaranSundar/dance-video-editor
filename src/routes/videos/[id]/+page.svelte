@@ -15,6 +15,7 @@
 	let editLead = $state('');
 	let editFollow = $state('');
 	let editDance = $state('');
+	let editCategory = $state<string>('demo');
 	let metaInitialized = $state(false);
 
 	const couples: [string, string][] = [
@@ -43,6 +44,7 @@
 			editLead = videoMeta.lead || '';
 			editFollow = videoMeta.follow || '';
 			editDance = videoMeta.dance || '';
+			editCategory = videoMeta.category ?? 'demo';
 			metaInitialized = true;
 		}
 	});
@@ -53,8 +55,9 @@
 			const lead = editLead;
 			const follow = editFollow;
 			const dance = editDance;
-			if (lead !== videoMeta.lead || follow !== videoMeta.follow || dance !== videoMeta.dance) {
-				store.updateVideo(videoId, { lead, follow, dance });
+			const category = editCategory as 'demo' | 'jack-and-jill' | 'workshop' | 'social';
+			if (lead !== videoMeta.lead || follow !== videoMeta.follow || dance !== videoMeta.dance || category !== (videoMeta.category ?? 'demo')) {
+				store.updateVideo(videoId, { lead, follow, dance, category });
 			}
 		}
 	});
@@ -151,6 +154,7 @@
 					<Dropdown label="Lead" bind:value={editLead} options={leadOptions} placeholder="Select lead..." />
 					<Dropdown label="Follow" bind:value={editFollow} options={followOptions} placeholder="Select follow..." />
 					<Dropdown label="Dance" bind:value={editDance} options={danceOptions} placeholder="Select dance..." />
+					<Dropdown label="Category" bind:value={editCategory} options={[{ value: 'demo', label: 'Demo' }, { value: 'jack-and-jill', label: 'Jack & Jill' }, { value: 'workshop', label: 'Workshop' }, { value: 'social', label: 'Social' }]} />
 				</div>
 				<div class="visibility-options">
 					<button class="vis-toggle" class:active={videoMeta.hidden} onclick={() => store.updateVideo(videoId, { hidden: !videoMeta.hidden })}>Hide from home</button>
