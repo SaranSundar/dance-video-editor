@@ -209,9 +209,9 @@
 		needsSeek = false;
 		const clip = sessionClips[currentIndex];
 		if (clip) {
-			videoEl.currentTime = clip.startTime;
 			videoEl.playbackRate = playbackSpeed;
-			videoEl.play().catch(() => {});
+			videoEl.currentTime = clip.startTime;
+			// autoplay attribute handles playing — don't call play() here
 		}
 	}
 
@@ -229,11 +229,15 @@
 		clipProgress = duration > 0 ? (elapsed / duration) * 100 : 0;
 	}
 
-	function togglePlayPause() {
+	function togglePlayPause(e: Event) {
+		e.preventDefault();
 		if (!videoEl) return;
-		userHasInteracted = true;
 		if (videoEl.paused) {
-			videoEl.play().catch(() => {});
+			const clip = sessionClips[currentIndex];
+			if (clip) {
+				videoEl.currentTime = Math.max(clip.startTime, Math.min(videoEl.currentTime, clip.endTime));
+			}
+			videoEl.play();
 		} else {
 			videoEl.pause();
 		}
@@ -350,12 +354,13 @@
 					<!-- svelte-ignore a11y_media_has_caption -->
 					<video
 						bind:this={videoEl}
-						src={videoUrl}
+						autoplay
 						playsinline
-						onloadeddata={handleVideoLoaded}
-						ontimeupdate={handleTimeUpdate}
 						onplay={() => playing = true}
 						onpause={() => playing = false}
+						ontimeupdate={handleTimeUpdate}
+						onloadedmetadata={handleVideoLoaded}
+						src={videoUrl}
 					></video>
 					{#if !playing}
 						<div class="pause-overlay">

@@ -87,6 +87,8 @@ static/
   opfs-worker.js        # [INACTIVE] Web Worker for chunked OPFS writes on Safari
   icon-192.svg          # App icon
   icon-512.svg          # App icon
+api/
+  bunny.ts              # Vercel serverless proxy for Bunny Storage writes (CORS)
 scripts/
   upload-to-bunny.mjs   # Bulk upload videos to Bunny Storage
   migrate-h265.mjs      # H.265 migration + clip remapping script
@@ -123,11 +125,15 @@ move, pattern, styling, footwork, musicality
 
 ## Key Behaviors
 
-### Codec Detection
+### Codec Detection & H.265 Requirements
 - On import, MP4 files are checked for video codec via `stsd` atom parsing
 - Only **H.264** (`avc1`/`avc3`) and **H.265** (`hvc1`/`hev1`) are allowed
 - VP9, AV1, VP8 are rejected with an alert explaining how to re-encode
 - All videos on Bunny are H.265 encoded
+- **CRITICAL: H.265 must use `hvc1` tag, not `hev1`** — Safari only plays `hvc1`. Both are valid HEVC but differ in how codec parameters are stored in the MP4 container. `hvc1` puts params in the container header; `hev1` puts them inline with frames.
+- `hevc_videotoolbox -tag:v hvc1` (hardware encoder) always produces `hvc1` — use this
+- `libx265` (software encoder) defaults to `hev1` — must add `-tag:v hvc1` explicitly
+- To fix an existing `hev1` file without re-encoding: `ffmpeg -i input.mp4 -c:v copy -tag:v hvc1 -c:a copy -movflags +faststart output.mp4`
 
 ### Clip Creation
 - Clips are just timestamps + metadata, created instantly (no ffmpeg)
@@ -141,9 +147,10 @@ move, pattern, styling, footwork, musicality
 - Skips already-imported videos (by fingerprint match, then filename match)
 - Generates thumbnail via canvas on import
 - Computes content fingerprint (file size + SHA-256 of first 1MB)
-- **Uploads video to Bunny Storage** with XHR progress tracking
-- **Uploads thumbnail to Bunny Storage**
+- **Uploads video to Bunny Storage** via `/api/bunny` proxy (Vercel serverless function, needed for CORS)
+- **Uploads thumbnail to Bunny Storage** via same proxy
 - Sets `cdnUrl` on video metadata, syncs metadata to Bunny
+- yt-dlp command generates a single command to download + re-encode to H.265 with `hevc_videotoolbox`
 
 ### Export/Import
 - **Export** is JSON metadata only (no video files) - tiny file
@@ -197,12 +204,15 @@ git push origin main
 **Live:** https://dance-video-editor.vercel.app
 
 **Important config:**
-- `vercel.json` sets `outputDirectory: "build"` and SPA rewrites (excluding `_app/`)
+- `vercel.json` sets `outputDirectory: "build"` and SPA rewrites (excluding `_app/` and `api/`)
 - `svelte.config.js` uses `@sveltejs/adapter-static` with `fallback: 'index.html'` for SPA routing
+- `api/bunny.ts` is a Vercel serverless function (outside SvelteKit, runs on Vercel natively)
 
 ## Known Couples (Presets)
 
-Anthony & Katie, Cornel & Rithika, Emilien & Tehina, Gero & Migle, Irakli & Maria, Luis & Andrea, Marcus & Bianca, Melvin & Gatica, Miguel & Sunsire, Ofir & Ofri. Favian as extra lead (no fixed partner).
+Anthony & Katie, Cornel & Rithika, Daniel & Desiree, Emilien & Tehina, Gero & Migle, Irakli & Maria, Jes & Jenny, Luis & Andrea, Marcus & Bianca, Melvin & Gatica, Micka & Laura, Miguel & Sunsire, Ofir & Ofri. Favian as extra lead (no fixed partner).
+
+Home page couple profiles are sorted by video count (most videos first). Couples without photos get CSS gradient avatars with initials.
 
 **Couples are defined in 3 files** - update all when adding new ones:
 1. `src/routes/+page.svelte` (home page import form + filters)
@@ -211,7 +221,9 @@ Anthony & Katie, Cornel & Rithika, Emilien & Tehina, Gero & Migle, Irakli & Mari
 
 ## Platform Notes
 
-- **H.265 playback**: works on Safari/Chrome but **not Firefox**. All videos on Bunny are H.265.
+- **H.265 playback**: works on Safari/Chrome but **not Firefox**. All videos on Bunny are H.265 with `hvc1` tag.
+- **Safari autoplay**: Safari blocks programmatic `play()` outside user gesture context. Practice player uses `autoplay` attribute on `<video>` + `onloadedmetadata` for seeking (matches ClipCard pattern). Don't call `play()` from async callbacks — it will silently fail on Safari.
+- **CORS**: Bunny CDN reads go direct (CORS headers enabled on pull zone with `json` in extension list). Bunny Storage writes go through `/api/bunny` Vercel serverless proxy (Storage API doesn't support browser CORS). The pull zone is `dance-videos.b-cdn.net` (NOT `dance-videos-ss.b-cdn.net` which is the raw storage zone URL without CORS).
 - **iOS PWA**: No native fullscreen API (CSS fallback), no programmatic file input click (label wrapper)
 - **ffmpeg.wasm**: Uses `-ss` before `-i` for fast seeking, `-preset ultrafast` for re-encoding. Only used for on-demand clip download, not clip creation. Requires SharedArrayBuffer (COOP/COEP headers) which are currently disabled.
 - **Gallery page** at `/gallery` exists with full filtering but is not linked in nav
