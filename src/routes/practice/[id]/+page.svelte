@@ -160,8 +160,8 @@
 
 	const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
-	// Set video URL synchronously from user gesture so Safari allows autoplay.
-	// getCdnUrlForVideo is sync (just a string), so no async needed.
+	let needsSeek = $state(false);
+
 	function startPlayback(fromIndex = 0) {
 		if (sessionClips.length === 0) return;
 		currentIndex = fromIndex;
@@ -194,17 +194,19 @@
 			return;
 		}
 
-		// Different video — set src (sync)
+		// Different video — set src, flag for seek on load
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		const cdnUrl = store.getCdnUrlForVideo(clip.videoId);
 		if (cdnUrl) {
 			currentVideoId = clip.videoId;
+			needsSeek = true;
 			videoUrl = cdnUrl;
 		}
 	}
 
-	function handlePlayerCanPlay() {
-		if (!videoEl) return;
+	function handleVideoLoaded() {
+		if (!videoEl || !needsSeek) return;
+		needsSeek = false;
 		const clip = sessionClips[currentIndex];
 		if (clip) {
 			videoEl.currentTime = clip.startTime;
@@ -258,6 +260,7 @@
 		playerVisible = false;
 		currentVideoId = null;
 		clipProgress = 0;
+		needsSeek = false;
 		if (revokeUrl) { revokeUrl(); revokeUrl = null; }
 		videoUrl = null;
 	}
@@ -349,8 +352,7 @@
 						bind:this={videoEl}
 						src={videoUrl}
 						playsinline
-						autoplay
-						oncanplay={handlePlayerCanPlay}
+						onloadeddata={handleVideoLoaded}
 						ontimeupdate={handleTimeUpdate}
 						onplay={() => playing = true}
 						onpause={() => playing = false}
