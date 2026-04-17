@@ -96,7 +96,7 @@ export async function tryRestoreHandle(): Promise<boolean> {
 	const handle = await loadHandle();
 	if (!handle) return false;
 
-	const perm = await handle.queryPermission({ mode: 'readwrite' });
+	const perm = await (handle as any).queryPermission({ mode: 'readwrite' });
 	if (perm === 'granted') {
 		if (await verifyFolder(handle)) {
 			dirHandle = handle;
@@ -112,7 +112,7 @@ export async function requestPermission(): Promise<boolean> {
 	if (!handle) return false;
 
 	try {
-		const perm = await handle.requestPermission({ mode: 'readwrite' });
+		const perm = await (handle as any).requestPermission({ mode: 'readwrite' });
 		if (perm === 'granted') {
 			dirHandle = handle;
 			return true;
@@ -127,7 +127,7 @@ export async function requestPermission(): Promise<boolean> {
 async function verifyFolder(handle: FileSystemDirectoryHandle): Promise<boolean> {
 	try {
 		// Try to list entries to confirm the folder is accessible
-		const iter = handle.values();
+		const iter = (handle as any).values();
 		await iter.next();
 		return true;
 	} catch {
@@ -140,7 +140,7 @@ export function getFolderName(): string | null {
 }
 
 export async function pickFolder(): Promise<void> {
-	const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+	const handle = await (window as any).showDirectoryPicker({ mode: 'readwrite' });
 	dirHandle = handle;
 	await storeHandle(handle);
 	await ensureStructure();
@@ -229,6 +229,8 @@ export async function addVideo(file: File, duration: number, thumbnailBlob: Blob
 		lead: info.lead,
 		follow: info.follow,
 		dance: info.dance,
+		hidden: false,
+		hiddenFromSearch: false,
 		addedAt: new Date().toISOString()
 	};
 
@@ -379,6 +381,8 @@ export async function addClip(
 		tags: input.tags,
 		parentClipId: input.parentClipId ?? null,
 		links: [],
+		hidden: false,
+		hiddenFromSearch: false,
 		createdAt: new Date().toISOString()
 	};
 
@@ -507,7 +511,7 @@ export async function nukeAll(): Promise<void> {
 	if (!dirHandle) throw new Error('No directory selected');
 	// Clear all entries in the directory
 	const entries: [string, 'file' | 'directory'][] = [];
-	for await (const [name, handle] of dirHandle.entries()) {
+	for await (const [name, handle] of (dirHandle as any).entries()) {
 		entries.push([name, handle.kind]);
 	}
 	for (const [name, kind] of entries) {
@@ -578,6 +582,8 @@ export async function importMetadata(json: string): Promise<void> {
 				lead: importedVideo.lead,
 				follow: importedVideo.follow,
 				dance: importedVideo.dance,
+				hidden: importedVideo.hidden ?? false,
+				hiddenFromSearch: importedVideo.hiddenFromSearch ?? false,
 				cdnUrl: importedVideo.cdnUrl,
 				addedAt: importedVideo.addedAt
 			});

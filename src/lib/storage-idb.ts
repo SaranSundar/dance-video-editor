@@ -190,6 +190,8 @@ export async function addVideo(
 		lead: info.lead,
 		follow: info.follow,
 		dance: info.dance,
+		hidden: false,
+		hiddenFromSearch: false,
 		addedAt: new Date().toISOString()
 	};
 
@@ -302,6 +304,8 @@ export async function addClip(
 		tags: [...input.tags],
 		parentClipId: input.parentClipId ?? null,
 		links: [],
+		hidden: false,
+		hiddenFromSearch: false,
 		createdAt: new Date().toISOString()
 	};
 	const meta = await readMetadata();
@@ -415,7 +419,7 @@ export async function deletePractice(practiceId: string): Promise<void> {
 export async function nukeAll(): Promise<void> {
 	const root = await getDir();
 	const entries: string[] = [];
-	for await (const [name] of root.entries()) {
+	for await (const [name] of (root as any).entries()) {
 		entries.push(name);
 	}
 	for (const name of entries) {
@@ -472,6 +476,8 @@ export async function importMetadata(json: string): Promise<void> {
 				lead: importedVideo.lead,
 				follow: importedVideo.follow,
 				dance: importedVideo.dance,
+				hidden: importedVideo.hidden ?? false,
+				hiddenFromSearch: importedVideo.hiddenFromSearch ?? false,
 				cdnUrl: importedVideo.cdnUrl,
 				addedAt: importedVideo.addedAt
 			});

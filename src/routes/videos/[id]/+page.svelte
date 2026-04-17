@@ -8,7 +8,7 @@
 	import ClipCard from '$lib/components/ClipCard.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 
-	let videoId = $derived($page.params.id);
+	let videoId = $derived($page.params.id ?? '');
 	let videoMeta = $derived(store.getVideos().find(v => v.id === videoId));
 	let clips = $derived(store.getClipsByVideo(videoId));
 

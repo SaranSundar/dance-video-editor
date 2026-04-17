@@ -61,7 +61,7 @@ export async function extractClip(
 	]);
 
 	const outputData = await ff.readFile('output.mp4');
-	const blob = new Blob([outputData], { type: 'video/mp4' });
+	const blob = new Blob([outputData as Uint8Array<ArrayBuffer>], { type: 'video/mp4' });
 
 	await ff.deleteFile('input.mp4');
 	await ff.deleteFile('output.mp4');
@@ -87,7 +87,7 @@ export async function generateThumbnail(
 	]);
 
 	const thumbData = await ff.readFile('thumb.jpg');
-	const blob = new Blob([thumbData], { type: 'image/jpeg' });
+	const blob = new Blob([thumbData as Uint8Array<ArrayBuffer>], { type: 'image/jpeg' });
 
 	await ff.deleteFile('input.mp4');
 	await ff.deleteFile('thumb.jpg');

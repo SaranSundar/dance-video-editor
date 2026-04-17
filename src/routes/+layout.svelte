@@ -7,7 +7,7 @@
 
 	let { children }: { children: Snippet } = $props();
 	let currentPath = $derived($page.url.pathname);
-	let state = $derived(store.getState());
+	let storeState = $derived(store.getState());
 	let isPwa = $state(false);
 	let exporting = $state(false);
 	let importing = $state(false);
@@ -138,9 +138,10 @@
 		</a>
 		<div class="nav-links">
 			<a href="/" class:active={currentPath === '/'}>Home</a>
+			<a href="/jnj" class:active={currentPath.startsWith('/jnj')}>J&amp;J</a>
 			<a href="/practice" class:active={currentPath.startsWith('/practice')}>Practice</a>
 			<a href="/levels" class:active={currentPath === '/levels'}>Levels</a>
-			{#if state === 'ready'}
+			{#if storeState === 'ready'}
 				{#if isPwa}
 					<button class="nav-action-btn" onclick={handleUpdate} disabled={updating} title="Check for updates and refresh">
 						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -159,7 +160,7 @@
 		</div>
 	{/if}
 	<main>
-		{#if state === 'loading'}
+		{#if storeState === 'loading'}
 			<div class="gate">
 				<div class="gate-spinner"></div>
 			</div>

@@ -10,7 +10,7 @@
 	import { getMovesForDance } from '$lib/moves';
 	import VideoPlayer from '$lib/components/VideoPlayer.svelte';
 
-	let clipId = $derived($page.params.id);
+	let clipId = $derived($page.params.id ?? '');
 	let clip = $derived(store.getClips().find(c => c.id === clipId));
 
 	// Sub-clips
@@ -57,10 +57,6 @@
 	}
 
 	let videoUrl = $state<string | null>(null);
-	let videoEl: HTMLVideoElement | undefined = $state();
-	let playing = $state(false);
-	let playbackRate = $state(1);
-	let looping = $state(true);
 
 	// Editable fields
 	let label = $state('');
@@ -213,101 +209,14 @@
 		}
 	}
 
-	let playerEl: HTMLElement | undefined = $state();
 	let currentTime = $state(0);
-	let clipDuration = $state(0);
-
-	function togglePlay() {
-		if (!videoEl || !clip) return;
-		if (videoEl.paused) {
-			// If at or past endTime, restart from beginning of clip
-			if (videoEl.currentTime >= clip.endTime || videoEl.currentTime < clip.startTime) {
-				videoEl.currentTime = clip.startTime;
-			}
-			videoEl.play();
-		} else {
-			videoEl.pause();
-		}
-	}
-
-	function seek(delta: number) {
-		if (!videoEl || !clip) return;
-		videoEl.currentTime = Math.max(clip.startTime, Math.min(clip.endTime, videoEl.currentTime + delta));
-	}
-
-	function setRate(rate: number) {
-		playbackRate = rate;
-		if (videoEl) videoEl.playbackRate = rate;
-	}
-
-	function handleTimelineClick(e: MouseEvent) {
-		if (!videoEl || !clip) return;
-		const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-		const pct = (e.clientX - rect.left) / rect.width;
-		videoEl.currentTime = clip.startTime + Math.max(0, pct * clipDuration);
-	}
-
-	function formatTimeCode(seconds: number): string {
-		const m = Math.floor(seconds / 60);
-		const s = Math.floor(seconds % 60);
-		const ms = Math.floor((seconds % 1) * 100);
-		return `${m}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
-	}
-
-	let fakeFullscreen = $state(false);
-
-	function toggleFullscreen() {
-		if (!playerEl) return;
-		if (document.fullscreenElement) {
-			document.exitFullscreen();
-		} else if (typeof playerEl.requestFullscreen === 'function') {
-			playerEl.requestFullscreen().catch(() => {
-				fakeFullscreen = !fakeFullscreen;
-			});
-		} else {
-			fakeFullscreen = !fakeFullscreen;
-		}
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-		switch (e.key) {
-			case ' ':
-				e.preventDefault();
-				togglePlay();
-				break;
-			case 'ArrowLeft':
-				e.preventDefault();
-				seek(e.shiftKey ? -5 : -1);
-				break;
-			case 'ArrowRight':
-				e.preventDefault();
-				seek(e.shiftKey ? 5 : 1);
-				break;
-			case ',':
-				e.preventDefault();
-				seek(-1 / 30);
-				break;
-			case '.':
-				e.preventDefault();
-				seek(1 / 30);
-				break;
-			case 'f':
-				toggleFullscreen();
-				break;
-		}
-	}
 
 	function formatTime(seconds: number): string {
 		const m = Math.floor(seconds / 60);
 		const s = Math.floor(seconds % 60);
 		return `${m}:${s.toString().padStart(2, '0')}`;
 	}
-
-	const rates = [0.25, 0.5, 0.75, 1, 1.5, 2];
 </script>
-
-<svelte:window onkeydown={handleKeydown} />
 
 {#if clip && videoUrl}
 	<div class="clip-page">
@@ -356,18 +265,6 @@
 						onClipSaved={() => { subClipIn = null; subClipOut = null; }}
 					/>
 				</div>
-
-				<!-- hidden video for download extraction -->
-				<video
-					bind:this={videoEl}
-					style="display:none"
-					src={videoUrl}
-					onloadedmetadata={() => {
-						if (videoEl && clip) {
-							clipDuration = clip.endTime - clip.startTime;
-						}
-					}}
-					></video>
 			</div>
 
 			<div class="edit-section">
