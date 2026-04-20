@@ -32,6 +32,7 @@
 		['Micka', 'Laura'],
 		['Miguel', 'Sunsire'],
 		['Ofir', 'Ofri'],
+		['Victor', 'Monika'],
 	];
 	const extraLeads = ['Favian'];
 	const leadOptions = [...new Set([...couples.map(c => c[0]), ...extraLeads])].sort().map(n => ({ value: n, label: n }));
@@ -92,6 +93,15 @@
 		await store.updateVideo(videoId, { cdnUrl: editCdnUrl.trim() });
 		// Reload video with new URL
 		loadingVideoId = '';
+	}
+
+	let creatingPractice = $state(false);
+	async function createPracticeFromClips() {
+		if (!videoMeta || clips.length === 0 || creatingPractice) return;
+		creatingPractice = true;
+		const ordered = [...clips].sort((a, b) => a.startTime - b.startTime).map(c => c.id);
+		const practice = await store.addPractice({ name: videoMeta.name, clipIds: ordered });
+		goto(`/practice/${practice.id}`);
 	}
 
 	$effect(() => {
@@ -217,6 +227,17 @@
 				<div class="sidebar-header">
 					<h3>Clips</h3>
 					<span class="clip-count">{clips.length}</span>
+					<button
+						class="practice-btn"
+						onclick={createPracticeFromClips}
+						disabled={creatingPractice}
+						title="Create a practice session with all clips from this video"
+					>
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polygon points="5 3 19 12 5 21 5 3" />
+						</svg>
+						{creatingPractice ? 'Creating…' : 'Create practice'}
+					</button>
 				</div>
 				<div class="clips-list">
 					{#each clips.filter(c => !c.parentClipId) as clip (clip.id)}
@@ -400,6 +421,32 @@
 		font-weight: 600;
 		padding: 2px 7px;
 		border-radius: 10px;
+	}
+
+	.practice-btn {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 10px;
+		background: rgba(255, 255, 255, 0.06);
+		color: #e4e4e7;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 6px;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.15s, border-color 0.15s;
+	}
+
+	.practice-btn:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.14);
+	}
+
+	.practice-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.clips-list {

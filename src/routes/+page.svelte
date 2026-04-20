@@ -163,6 +163,7 @@
 		{ lead: 'Micka', follow: 'Laura', img: '', label: 'Micka & Laura' },
 		{ lead: 'Miguel', follow: 'Sunsire', img: '/couples/miguel-sunsire.jpg', label: 'Miguel & Sunsire' },
 		{ lead: 'Ofir', follow: 'Ofri', img: '/couples/ofir-ofri.jpg', label: 'Ofir & Ofri' },
+		{ lead: 'Victor', follow: 'Monika', img: '/couples/victor-monika.jpg', label: 'Victor & Monika' },
 		{ lead: 'Favian', follow: '', img: '/couples/favian.jpg', label: 'Favian' },
 	];
 
@@ -229,6 +230,7 @@
 		['Micka', 'Laura'],
 		['Miguel', 'Sunsire'],
 		['Ofir', 'Ofri'],
+		['Victor', 'Monika'],
 	];
 	const extraLeads = ['Favian'];
 	const allKnownNames = [...couples.flat(), ...extraLeads];

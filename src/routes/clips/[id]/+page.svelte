@@ -86,6 +86,7 @@
 		['Micka', 'Laura'],
 		['Miguel', 'Sunsire'],
 		['Ofir', 'Ofri'],
+		['Victor', 'Monika'],
 	];
 	const extraLeads = ['Favian'];
 	const leadOptions = [...new Set([...couples.map(c => c[0]), ...extraLeads])].sort().map(n => ({ value: n, label: n }));

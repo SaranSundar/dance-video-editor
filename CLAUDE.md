@@ -152,6 +152,42 @@ move, pattern, styling, footwork, musicality
 - Sets `cdnUrl` on video metadata, syncs metadata to Bunny
 - yt-dlp command generates a single command to download + re-encode to H.265 with `hevc_videotoolbox`
 
+### YouTube → Bunny Workflow (end-to-end)
+
+Two paths to go from a YouTube URL to a published, playable video in ClipIt:
+
+**Path A: web UI (normal, single-video)**
+1. Paste URL into the YouTube helper on the home page → click Generate → copy the command.
+2. The generated command (see `generateYtdlp()` in `src/routes/+page.svelte`) is:
+   ```
+   yt-dlp -f "bestvideo+bestaudio/best" --merge-output-format mp4 \
+     -o "%(title)s.%(ext)s" --restrict-filenames \
+     --exec "ffmpeg -i {} -c:v hevc_videotoolbox -q:v 55 -tag:v hvc1 \
+       -c:a aac -b:a 192k -movflags +faststart {}.h265.mp4 && rm {}" \
+     "<URL>"
+   ```
+   - `bestvideo+bestaudio/best` downloads highest available video + audio separately and merges into MP4.
+   - `hevc_videotoolbox` is the Apple Silicon hardware encoder → produces `hvc1` (Safari-compatible).
+   - `-q:v 55` is a quality-based rate (lower = better, ~50–60 is a good sweet spot).
+   - `-movflags +faststart` moves the `moov` atom to the start for progressive streaming over CDN.
+   - The original merged MP4 is deleted after transcode; only `{title}.mp4.h265.mp4` remains.
+   - For playlist URLs (`?list=...`), add `--no-playlist` or the helper will queue the whole playlist.
+3. Drop the resulting `.h265.mp4` into the import area on the home page.
+4. Fill in per-video metadata (couple, dance, category). Category options: `demo`, `jack-and-jill`, `workshop`, `social`.
+5. On import the app: computes fingerprint → generates canvas thumbnail → PUTs video + thumbnail to Bunny Storage via `/api/bunny` proxy → sets `cdnUrl` → syncs `metadata.json`.
+
+**Path B: CLI bulk upload (for batches or scripted one-offs)**
+1. Download + encode as above, save to a directory.
+2. Use `scripts/upload-to-bunny.mjs` as a template — it PUTs direct to `la.storage.bunnycdn.com` with the storage `AccessKey` (bypasses the Vercel proxy, since Node can make cross-origin requests freely).
+3. Flow per file: UUID → fingerprint (file size + SHA-256 of first 1MB) → ffprobe duration → PUT `{uuid}.mp4` → append VideoMeta entry.
+4. For a single ad-hoc upload, also: extract thumbnail (`ffmpeg -ss <t> -i in.mp4 -vframes 1 -q:v 2 thumb.jpg`), PUT as `{uuid}-thumb.jpg`, then fetch current `metadata.json` from the CDN, append the new entry, PUT it back to storage.
+
+**Metadata update step (either path):**
+- `metadata.json` is at `https://dance-videos.b-cdn.net/metadata.json` (read, CORS-enabled pull zone) and `https://la.storage.bunnycdn.com/dance-videos-ss/metadata.json` (write, with `AccessKey` header). Reads from the raw storage zone URL (`dance-videos-ss.b-cdn.net`) return 403 — always use the pull zone (`dance-videos.b-cdn.net`).
+- Shape: `{ videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[] }`. Append to `videos[]`; leave other arrays untouched.
+- Required VideoMeta fields: `id`, `name`, `fingerprint`, `duration`, `lead`, `follow`, `dance`, `category`, `hidden: false`, `hiddenFromSearch: false`, `addedAt` (ISO), `cdnUrl`.
+- Always fetch `metadata.json` with `cache: 'no-store'` (or `?t=<timestamp>` busting) before edit — other clients may have written since.
+
 ### Export/Import
 - **Export** is JSON metadata only (no video files) - tiny file
 - **Import** reads JSON and replaces in-memory state, then syncs to Bunny
@@ -210,7 +246,7 @@ git push origin main
 
 ## Known Couples (Presets)
 
-Anthony & Katie, Cornel & Rithika, Daniel & Desiree, Emilien & Tehina, Gero & Migle, Irakli & Maria, Jes & Jenny, Luis & Andrea, Marcus & Bianca, Melvin & Gatica, Micka & Laura, Miguel & Sunsire, Ofir & Ofri. Favian as extra lead (no fixed partner).
+Anthony & Katie, Cornel & Rithika, Daniel & Desiree, Emilien & Tehina, Gero & Migle, Irakli & Maria, Jes & Jenny, Luis & Andrea, Marcus & Bianca, Melvin & Gatica, Micka & Laura, Miguel & Sunsire, Ofir & Ofri, Victor & Monika. Favian as extra lead (no fixed partner).
 
 Home page couple profiles are sorted by video count (most videos first). Couples without photos get CSS gradient avatars with initials.
 
