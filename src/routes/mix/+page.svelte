@@ -41,6 +41,7 @@
 	let playbackRate = $state(1);
 	let repeatCount = $state(1);
 	let showConfig = $state(true);
+	let showPool = $state(true);
 
 	const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5] as const;
 
@@ -286,9 +287,19 @@
 		segmentElapsed = 0;
 		warningsFired = [];
 		currentRepeat = 1;
-		needsSeek = true;
-		audioUrl = url;
 		itemsPlayed += 1;
+
+		const sameSrc = audioUrl === url;
+		if (sameSrc && audioEl) {
+			// Source didn't change — loadedmetadata won't fire, seek directly
+			needsSeek = false;
+			audioEl.currentTime = start;
+			audioEl.playbackRate = playbackRate;
+			audioEl.play().catch(() => {});
+		} else {
+			needsSeek = true;
+			audioUrl = url;
+		}
 	}
 
 	function replayCurrent() {
@@ -638,13 +649,22 @@
 	<!-- Pool source -->
 	<section class="panel">
 		<div class="panel-header">
-			<h2>Pool</h2>
+			<button class="collapse-btn" onclick={() => showPool = !showPool}>
+				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="transform: rotate({showPool ? 90 : 0}deg); transition: transform 0.15s;">
+					<polyline points="9 6 15 12 9 18" />
+				</svg>
+				<h2>Pool</h2>
+				<span class="header-count">
+					{poolCount} {poolSource === 'clips' ? (poolCount === 1 ? 'clip' : 'clips') : (poolCount === 1 ? 'song' : 'songs')}
+				</span>
+			</button>
 			<div class="mode-toggle">
 				<button class:active={poolSource === 'songs'} onclick={() => poolSource = 'songs'}>Songs</button>
 				<button class:active={poolSource === 'clips'} onclick={() => poolSource = 'clips'}>Clips</button>
 			</div>
 		</div>
 
+		{#if showPool}
 		<div class="sub-header">
 			<div class="mode-toggle">
 				<button class:active={poolMode === 'filters'} onclick={() => poolMode = 'filters'}>Filters</button>
@@ -789,6 +809,7 @@
 				{poolCount} {poolSource === 'clips' ? (poolCount === 1 ? 'clip' : 'clips') : (poolCount === 1 ? 'song' : 'songs')} in pool
 			</span>
 		</div>
+		{/if}
 	</section>
 
 	<!-- Config -->
@@ -1341,6 +1362,12 @@
 		font-family: inherit;
 	}
 	.collapse-btn:hover { color: #e4e4e7; }
+	.header-count {
+		color: #52525b;
+		font-size: 11px;
+		font-weight: 500;
+		margin-left: 6px;
+	}
 
 	.mode-toggle {
 		display: flex;
