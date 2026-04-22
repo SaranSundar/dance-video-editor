@@ -77,7 +77,8 @@ src/
     videos/[id]/        # Video editor - player, video metadata editing, clip creation, visibility
     clips/[id]/         # Clip detail - player, all metadata editing, sub-clips, links, visibility
     practice/           # Practice sessions list - create/delete sessions
-    practice/[id]/      # Practice session editor - drag-drop clip arrangement, sequential player, type filter
+    practice/[id]/      # Practice session editor - drag-drop clip arrangement, sequential player, type filter, fullscreen
+    mix/                # Jack & Jill Mix - random-shuffle audio practice player (songs or clips)
     gallery/            # Gallery with filters (exists but not linked in nav)
     levels/             # Levels page
 static/
@@ -122,6 +123,24 @@ move, pattern, styling, footwork, musicality
 - Clip picker with search and type filter dropdown
 - Loop toggle for repeating the entire session
 - Player auto-advances through clips, shows current position
+- Fullscreen button uses native `requestFullscreen()` with CSS fallback for iOS PWA
+
+### Jack & Jill Mix (`/mix`)
+
+Random-shuffle audio practice tool for training musical adaptation. All state lives in `src/routes/mix/+page.svelte`; settings persist to `localStorage` under `mix-config-v1`.
+
+- **Audio-only playback**: hidden `<audio>` element pointed at existing `.mp4` CDN URLs. Browser decodes just the AAC track, so no video decode CPU — but **bandwidth is the same** as video playback (MP4 interleaves samples). True bandwidth reduction needs a separate `.m4a` extraction per video; not built yet.
+- **Pool source**: toggle between Songs (full videos) and Clips (existing `ClipMeta` entries). In Clips mode, each segment is the clip's intrinsic `startTime`→`endTime` — segment duration / variance / start-mode settings are hidden because they don't apply.
+- **Filters vs hand-pick**: dance / category / couple chips / clip-type chips, or a multi-select picker over videos or clips. Filter mode respects `hidden` / `hiddenFromSearch`; hand-pick shows everything.
+- **Segment timing (songs mode)**: base duration 15–120s (default 20s) with optional variance (±5/10/15s).
+- **Start of song mode**: `Trim edges` = random spot but never within N seconds of either end (slider sets N); `From start` = always 0:00; `Random` = anywhere including intro/outro.
+- **Same-src seek quirk**: when the shuffle happens to pick the same video twice in a row (e.g. pool of 1), the `<audio>` element's `src` doesn't change, so `loadedmetadata` never fires. `loadNextItem()` detects same-URL and issues the seek directly instead of waiting for the event.
+- **Shuffle**: no repeats until pool exhausted, then reset excluding the last-played item to avoid back-to-back dupes.
+- **Repeat each N times**: number input (1–20, default 1). When > 1, the same segment replays from the same start offset N times before advancing. Manual Next still skips to the next item regardless of remaining loops.
+- **Gap between items**: 0/1/3/5s optional silence (not applied between repeats of the same item).
+- **Session cap**: optional 5/10/15/30 min auto-end.
+- **Warning beep (default off)**: Web Audio API square wave at T-3/2/1 (880/990/1100 Hz, gain 0.6). AudioContext must be recreated if it was closed in `onDestroy` — the variable is reset to `null` there, and `ensureAudioCtx()` checks for `state === 'closed'` before reuse.
+- **Seek / speed**: clickable segment progress bar seeks within the current segment; warningsFired is recomputed so only future-window beeps fire after a seek. Speed selector (`0.5× / 0.75× / 1× / 1.25× / 1.5×`) reapplies `playbackRate` every time a new audio source loads, so it persists across songs.
 
 ## Key Behaviors
 
@@ -172,6 +191,7 @@ Two paths to go from a YouTube URL to a published, playable video in ClipIt:
    - `-movflags +faststart` moves the `moov` atom to the start for progressive streaming over CDN.
    - The original merged MP4 is deleted after transcode; only `{title}.mp4.h265.mp4` remains.
    - For playlist URLs (`?list=...`), add `--no-playlist` or the helper will queue the whole playlist.
+   - **PO-token / 403 workaround**: YouTube now blocks most formats without a GVS PO token. If yt-dlp errors with `HTTP Error 403: Forbidden` on every fragment, pass `--cookies-from-browser chrome` (or `safari`). Chrome cookies worked here; Safari cookies alone did not. This pulls from your logged-in Chrome profile on disk.
 3. Drop the resulting `.h265.mp4` into the import area on the home page.
 4. Fill in per-video metadata (couple, dance, category). Category options: `demo`, `jack-and-jill`, `workshop`, `social`.
 5. On import the app: computes fingerprint → generates canvas thumbnail → PUTs video + thumbnail to Bunny Storage via `/api/bunny` proxy → sets `cdnUrl` → syncs `metadata.json`.
@@ -263,6 +283,8 @@ Home page couple profiles are sorted by video count (most videos first). Couples
 - **iOS PWA**: No native fullscreen API (CSS fallback), no programmatic file input click (label wrapper)
 - **ffmpeg.wasm**: Uses `-ss` before `-i` for fast seeking, `-preset ultrafast` for re-encoding. Only used for on-demand clip download, not clip creation. Requires SharedArrayBuffer (COOP/COEP headers) which are currently disabled.
 - **Gallery page** at `/gallery` exists with full filtering but is not linked in nav
+- **`<audio>` with MP4 source**: `/mix` points an `HTMLAudioElement` at existing `.mp4` CDN URLs. Browsers decode only the AAC track (no video decode) — saves CPU, not bandwidth. Format is fine on all major browsers.
+- **Killing stray Playwright browsers**: MCP Playwright leaves Chrome processes behind. Kill them safely with `pkill -f "playwright_chromiumdev_profile"` — that flag only appears in Playwright-spawned processes, never in the user's real Chrome.
 
 ## Re-enabling Local Storage
 
