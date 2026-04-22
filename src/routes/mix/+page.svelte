@@ -31,7 +31,7 @@
 	let pickerSearch = $state('');
 
 	// Config
-	let segmentDuration = $state(45);
+	let segmentDuration = $state(20);
 	let segmentVariance = $state(10);
 	let startMode = $state<StartMode>('trim-edges');
 	let skipEdgesSeconds = $state(15);
