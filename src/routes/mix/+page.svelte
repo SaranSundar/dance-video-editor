@@ -38,7 +38,10 @@
 	let gapDuration = $state(0);
 	let sessionCapMinutes = $state(0);
 	let beepEnabled = $state(true);
+	let playbackRate = $state(1);
 	let showConfig = $state(true);
+
+	const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5] as const;
 
 	// Player
 	let phase = $state<Phase>('idle');
@@ -123,6 +126,7 @@
 			if (typeof c.gapDuration === 'number') gapDuration = c.gapDuration;
 			if (typeof c.sessionCapMinutes === 'number') sessionCapMinutes = c.sessionCapMinutes;
 			if (typeof c.beepEnabled === 'boolean') beepEnabled = c.beepEnabled;
+			if (typeof c.playbackRate === 'number' && SPEEDS.includes(c.playbackRate as never)) playbackRate = c.playbackRate;
 		} catch {
 			// ignore
 		}
@@ -133,7 +137,7 @@
 			poolSource, poolMode, filterDance, filterCategory, filterCouples,
 			clipTypeFilters, manualVideoIds, manualClipIds,
 			segmentDuration, segmentVariance, startMode, skipEdgesSeconds,
-			gapDuration, sessionCapMinutes, beepEnabled,
+			gapDuration, sessionCapMinutes, beepEnabled, playbackRate,
 		};
 		try {
 			localStorage.setItem(CONFIG_KEY, JSON.stringify(c));
@@ -287,7 +291,25 @@
 		if (!audioEl || !needsSeek) return;
 		needsSeek = false;
 		audioEl.currentTime = segmentStartOffset;
+		audioEl.playbackRate = playbackRate;
 		audioEl.play().catch(() => {});
+	}
+
+	function setSpeed(s: number) {
+		playbackRate = s;
+		if (audioEl) audioEl.playbackRate = s;
+	}
+
+	function seekSegment(e: MouseEvent) {
+		if (!audioEl || phase === 'idle' || phase === 'ended' || segmentDurationActual <= 0) return;
+		const bar = e.currentTarget as HTMLElement;
+		const rect = bar.getBoundingClientRect();
+		const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+		const newElapsed = pct * segmentDurationActual;
+		audioEl.currentTime = segmentStartOffset + newElapsed;
+		segmentElapsed = newElapsed;
+		const remaining = segmentDurationActual - newElapsed;
+		warningsFired = [3, 2, 1].filter(t => remaining <= t);
 	}
 
 	function handleTimeUpdate() {
@@ -552,7 +574,9 @@
 					{/if}
 				</div>
 
-				<div class="progress-bar">
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div class="progress-bar seekable" onclick={seekSegment} title="Click to seek within this segment">
 					<div class="progress-fill" style="width: {progressPct}%"></div>
 				</div>
 
@@ -570,6 +594,11 @@
 						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="5 4 15 12 5 20" /><line x1="19" y1="4" x2="19" y2="20" /></svg>
 						Next
 					</button>
+					<select class="speed-select" value={playbackRate} onchange={(e) => setSpeed(Number((e.target as HTMLSelectElement).value))}>
+						{#each SPEEDS as s}
+							<option value={s}>{s}×</option>
+						{/each}
+					</select>
 				</div>
 
 				<div class="session-meta">
@@ -1074,10 +1103,33 @@
 		overflow: hidden;
 		margin-bottom: 16px;
 	}
+	.progress-bar.seekable {
+		cursor: pointer;
+	}
+	.progress-bar.seekable:hover {
+		height: 8px;
+	}
 	.progress-fill {
 		height: 100%;
 		background: #6366f1;
 		transition: width 0.15s linear;
+	}
+	.speed-select {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+		padding: 9px 12px;
+		border-radius: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+	.speed-select:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.4);
 	}
 
 	.controls {

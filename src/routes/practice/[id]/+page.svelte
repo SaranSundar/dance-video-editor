@@ -151,12 +151,29 @@
 	let playing = $state(false);
 	let currentIndex = $state(0);
 	let videoEl = $state<HTMLVideoElement | undefined>();
+	let playerWrapperEl = $state<HTMLDivElement | undefined>();
 	let videoUrl = $state<string | null>(null);
 	let revokeUrl = $state<(() => void) | null>(null);
 	let playerVisible = $state(false);
 	let playbackSpeed = $state(1);
 	let clipProgress = $state(0);
 	let currentVideoId = $state<string | null>(null);
+	let fakeFullscreen = $state(false);
+
+	function toggleFullscreen(e: Event) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!playerWrapperEl) return;
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+		} else if (typeof playerWrapperEl.requestFullscreen === 'function') {
+			playerWrapperEl.requestFullscreen().catch(() => {
+				fakeFullscreen = !fakeFullscreen;
+			});
+		} else {
+			fakeFullscreen = !fakeFullscreen;
+		}
+	}
 
 	const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -350,7 +367,7 @@
 				</div>
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<div class="player-wrapper" onclick={togglePlayPause}>
+				<div class="player-wrapper" bind:this={playerWrapperEl} class:fake-fullscreen={fakeFullscreen} onclick={togglePlayPause}>
 					<!-- svelte-ignore a11y_media_has_caption -->
 					<video
 						bind:this={videoEl}
@@ -400,6 +417,11 @@
 									<option value={s}>{s}x</option>
 								{/each}
 							</select>
+							<button class="ctrl-btn" onclick={toggleFullscreen} title="Fullscreen">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M3 7V3h4M21 7V3h-4M3 17v4h4M21 17v4h-4" />
+								</svg>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -726,6 +748,27 @@
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
+	}
+
+	:global(.player-wrapper:fullscreen),
+	.fake-fullscreen {
+		aspect-ratio: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	:global(.player-wrapper:fullscreen video),
+	.fake-fullscreen video {
+		max-height: 100vh;
+		max-width: 100vw;
+		width: auto;
+		height: auto;
+	}
+	.fake-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		background: #000;
 	}
 
 	.pause-overlay {
