@@ -5,7 +5,7 @@
 
 	type PoolSource = 'songs' | 'clips';
 	type PoolMode = 'filters' | 'manual';
-	type StartMode = 'skip-intro' | 'from-start' | 'random';
+	type StartMode = 'trim-edges' | 'from-start' | 'random';
 	type Phase = 'idle' | 'playing' | 'paused' | 'gap' | 'ended';
 	type Item = { video: VideoMeta; clip: ClipMeta | null };
 
@@ -33,9 +33,8 @@
 	// Config
 	let segmentDuration = $state(45);
 	let segmentVariance = $state(10);
-	let startMode = $state<StartMode>('skip-intro');
-	let skipIntroSeconds = $state(15);
-	let skipOutroSeconds = $state(15);
+	let startMode = $state<StartMode>('trim-edges');
+	let skipEdgesSeconds = $state(15);
 	let gapDuration = $state(0);
 	let sessionCapMinutes = $state(0);
 	let beepEnabled = $state(true);
@@ -117,9 +116,10 @@
 			if (Array.isArray(c.manualClipIds)) manualClipIds = c.manualClipIds.filter((x: unknown) => typeof x === 'string');
 			if (typeof c.segmentDuration === 'number') segmentDuration = c.segmentDuration;
 			if (typeof c.segmentVariance === 'number') segmentVariance = c.segmentVariance;
-			if (c.startMode === 'skip-intro' || c.startMode === 'from-start' || c.startMode === 'random') startMode = c.startMode;
-			if (typeof c.skipIntroSeconds === 'number') skipIntroSeconds = c.skipIntroSeconds;
-			if (typeof c.skipOutroSeconds === 'number') skipOutroSeconds = c.skipOutroSeconds;
+			if (c.startMode === 'trim-edges' || c.startMode === 'from-start' || c.startMode === 'random') startMode = c.startMode;
+			else if (c.startMode === 'skip-intro') startMode = 'trim-edges'; // legacy migration
+			if (typeof c.skipEdgesSeconds === 'number') skipEdgesSeconds = c.skipEdgesSeconds;
+			else if (typeof c.skipIntroSeconds === 'number') skipEdgesSeconds = c.skipIntroSeconds; // legacy migration
 			if (typeof c.gapDuration === 'number') gapDuration = c.gapDuration;
 			if (typeof c.sessionCapMinutes === 'number') sessionCapMinutes = c.sessionCapMinutes;
 			if (typeof c.beepEnabled === 'boolean') beepEnabled = c.beepEnabled;
@@ -132,7 +132,7 @@
 		const c = {
 			poolSource, poolMode, filterDance, filterCategory, filterCouples,
 			clipTypeFilters, manualVideoIds, manualClipIds,
-			segmentDuration, segmentVariance, startMode, skipIntroSeconds, skipOutroSeconds,
+			segmentDuration, segmentVariance, startMode, skipEdgesSeconds,
 			gapDuration, sessionCapMinutes, beepEnabled,
 		};
 		try {
@@ -178,19 +178,19 @@
 		const variance = segmentVariance > 0 ? (Math.random() * 2 - 1) * segmentVariance : 0;
 		let dur = Math.max(5, segmentDuration + variance);
 
-		const isSkip = startMode === 'skip-intro';
-		// Reserve a playable window inside the song
+		const isTrim = startMode === 'trim-edges';
 		const minWindow = 10;
-		const skipIn = isSkip ? Math.min(skipIntroSeconds, Math.max(0, videoLen - minWindow)) : 0;
-		const skipOut = isSkip ? Math.min(skipOutroSeconds, Math.max(0, videoLen - skipIn - minWindow)) : 0;
-		const playable = Math.max(minWindow, videoLen - skipIn - skipOut);
+		// Same value trims both ends, capped so a window of at least minWindow remains
+		const maxTrim = Math.max(0, (videoLen - minWindow) / 2);
+		const trim = isTrim ? Math.min(skipEdgesSeconds, maxTrim) : 0;
+		const playable = Math.max(minWindow, videoLen - trim * 2);
 
 		dur = Math.min(dur, playable);
 
 		let start = 0;
-		if (startMode === 'skip-intro') {
-			const maxStart = Math.max(skipIn, videoLen - skipOut - dur);
-			start = skipIn + Math.random() * Math.max(0, maxStart - skipIn);
+		if (startMode === 'trim-edges') {
+			const maxStart = Math.max(trim, videoLen - trim - dur);
+			start = trim + Math.random() * Math.max(0, maxStart - trim);
 		} else if (startMode === 'random') {
 			const maxStart = Math.max(0, videoLen - dur);
 			start = Math.random() * maxStart;
@@ -498,7 +498,7 @@
 				{:else}
 					<p class="hint">
 						{segmentDuration}s{segmentVariance > 0 ? ` ±${segmentVariance}s` : ''} segments ·
-						{startMode === 'skip-intro' ? `random spot, skip ${skipIntroSeconds}s intro / ${skipOutroSeconds}s outro` :
+						{startMode === 'trim-edges' ? `random spot, trim ${skipEdgesSeconds}s from each edge` :
 						 startMode === 'from-start' ? 'from start' : 'random spot in song'}
 					</p>
 				{/if}
@@ -788,8 +788,8 @@
 					<div class="cfg-field">
 						<div class="field-label">Start of song</div>
 						<div class="option-row">
-							<button class="option" class:on={startMode === 'skip-intro'} onclick={() => startMode = 'skip-intro'}>
-								Skip intro
+							<button class="option" class:on={startMode === 'trim-edges'} onclick={() => startMode = 'trim-edges'}>
+								Trim edges
 							</button>
 							<button class="option" class:on={startMode === 'from-start'} onclick={() => startMode = 'from-start'}>
 								From start
@@ -798,28 +798,18 @@
 								Random
 							</button>
 						</div>
-						{#if startMode === 'skip-intro'}
+						{#if startMode === 'trim-edges'}
 							<div class="slider-row small">
 								<input
 									type="range"
 									min="0"
 									max="60"
 									step="5"
-									bind:value={skipIntroSeconds}
+									bind:value={skipEdgesSeconds}
 								/>
-								<span class="slider-val">skip {skipIntroSeconds}s intro</span>
+								<span class="slider-val">trim {skipEdgesSeconds}s</span>
 							</div>
-							<div class="slider-row small">
-								<input
-									type="range"
-									min="0"
-									max="60"
-									step="5"
-									bind:value={skipOutroSeconds}
-								/>
-								<span class="slider-val">skip {skipOutroSeconds}s outro</span>
-							</div>
-							<div class="cfg-hint">Random moment between {skipIntroSeconds}s in and {skipOutroSeconds}s before the end.</div>
+							<div class="cfg-hint">Random moment, but never within {skipEdgesSeconds}s of the start or end.</div>
 						{:else if startMode === 'from-start'}
 							<div class="cfg-hint">Always begin at 0:00 (same opening every song).</div>
 						{:else}
