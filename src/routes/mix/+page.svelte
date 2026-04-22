@@ -37,7 +37,7 @@
 	let skipEdgesSeconds = $state(15);
 	let gapDuration = $state(0);
 	let sessionCapMinutes = $state(0);
-	let beepEnabled = $state(true);
+	let beepEnabled = $state(false);
 	let playbackRate = $state(1);
 	let showConfig = $state(true);
 
