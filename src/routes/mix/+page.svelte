@@ -39,6 +39,7 @@
 	let sessionCapMinutes = $state(0);
 	let beepEnabled = $state(false);
 	let playbackRate = $state(1);
+	let repeatCount = $state(1);
 	let showConfig = $state(true);
 
 	const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5] as const;
@@ -56,6 +57,7 @@
 	let playedIds = $state<string[]>([]);
 	let lastPlayedId = $state<string | null>(null);
 	let itemsPlayed = $state(0);
+	let currentRepeat = $state(1);
 	let sessionStartedAtMs = $state(0);
 	let sessionElapsedSec = $state(0);
 	let needsSeek = $state(false);
@@ -127,6 +129,7 @@
 			if (typeof c.sessionCapMinutes === 'number') sessionCapMinutes = c.sessionCapMinutes;
 			if (typeof c.beepEnabled === 'boolean') beepEnabled = c.beepEnabled;
 			if (typeof c.playbackRate === 'number' && SPEEDS.includes(c.playbackRate as never)) playbackRate = c.playbackRate;
+			if (typeof c.repeatCount === 'number') repeatCount = Math.max(1, Math.min(20, Math.floor(c.repeatCount)));
 		} catch {
 			// ignore
 		}
@@ -137,7 +140,7 @@
 			poolSource, poolMode, filterDance, filterCategory, filterCouples,
 			clipTypeFilters, manualVideoIds, manualClipIds,
 			segmentDuration, segmentVariance, startMode, skipEdgesSeconds,
-			gapDuration, sessionCapMinutes, beepEnabled, playbackRate,
+			gapDuration, sessionCapMinutes, beepEnabled, playbackRate, repeatCount,
 		};
 		try {
 			localStorage.setItem(CONFIG_KEY, JSON.stringify(c));
@@ -282,9 +285,19 @@
 		segmentDurationActual = duration;
 		segmentElapsed = 0;
 		warningsFired = [];
+		currentRepeat = 1;
 		needsSeek = true;
 		audioUrl = url;
 		itemsPlayed += 1;
+	}
+
+	function replayCurrent() {
+		if (!audioEl) return;
+		currentRepeat += 1;
+		segmentElapsed = 0;
+		warningsFired = [];
+		audioEl.currentTime = segmentStartOffset;
+		audioEl.play().catch(() => {});
 	}
 
 	function handleAudioLoaded() {
@@ -340,6 +353,10 @@
 
 	function advanceToNext() {
 		if (!audioEl) return;
+		if (currentRepeat < repeatCount) {
+			replayCurrent();
+			return;
+		}
 		if (gapDuration > 0) {
 			phase = 'gap';
 			audioEl.pause();
@@ -603,6 +620,10 @@
 
 				<div class="session-meta">
 					<span>{poolSource === 'clips' ? 'Clip' : 'Song'} {itemsPlayed}</span>
+					{#if repeatCount > 1}
+						<span class="dot"></span>
+						<span>loop {currentRepeat}/{repeatCount}</span>
+					{/if}
 					<span class="dot"></span>
 					<span>{formatTime(sessionElapsedSec)} elapsed</span>
 					{#if sessionCapMinutes > 0}
@@ -852,6 +873,38 @@
 				{/if}
 
 				<div class="cfg-field">
+					<label for="repeat-count" class="field-label-as-label">Repeat each {poolSource === 'clips' ? 'clip' : 'song'}</label>
+					<div class="number-row">
+						<button
+							class="num-btn"
+							onclick={() => repeatCount = Math.max(1, repeatCount - 1)}
+							disabled={repeatCount <= 1}
+							aria-label="Decrease"
+						>−</button>
+						<input
+							id="repeat-count"
+							type="number"
+							class="num-input"
+							min="1"
+							max="20"
+							step="1"
+							value={repeatCount}
+							oninput={(e) => {
+								const v = parseInt((e.target as HTMLInputElement).value, 10);
+								if (!isNaN(v)) repeatCount = Math.max(1, Math.min(20, v));
+							}}
+						/>
+						<button
+							class="num-btn"
+							onclick={() => repeatCount = Math.min(20, repeatCount + 1)}
+							disabled={repeatCount >= 20}
+							aria-label="Increase"
+						>+</button>
+						<span class="num-suffix">{repeatCount === 1 ? 'once (no repeat)' : `${repeatCount}× before next`}</span>
+					</div>
+				</div>
+
+				<div class="cfg-field">
 					<div class="field-label">Gap between {poolSource === 'clips' ? 'clips' : 'songs'}</div>
 					<div class="option-row">
 						{#each [0, 1, 3, 5] as g}
@@ -1073,6 +1126,68 @@
 		color: #52525b;
 		font-size: 11px;
 		margin-top: 4px;
+	}
+	.field-label-as-label {
+		font-size: 12px;
+		color: #71717a;
+		font-weight: 500;
+	}
+	.number-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.num-btn {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		font-family: inherit;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+	}
+	.num-btn:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.08);
+	}
+	.num-btn:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+	.num-input {
+		width: 52px;
+		height: 28px;
+		text-align: center;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e4e7;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		font-family: inherit;
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+	.num-input::-webkit-outer-spin-button,
+	.num-input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	.num-input:focus {
+		outline: none;
+		border-color: rgba(99, 102, 241, 0.4);
+	}
+	.num-suffix {
+		color: #71717a;
+		font-size: 12px;
+		margin-left: 4px;
 	}
 
 	.countdown {
