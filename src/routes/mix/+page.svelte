@@ -180,7 +180,29 @@
 		return { video, clip };
 	}
 
-	function setupSegment(item: Item): { start: number; duration: number } {
+	function pickStartInWindow(windowStart: number, windowEnd: number, dur: number, avoid?: { start: number; duration: number }): number {
+		const maxStart = Math.max(windowStart, windowEnd - dur);
+		if (!avoid) {
+			return windowStart + Math.random() * Math.max(0, maxStart - windowStart);
+		}
+		// Two non-overlapping regions of valid starts:
+		// A: windowStart .. (avoid.start - dur) — places segment ending before avoid.start
+		// B: (avoid.start + avoid.duration) .. maxStart — places segment starting after avoid ends
+		const aEnd = avoid.start - dur;
+		const bStart = avoid.start + avoid.duration;
+		const aLen = Math.max(0, aEnd - windowStart);
+		const bLen = Math.max(0, maxStart - bStart);
+		const total = aLen + bLen;
+		if (total <= 0) {
+			// Can't fit a non-overlapping segment — pick the opposite end from avoid instead
+			const mid = (windowStart + maxStart) / 2;
+			return avoid.start <= mid ? maxStart : windowStart;
+		}
+		const pick = Math.random() * total;
+		return pick < aLen ? windowStart + pick : bStart + (pick - aLen);
+	}
+
+	function setupSegment(item: Item, avoid?: { start: number; duration: number }): { start: number; duration: number } {
 		if (item.clip) {
 			const len = Math.max(2, item.clip.endTime - item.clip.startTime);
 			return { start: item.clip.startTime, duration: len };
@@ -200,11 +222,9 @@
 
 		let start = 0;
 		if (startMode === 'trim-edges') {
-			const maxStart = Math.max(trim, videoLen - trim - dur);
-			start = trim + Math.random() * Math.max(0, maxStart - trim);
+			start = pickStartInWindow(trim, videoLen - trim, dur, avoid);
 		} else if (startMode === 'random') {
-			const maxStart = Math.max(0, videoLen - dur);
-			start = Math.random() * maxStart;
+			start = pickStartInWindow(0, videoLen, dur, avoid);
 		}
 		return { start, duration: dur };
 	}
@@ -318,7 +338,11 @@
 		const itemId = next.clip ? next.clip.id : next.video.id;
 		playedIds = [...playedIds, itemId];
 
-		const { start, duration } = setupSegment(next);
+		// If the same video is playing right now, avoid overlapping segments
+		const avoid = (currentVideo && next.video.id === currentVideo.id && segmentDurationActual > 0)
+			? { start: segmentStartOffset, duration: segmentDurationActual }
+			: undefined;
+		const { start, duration } = setupSegment(next, avoid);
 		const entry: HistoryEntry = { video: next.video, clip: next.clip, startOffset: start, duration };
 		// Cap history to keep memory bounded
 		const capped = history.length >= 100 ? history.slice(-99) : history;
