@@ -8,6 +8,7 @@
 	type StartMode = 'trim-edges' | 'from-start' | 'random';
 	type Phase = 'idle' | 'playing' | 'paused' | 'gap' | 'ended';
 	type Item = { video: VideoMeta; clip: ClipMeta | null };
+	type HistoryEntry = { video: VideoMeta; clip: ClipMeta | null; startOffset: number; duration: number };
 
 	const CONFIG_KEY = 'mix-config-v1';
 	const CLIP_TYPES = ['move', 'pattern', 'styling', 'footwork', 'musicality'] as const;
@@ -59,6 +60,8 @@
 	let lastPlayedId = $state<string | null>(null);
 	let itemsPlayed = $state(0);
 	let currentRepeat = $state(1);
+	let history = $state<HistoryEntry[]>([]);
+	let historyCursor = $state(-1);
 	let sessionStartedAtMs = $state(0);
 	let sessionElapsedSec = $state(0);
 	let needsSeek = $state(false);
@@ -253,10 +256,41 @@
 		playedIds = [];
 		lastPlayedId = null;
 		itemsPlayed = 0;
+		history = [];
+		historyCursor = -1;
 		sessionStartedAtMs = Date.now();
 		sessionElapsedSec = 0;
 		phase = 'playing';
 		loadNextItem();
+	}
+
+	function applyHistoryEntry(entry: HistoryEntry) {
+		if (!audioEl) return;
+		const url = store.getCdnUrlForVideo(entry.video.id);
+		if (!url) return;
+
+		currentVideo = entry.video;
+		currentClip = entry.clip;
+		const itemId = entry.clip ? entry.clip.id : entry.video.id;
+		lastPlayedId = itemId;
+
+		segmentStartOffset = entry.startOffset;
+		segmentDurationActual = entry.duration;
+		segmentElapsed = 0;
+		warningsFired = [];
+		currentRepeat = 1;
+		itemsPlayed += 1;
+
+		const sameSrc = audioUrl === url;
+		if (sameSrc && audioEl) {
+			needsSeek = false;
+			audioEl.currentTime = entry.startOffset;
+			audioEl.playbackRate = playbackRate;
+			audioEl.play().catch(() => {});
+		} else {
+			needsSeek = true;
+			audioUrl = url;
+		}
 	}
 
 	function loadNextItem() {
@@ -269,37 +303,37 @@
 			}
 		}
 
+		// Forward through history if we Previous'd earlier
+		if (historyCursor < history.length - 1) {
+			historyCursor += 1;
+			applyHistoryEntry(history[historyCursor]);
+			return;
+		}
+
 		const next = pickNextItem();
 		if (!next) { endSession(); return; }
 
-		const url = store.getCdnUrlForVideo(next.video.id);
-		if (!url) { advanceToNext(); return; }
+		if (!store.getCdnUrlForVideo(next.video.id)) { advanceToNext(); return; }
 
-		currentVideo = next.video;
-		currentClip = next.clip;
 		const itemId = next.clip ? next.clip.id : next.video.id;
 		playedIds = [...playedIds, itemId];
-		lastPlayedId = itemId;
 
 		const { start, duration } = setupSegment(next);
-		segmentStartOffset = start;
-		segmentDurationActual = duration;
-		segmentElapsed = 0;
-		warningsFired = [];
-		currentRepeat = 1;
-		itemsPlayed += 1;
+		const entry: HistoryEntry = { video: next.video, clip: next.clip, startOffset: start, duration };
+		// Cap history to keep memory bounded
+		const capped = history.length >= 100 ? history.slice(-99) : history;
+		history = [...capped, entry];
+		historyCursor = history.length - 1;
+		applyHistoryEntry(entry);
+	}
 
-		const sameSrc = audioUrl === url;
-		if (sameSrc && audioEl) {
-			// Source didn't change — loadedmetadata won't fire, seek directly
-			needsSeek = false;
-			audioEl.currentTime = start;
-			audioEl.playbackRate = playbackRate;
-			audioEl.play().catch(() => {});
-		} else {
-			needsSeek = true;
-			audioUrl = url;
-		}
+	function loadPreviousItem() {
+		if (!audioEl) return;
+		if (historyCursor <= 0) return;
+		historyCursor -= 1;
+		if (phase === 'gap') { clearGapTimers(); phase = 'playing'; }
+		else if (phase === 'paused') phase = 'playing';
+		applyHistoryEntry(history[historyCursor]);
 	}
 
 	function replayCurrent() {
@@ -609,6 +643,10 @@
 				</div>
 
 				<div class="controls">
+					<button class="ctrl-btn" onclick={loadPreviousItem} disabled={historyCursor <= 0} title="Previous">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="19 20 9 12 19 4" /><line x1="5" y1="4" x2="5" y2="20" /></svg>
+						Prev
+					</button>
 					<button class="ctrl-btn primary" onclick={togglePause} disabled={phase === 'gap'}>
 						{#if phase === 'playing'}
 							<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
