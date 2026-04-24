@@ -242,6 +242,37 @@
 		}
 	}
 
+	function duckMusicForBell() {
+		if (!audioEl) return;
+		const startVol = 1;
+		const lowVol = 0.25;
+		const fadeInMs = 120;
+		const holdMs = 550;
+		const fadeOutMs = 280;
+		const total = fadeInMs + holdMs + fadeOutMs;
+		const t0 = performance.now();
+		const step = () => {
+			if (!audioEl) return;
+			const t = performance.now() - t0;
+			if (t >= total) {
+				audioEl.volume = startVol;
+				return;
+			}
+			let v: number;
+			if (t < fadeInMs) {
+				v = startVol - (startVol - lowVol) * (t / fadeInMs);
+			} else if (t < fadeInMs + holdMs) {
+				v = lowVol;
+			} else {
+				const k = (t - fadeInMs - holdMs) / fadeOutMs;
+				v = lowVol + (startVol - lowVol) * k;
+			}
+			audioEl.volume = Math.max(0, Math.min(1, v));
+			requestAnimationFrame(step);
+		};
+		requestAnimationFrame(step);
+	}
+
 	function playBell() {
 		if (!beepEnabled) return;
 		const ctx = ensureAudioCtx();
@@ -269,6 +300,7 @@
 				osc.start(t);
 				osc.stop(t + p.decay + 0.05);
 			}
+			duckMusicForBell();
 		} catch {
 			// ignore
 		}
