@@ -2,6 +2,14 @@ const DB_NAME = 'clipit-handle';
 const STORE_NAME = 'handles';
 const HANDLE_KEY = 'root';
 
+interface VideoSection {
+	id: string;
+	name?: string;
+	startTime: number;
+	endTime: number;
+	loopCount: number;
+}
+
 interface VideoMeta {
 	id: string;
 	name: string;
@@ -15,6 +23,8 @@ interface VideoMeta {
 	hiddenFromSearch: boolean;
 	addedAt: string;
 	cdnUrl?: string;
+	bpm?: number;
+	sections?: VideoSection[];
 }
 
 interface ClipMeta {
@@ -52,7 +62,7 @@ interface Metadata {
 	practices?: PracticeMeta[];
 }
 
-export type { VideoMeta, ClipMeta, PracticeMeta, Metadata };
+export type { VideoMeta, VideoSection, ClipMeta, PracticeMeta, Metadata };
 
 let dirHandle: FileSystemDirectoryHandle | null = null;
 

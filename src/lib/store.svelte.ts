@@ -1,7 +1,7 @@
 import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl } from './bunny';
-import type { VideoMeta, ClipMeta, PracticeMeta } from './storage';
+import type { VideoMeta, VideoSection, ClipMeta, PracticeMeta } from './storage';
 
-export type { VideoMeta, ClipMeta, PracticeMeta };
+export type { VideoMeta, VideoSection, ClipMeta, PracticeMeta };
 
 type StorageState = 'loading' | 'ready';
 
@@ -119,7 +119,7 @@ export async function addVideo(_file: File, duration: number, _thumbnailBlob: Bl
 	return video;
 }
 
-export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; category?: 'demo' | 'jack-and-jill' | 'workshop' | 'social'; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string }) {
+export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; category?: 'demo' | 'jack-and-jill' | 'workshop' | 'social'; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string; bpm?: number; sections?: VideoSection[] }) {
 	videos = videos.map(v => v.id === videoId ? { ...v, ...updates } : v);
 	if (updates.name !== undefined) {
 		clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: updates.name! } : c);

@@ -141,6 +141,7 @@
 			<a href="/jnj" class:active={currentPath.startsWith('/jnj')}>J&amp;J</a>
 			<a href="/practice" class:active={currentPath.startsWith('/practice')}>Practice</a>
 			<a href="/mix" class:active={currentPath.startsWith('/mix')}>Mix</a>
+			<a href="/song" class:active={currentPath.startsWith('/song')}>Song</a>
 			<a href="/levels" class:active={currentPath === '/levels'}>Levels</a>
 			{#if storeState === 'ready'}
 				{#if isPwa}
