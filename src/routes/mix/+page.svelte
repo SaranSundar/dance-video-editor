@@ -242,24 +242,33 @@
 		}
 	}
 
-	function playBeep(freq: number) {
+	function playBell() {
 		if (!beepEnabled) return;
 		const ctx = ensureAudioCtx();
 		if (!ctx) return;
 		try {
-			const osc = ctx.createOscillator();
-			const gain = ctx.createGain();
-			osc.connect(gain);
-			gain.connect(ctx.destination);
-			osc.type = 'square';
-			osc.frequency.value = freq;
 			const t = ctx.currentTime + 0.005;
-			gain.gain.setValueAtTime(0, t);
-			gain.gain.linearRampToValueAtTime(0.6, t + 0.01);
-			gain.gain.setValueAtTime(0.6, t + 0.18);
-			gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-			osc.start(t);
-			osc.stop(t + 0.26);
+			// Bell-like additive synthesis: inharmonic partials with independent decays.
+			// Higher partials decay faster for the classic metallic "shimmer" on top of a sustained fundamental.
+			const partials: Array<{ freq: number; gain: number; decay: number }> = [
+				{ freq: 880, gain: 0.6, decay: 1.2 },
+				{ freq: 2200, gain: 0.28, decay: 0.7 },
+				{ freq: 3120, gain: 0.14, decay: 0.45 },
+				{ freq: 4400, gain: 0.07, decay: 0.3 },
+			];
+			for (const p of partials) {
+				const osc = ctx.createOscillator();
+				const g = ctx.createGain();
+				osc.type = 'sine';
+				osc.frequency.value = p.freq;
+				osc.connect(g);
+				g.connect(ctx.destination);
+				g.gain.setValueAtTime(0, t);
+				g.gain.linearRampToValueAtTime(p.gain, t + 0.005);
+				g.gain.exponentialRampToValueAtTime(0.0001, t + p.decay);
+				osc.start(t);
+				osc.stop(t + p.decay + 0.05);
+			}
 		} catch {
 			// ignore
 		}
@@ -391,7 +400,9 @@
 		audioEl.currentTime = segmentStartOffset + newElapsed;
 		segmentElapsed = newElapsed;
 		const remaining = segmentDurationActual - newElapsed;
-		warningsFired = [3, 2, 1].filter(t => remaining <= t);
+		// Mark the 3s warning as fired if we've already passed that threshold,
+		// so seeking into the final 3s doesn't re-fire the bell.
+		warningsFired = remaining <= 3 ? [3] : [];
 	}
 
 	function handleTimeUpdate() {
@@ -402,13 +413,9 @@
 
 		const remaining = segmentDurationActual - elapsed;
 
-		if (beepEnabled) {
-			for (const t of [3, 2, 1]) {
-				if (remaining <= t && remaining > t - 1 && !warningsFired.includes(t)) {
-					warningsFired = [...warningsFired, t];
-					playBeep(880 + (3 - t) * 110);
-				}
-			}
+		if (beepEnabled && remaining <= 3 && remaining > 2 && !warningsFired.includes(3)) {
+			warningsFired = [...warningsFired, 3];
+			playBell();
 		}
 
 		if (elapsed >= segmentDurationActual) {
@@ -1020,7 +1027,7 @@
 				<div class="cfg-field">
 					<label class="check-label">
 						<input type="checkbox" bind:checked={beepEnabled} />
-						<span>Warning beep (T-3s countdown)</span>
+						<span>Warning bell at T-3s</span>
 					</label>
 				</div>
 			</div>
