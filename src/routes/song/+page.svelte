@@ -558,7 +558,7 @@
 						{sections.length > 0 ? 'Regenerate sections' : 'Generate sections'}
 					</button>
 					{#if sections.length > 0}
-						<button class="ghost-btn small" onclick={clearSections}>Clear all</button>
+						<button class="ghost-btn small" onclick={clearSections} disabled title="Deletion disabled in UI — edit metadata.json manually">Clear all</button>
 					{/if}
 				</div>
 				{#if sections.length > 0}
@@ -616,7 +616,7 @@
 								<span class="loop-val">{s.loopCount}×</span>
 								<button class="num-btn tiny" onclick={() => updateSection(s.id, { loopCount: Math.min(20, s.loopCount + 1) })} disabled={s.loopCount >= 20} aria-label="Increase">+</button>
 							</div>
-							<button class="row-btn danger" onclick={() => deleteSection(s.id)} disabled={sections.length <= 1} title="Delete section">
+							<button class="row-btn danger" onclick={() => deleteSection(s.id)} disabled title="Deletion disabled in UI — edit metadata.json manually">
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
 							</button>
 						</div>

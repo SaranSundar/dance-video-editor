@@ -880,7 +880,7 @@
 							<h3>{video.name}</h3>
 							<div class="video-actions">
 								<button class="action-icon-btn" onclick={(e) => startRename(e, video)} title="Rename">Rename</button>
-								<button class="action-icon-btn delete-btn" onclick={(e) => deleteVideo(e, video.id)} title="Delete">Delete</button>
+								<button class="action-icon-btn delete-btn" onclick={(e) => deleteVideo(e, video.id)} disabled title="Deletion disabled in UI — edit metadata.json manually">Delete</button>
 							</div>
 						{/if}
 					</div>
