@@ -79,6 +79,7 @@ src/
     practice/           # Practice sessions list - create/delete sessions
     practice/[id]/      # Practice session editor - drag-drop clip arrangement, sequential player, type filter, fullscreen
     mix/                # Jack & Jill Mix - random-shuffle audio practice player (songs or clips)
+    song/               # Song Sections - single-song section editor + sequential looping player
     gallery/            # Gallery with filters (exists but not linked in nav)
     levels/             # Levels page
 static/
@@ -97,13 +98,15 @@ scripts/
 
 ## Data Model
 
-**VideoMeta:** id, name, fingerprint, duration, lead, follow, dance, hidden, hiddenFromSearch, addedAt, cdnUrl
+**VideoMeta:** id, name, fingerprint, duration, lead, follow, dance, category, hidden, hiddenFromSearch, addedAt, cdnUrl, bpm?, sections?
+
+**VideoSection:** id, name?, startTime, endTime, loopCount — stored inside `VideoMeta.sections[]`, used by `/song` for structured sequential playback.
 
 **ClipMeta:** id, videoId, videoName, label, lead, follow, dance, style, mastery, clipType, startTime, endTime, tags[], parentClipId, links[], hidden, hiddenFromSearch, createdAt
 
 **PracticeMeta:** id, name, clipIds[], loop, createdAt
 
-Clips are metadata-only - no separate video files. Playback seeks into the source video via CDN URL.
+Clips are metadata-only - no separate video files. Playback seeks into the source video via CDN URL. Sections are also metadata-only, living on `VideoMeta` rather than as top-level entities.
 
 ### Clip Types
 move, pattern, styling, footwork, musicality
@@ -137,10 +140,23 @@ Random-shuffle audio practice tool for training musical adaptation. All state li
 - **Same-src seek quirk**: when the shuffle happens to pick the same video twice in a row (e.g. pool of 1), the `<audio>` element's `src` doesn't change, so `loadedmetadata` never fires. `loadNextItem()` detects same-URL and issues the seek directly instead of waiting for the event.
 - **Shuffle**: no repeats until pool exhausted, then reset excluding the last-played item to avoid back-to-back dupes.
 - **Repeat each N times**: number input (1–20, default 1). When > 1, the same segment replays from the same start offset N times before advancing. Manual Next still skips to the next item regardless of remaining loops.
+- **Prev / forward history**: every played item (plus its exact start offset + duration) is pushed to an in-memory history with a cursor. Prev decrements the cursor and replays that entry at its original position; Next after a Prev walks forward through history before falling back to a fresh random pick when at the tip. History resets on `startSession`, does not persist across reloads, and is capped at 100 entries.
+- **Non-overlapping re-picks**: when the shuffle happens to choose the same video as what's currently playing (pool of 1 being the common case), the new random start excludes the previous segment's range via `pickStartInWindow()` — picks from the union of `[windowStart, prevStart − dur]` and `[prevEnd, windowEnd − dur]`. Falls back to the opposite end if the song is too short for two non-overlapping segments.
 - **Gap between items**: 0/1/3/5s optional silence (not applied between repeats of the same item).
 - **Session cap**: optional 5/10/15/30 min auto-end.
 - **Warning beep (default off)**: Web Audio API square wave at T-3/2/1 (880/990/1100 Hz, gain 0.6). AudioContext must be recreated if it was closed in `onDestroy` — the variable is reset to `null` there, and `ensureAudioCtx()` checks for `state === 'closed'` before reuse.
 - **Seek / speed**: clickable segment progress bar seeks within the current segment; warningsFired is recomputed so only future-window beeps fire after a seek. Speed selector (`0.5× / 0.75× / 1× / 1.25× / 1.5×`) reapplies `playbackRate` every time a new audio source loads, so it persists across songs.
+
+### Song Sections (`/song`)
+
+Per-song structural playback: pick a single song, define a sequence of timed sections, loop each N times before advancing.
+
+- **Storage**: sections live on the video itself (`VideoMeta.sections[]`), so they survive across sessions once set. `VideoMeta.bpm` also stored so the section editor remembers what BPM you used. UI settings (last-picked song, default loops, playback rate) persist to `localStorage` under `song-config-v1`.
+- **Auto-distribute**: takes the song duration, computes total 8-counts using the configured BPM (default 130 — typical bachata), and divides them evenly across the requested section count. 8-count length = `(8 × 60) / bpm` seconds.
+- **Draggable boundaries**: each inter-section handle is pointer-capture draggable; `setSectionBoundary()` snaps the new time to the nearest 8-count and clamps to adjacent section bounds. Sections always touch — moving a handle resizes the adjacent two, no gaps.
+- **Deletion merges**: removing a section extends the previous section to absorb the deleted range (last-section case extends the first).
+- **Playback**: plays section.start → section.end, replays `loopCount` times, then advances. Prev steps back a loop (or to the previous section if on loop 1). Speed selector and clickable seek within the current section, same pattern as `/mix`.
+- **Same-src quirk applies here too**: because `/song` only touches one audio source, starting playback after a change to the same song seeks directly on the existing element rather than waiting for `loadedmetadata`.
 
 ## Key Behaviors
 
@@ -285,6 +301,7 @@ Home page couple profiles are sorted by video count (most videos first). Couples
 - **Gallery page** at `/gallery` exists with full filtering but is not linked in nav
 - **`<audio>` with MP4 source**: `/mix` points an `HTMLAudioElement` at existing `.mp4` CDN URLs. Browsers decode only the AAC track (no video decode) — saves CPU, not bandwidth. Format is fine on all major browsers.
 - **Killing stray Playwright browsers**: MCP Playwright leaves Chrome processes behind. Kill them safely with `pkill -f "playwright_chromiumdev_profile"` — that flag only appears in Playwright-spawned processes, never in the user's real Chrome.
+- **UI delete buttons disabled**: every destructive button in the app (delete video / clip / practice session / clip-from-session / link / section, plus clear-all sections) is currently `disabled` with a tooltip explaining why. Underlying store functions (`deleteVideo`, `deleteClip`, `deletePractice`, `removeLink`, `nukeAll`, `updateVideo({sections: ...})`) still exist and work — deletes happen either via Claude session, terminal + direct PUT to `metadata.json`, or by importing a pruned JSON via the home-page Import button. This is a temporary guardrail; remove the `disabled` attributes if re-enabling.
 
 ## Re-enabling Local Storage
 
