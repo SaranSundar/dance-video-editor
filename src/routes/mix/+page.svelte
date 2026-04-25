@@ -15,7 +15,7 @@
 
 	const knownCouples = [
 		'Anthony', 'Cornel', 'Daniel', 'Emilien', 'Gero', 'Irakli',
-		'Jes', 'Luis', 'Marcus', 'Melvin', 'Micka', 'Miguel', 'Ofir',
+		'Jean', 'Jes', 'Luis', 'Marcus', 'Melvin', 'Micka', 'Miguel', 'Ofir',
 		'Victor', 'Favian',
 	];
 

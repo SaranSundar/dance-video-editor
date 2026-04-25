@@ -25,6 +25,7 @@
 		['Emilien', 'Tehina'],
 		['Gero', 'Migle'],
 		['Irakli', 'Maria'],
+		['Jean', 'Alex'],
 		['Jes', 'Jenny'],
 		['Luis', 'Andrea'],
 		['Marcus', 'Bianca'],
