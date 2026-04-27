@@ -3,7 +3,15 @@
  * Reads go directly to CDN. Writes go through /api/bunny proxy (CORS).
  */
 
-const CDN_BASE = 'https://dance-videos.b-cdn.net';
+import { PUBLIC_BUNNY_CDN_BASE } from '$env/static/public';
+
+const CDN_BASE = PUBLIC_BUNNY_CDN_BASE;
+
+if (!CDN_BASE) {
+	throw new Error(
+		'Missing PUBLIC_BUNNY_CDN_BASE env var. Set it to your Bunny pull-zone URL (e.g. https://your-zone.b-cdn.net).'
+	);
+}
 
 // Metadata
 

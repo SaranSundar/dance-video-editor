@@ -11,12 +11,22 @@ import crypto from 'crypto';
 import { execSync } from 'child_process';
 import { Readable } from 'stream';
 
-const STORAGE_ZONE = 'dance-videos-ss';
-const API_KEY = 'e23def33-c1e6-4b94-b7ffa764825a-b295-44be';
-const STORAGE_HOST = 'la.storage.bunnycdn.com';
-const CDN_BASE = 'https://dance-videos.b-cdn.net';
-const DIR = '/Users/saran/Downloads/bachata-demos';
-const OUT = '/Users/saran/Downloads/clipit-bunny-metadata.json';
+const STORAGE_ZONE = process.env.BUNNY_STORAGE_ZONE;
+const API_KEY = process.env.BUNNY_STORAGE_API_KEY;
+const STORAGE_HOST = process.env.BUNNY_STORAGE_HOST ?? 'storage.bunnycdn.com';
+const CDN_BASE = process.env.PUBLIC_BUNNY_CDN_BASE;
+const DIR = process.env.UPLOAD_DIR ?? process.argv[2];
+const OUT = process.env.OUT_METADATA ?? process.argv[3] ?? './clipit-bunny-metadata.json';
+
+if (!STORAGE_ZONE || !API_KEY || !CDN_BASE) {
+  console.error('Missing env vars. Required: BUNNY_STORAGE_ZONE, BUNNY_STORAGE_API_KEY, PUBLIC_BUNNY_CDN_BASE.');
+  console.error('Run with:  node --env-file=.env scripts/upload-to-bunny.mjs <dir>');
+  process.exit(1);
+}
+if (!DIR) {
+  console.error('Missing upload dir. Pass as argv[2] or set UPLOAD_DIR.');
+  process.exit(1);
+}
 
 const couples = [
   ['Anthony', 'Katie'],

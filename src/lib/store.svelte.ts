@@ -1,3 +1,4 @@
+import { PUBLIC_BUNNY_CDN_BASE } from '$env/static/public';
 import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl } from './bunny';
 import type { VideoMeta, VideoSection, ClipMeta, PracticeMeta } from './storage';
 
@@ -283,7 +284,7 @@ export async function getVideoBlob(_videoId: string): Promise<Blob> {
 export function getStorageType() { return 'cloud' as const; }
 export function getFolderName() { return null; }
 export function isVideoLocal() { return false; }
-export function getCdnBaseUrl() { return 'https://dance-videos.b-cdn.net'; }
+export function getCdnBaseUrl() { return PUBLIC_BUNNY_CDN_BASE; }
 export async function pickFolder() { /* no-op */ }
 export async function grantPermission() { /* no-op */ }
 export async function refresh() {

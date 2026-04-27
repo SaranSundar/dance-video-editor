@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const STORAGE_ZONE = 'dance-videos-ss';
-const API_KEY = 'e23def33-c1e6-4b94-b7ffa764825a-b295-44be';
-const STORAGE_HOST = 'la.storage.bunnycdn.com';
+const STORAGE_ZONE = process.env.BUNNY_STORAGE_ZONE;
+const API_KEY = process.env.BUNNY_STORAGE_API_KEY;
+const STORAGE_HOST = process.env.BUNNY_STORAGE_HOST ?? 'storage.bunnycdn.com';
 
 export const config = {
 	maxDuration: 300,
@@ -14,6 +14,12 @@ export const config = {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+	if (!STORAGE_ZONE || !API_KEY) {
+		return res.status(500).json({
+			error: 'Server is missing BUNNY_STORAGE_ZONE or BUNNY_STORAGE_API_KEY env vars',
+		});
+	}
+
 	if (req.method !== 'PUT') {
 		return res.status(405).json({ error: 'Method not allowed' });
 	}
@@ -26,7 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	const url = `https://${STORAGE_HOST}/${STORAGE_ZONE}/${filePath}`;
 	const contentType = req.headers['content-type'] || 'application/octet-stream';
 
-	// Collect request body as buffer
 	const chunks: Buffer[] = [];
 	for await (const chunk of req) {
 		chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);

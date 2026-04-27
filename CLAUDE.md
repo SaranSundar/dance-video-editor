@@ -24,19 +24,19 @@ These files are kept in the codebase for potential future re-enablement of local
 
 ## Bunny Storage (Cloud Backend)
 
-All data flows through Bunny CDN/Storage. The app is personal-use, so the API key is embedded client-side.
+All data flows through Bunny CDN/Storage. Configuration comes from env vars — see `.env.example` for the canonical list and `README.md` for setup. Never hardcode the zone, host, CDN URL, or API key in code or docs.
 
-**Configuration (`src/lib/bunny.ts`):**
-- Storage zone: `dance-videos-ss`
-- Storage host: `la.storage.bunnycdn.com`
-- CDN base: `https://dance-videos-ss.b-cdn.net`
+**Configuration (env-driven):**
+- `BUNNY_STORAGE_ZONE` — storage zone name. Used server-side in `api/bunny.ts` and the bulk-upload scripts.
+- `BUNNY_STORAGE_HOST` — regional storage endpoint (defaults to `storage.bunnycdn.com`). Server-side only.
+- `BUNNY_STORAGE_API_KEY` — storage zone password. Server-side only, never exposed to the browser.
+- `PUBLIC_BUNNY_CDN_BASE` — pull-zone URL (e.g. `https://<zone>.b-cdn.net`). Read by `src/lib/bunny.ts` via `$env/static/public` and inlined into the client bundle at build time.
 
-**What's stored on Bunny:**
+**What's stored on Bunny (under `${BUNNY_STORAGE_ZONE}/`):**
 ```
-dance-videos-ss/
-  metadata.json         # { videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[] }
-  {uuid}.mp4            # Video files (H.265 encoded)
-  {uuid}-thumb.jpg      # Thumbnail images
+metadata.json         # { videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[] }
+{uuid}.mp4            # Video files (H.265 encoded)
+{uuid}-thumb.jpg      # Thumbnail images
 ```
 
 **Data flow:**
@@ -214,12 +214,12 @@ Two paths to go from a YouTube URL to a published, playable video in ClipIt:
 
 **Path B: CLI bulk upload (for batches or scripted one-offs)**
 1. Download + encode as above, save to a directory.
-2. Use `scripts/upload-to-bunny.mjs` as a template — it PUTs direct to `la.storage.bunnycdn.com` with the storage `AccessKey` (bypasses the Vercel proxy, since Node can make cross-origin requests freely).
+2. Use `scripts/upload-to-bunny.mjs` as a template — it PUTs direct to `https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/...` with the `AccessKey: ${BUNNY_STORAGE_API_KEY}` header (bypasses the Vercel proxy, since Node can make cross-origin requests freely). Run with `node --env-file=.env scripts/upload-to-bunny.mjs <dir>`.
 3. Flow per file: UUID → fingerprint (file size + SHA-256 of first 1MB) → ffprobe duration → PUT `{uuid}.mp4` → append VideoMeta entry.
 4. For a single ad-hoc upload, also: extract thumbnail (`ffmpeg -ss <t> -i in.mp4 -vframes 1 -q:v 2 thumb.jpg`), PUT as `{uuid}-thumb.jpg`, then fetch current `metadata.json` from the CDN, append the new entry, PUT it back to storage.
 
 **Metadata update step (either path):**
-- `metadata.json` is at `https://dance-videos.b-cdn.net/metadata.json` (read, CORS-enabled pull zone) and `https://la.storage.bunnycdn.com/dance-videos-ss/metadata.json` (write, with `AccessKey` header). Reads from the raw storage zone URL (`dance-videos-ss.b-cdn.net`) return 403 — always use the pull zone (`dance-videos.b-cdn.net`).
+- Read URL: `${PUBLIC_BUNNY_CDN_BASE}/metadata.json` (CORS-enabled pull zone). Write URL: `https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/metadata.json` with `AccessKey: ${BUNNY_STORAGE_API_KEY}` header. Reads from the raw storage host return 403 — always use the pull zone for reads. Resolve the actual values from `.env`; do not commit them anywhere.
 - Shape: `{ videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[] }`. Append to `videos[]`; leave other arrays untouched.
 - Required VideoMeta fields: `id`, `name`, `fingerprint`, `duration`, `lead`, `follow`, `dance`, `category`, `hidden: false`, `hiddenFromSearch: false`, `addedAt` (ISO), `cdnUrl`.
 - Always fetch `metadata.json` with `cache: 'no-store'` (or `?t=<timestamp>` busting) before edit — other clients may have written since.
@@ -295,7 +295,7 @@ Home page couple profiles are sorted by video count (most videos first). Couples
 
 - **H.265 playback**: works on Safari/Chrome but **not Firefox**. All videos on Bunny are H.265 with `hvc1` tag.
 - **Safari autoplay**: Safari blocks programmatic `play()` outside user gesture context. Practice player uses `autoplay` attribute on `<video>` + `onloadedmetadata` for seeking (matches ClipCard pattern). Don't call `play()` from async callbacks — it will silently fail on Safari.
-- **CORS**: Bunny CDN reads go direct (CORS headers enabled on pull zone with `json` in extension list). Bunny Storage writes go through `/api/bunny` Vercel serverless proxy (Storage API doesn't support browser CORS). The pull zone is `dance-videos.b-cdn.net` (NOT `dance-videos-ss.b-cdn.net` which is the raw storage zone URL without CORS).
+- **CORS**: Bunny CDN reads go direct (CORS headers enabled on pull zone with `json` in extension list). Bunny Storage writes go through `/api/bunny` Vercel serverless proxy (Storage API doesn't support browser CORS). Always read from the pull zone (`PUBLIC_BUNNY_CDN_BASE`) — reads from the raw `${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}` URL return 403 because the storage host has no CORS.
 - **iOS PWA**: No native fullscreen API (CSS fallback), no programmatic file input click (label wrapper)
 - **ffmpeg.wasm**: Uses `-ss` before `-i` for fast seeking, `-preset ultrafast` for re-encoding. Only used for on-demand clip download, not clip creation. Requires SharedArrayBuffer (COOP/COEP headers) which are currently disabled.
 - **Gallery page** at `/gallery` exists with full filtering but is not linked in nav
