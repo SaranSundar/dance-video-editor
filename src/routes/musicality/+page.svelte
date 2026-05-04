@@ -117,15 +117,39 @@
 		})();
 	});
 
+	// Persistent disk cache via Cache API — survives page reloads.
+	// In-memory `audioCache` still holds blob: URLs (one per page load),
+	// but the underlying bytes come from disk on second mount, so we don't
+	// re-download from the CDN.
+	const PERSISTENT_CACHE_NAME = 'musicality-audio-v1';
+
+	async function loadBlobFromCacheOrFetch(url: string): Promise<Blob> {
+		if (typeof caches !== 'undefined') {
+			try {
+				const cache = await caches.open(PERSISTENT_CACHE_NAME);
+				const hit = await cache.match(url);
+				if (hit) return await hit.blob();
+				const res = await fetch(url);
+				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				// Clone before reading body — cache.put consumes it
+				cache.put(url, res.clone()).catch(e => console.warn('cache.put failed', e));
+				return await res.blob();
+			} catch (e) {
+				console.warn('Cache API path failed, falling back to plain fetch:', e);
+			}
+		}
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(`HTTP ${res.status}`);
+		return await res.blob();
+	}
+
 	async function ensureAudio(videoId: string): Promise<string | null> {
 		const cached = audioCache.get(videoId);
 		if (cached) return cached;
 		const url = store.getCdnUrlForVideo(videoId);
 		if (!url) return null;
 		try {
-			const res = await fetch(url);
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			const blob = await res.blob();
+			const blob = await loadBlobFromCacheOrFetch(url);
 			const blobUrl = URL.createObjectURL(blob);
 			audioCache.set(videoId, blobUrl);
 			return blobUrl;
