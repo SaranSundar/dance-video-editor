@@ -80,6 +80,7 @@ src/
     practice/[id]/      # Practice session editor - drag-drop clip arrangement, sequential player, type filter, fullscreen
     mix/                # Jack & Jill Mix - random-shuffle audio practice player (songs or clips)
     song/               # Song Sections - single-song section editor + sequential looping player
+    musicality/         # Musicality - per-song clip moments with lead-in/lead-out buffers, prefetched audio
     gallery/            # Gallery with filters (exists but not linked in nav)
     levels/             # Levels page
 static/
@@ -101,6 +102,8 @@ scripts/
 **VideoMeta:** id, name, fingerprint, duration, lead, follow, dance, category, hidden, hiddenFromSearch, addedAt, cdnUrl, bpm?, sections?
 
 **VideoSection:** id, name?, startTime, endTime, loopCount — stored inside `VideoMeta.sections[]`, used by `/song` for structured sequential playback.
+
+**MusicalityClip:** id, videoId, name?, startTime, endTime, bufferBefore, bufferAfter, loopCount — stored as a top-level `musicality[]` array on the metadata (sibling to `videos`/`clips`/`practices`), used by `/musicality`. Audio-only practice — independent of `clips[]` (which are video clips). Each entry references the source song by `videoId`.
 
 **ClipMeta:** id, videoId, videoName, label, lead, follow, dance, style, mastery, clipType, startTime, endTime, tags[], parentClipId, links[], hidden, hiddenFromSearch, createdAt
 
@@ -146,6 +149,19 @@ Random-shuffle audio practice tool for training musical adaptation. All state li
 - **Session cap**: optional 5/10/15/30 min auto-end.
 - **Warning beep (default off)**: Web Audio API square wave at T-3/2/1 (880/990/1100 Hz, gain 0.6). AudioContext must be recreated if it was closed in `onDestroy` — the variable is reset to `null` there, and `ensureAudioCtx()` checks for `state === 'closed'` before reuse.
 - **Seek / speed**: clickable segment progress bar seeks within the current segment; warningsFired is recomputed so only future-window beeps fire after a seek. Speed selector (`0.5× / 0.75× / 1× / 1.25× / 1.5×`) reapplies `playbackRate` every time a new audio source loads, so it persists across songs.
+
+### Musicality (`/musicality`)
+
+Per-song "interesting moment" practice. For each song, mark in/out points around musicality moments; each clip plays with a configurable lead-in (buffer-before) and lead-out (buffer-after) so you have time to settle into the moment, then loops N times before advancing.
+
+- **Storage**: clips live in a top-level `musicality[]` array on `metadata.json` (sibling to `videos`, `clips`, `practices`), each entry keyed by `videoId`. Independent of video `clips[]` so audio-only practice doesn't interfere with the video-clip workflow. UI defaults (selected song, default buffers, default loops, playback rate) persist to `localStorage` under `musicality-config-v1`. Store API: `getMusicality()`, `getMusicalityForVideo(videoId)`, `addMusicalityClip(...)`, `updateMusicalityClip(id, patch)`, `deleteMusicalityClip(id)`, `setMusicalityForVideo(videoId, clips)`.
+- **Audio prefetch**: on page mount, every video that has at least one musicality clip is fetched as a `Blob` (sequentially via `ensureAudio()`), wrapped in `URL.createObjectURL()`, and cached in an in-memory `Map<videoId, blobUrl>`. Practice playback uses the blob URL → no streaming buffer, instant seek between clips. Object URLs revoked on `onDestroy`. The currently-selected song is also fetched on demand if it wasn't on the initial pass.
+- **Two audio elements**: one for the editor (scrubbing the song to find moments + mark in/out), one for the practice player. Editor is paused before practice starts so the two never overlap.
+- **Editor**: standard play/pause + ±1/±5s nudges + clickable scrub track. Existing clips render as colored bands on the track for context. `Mark IN` / `Mark OUT` capture the current scrubber time as the draft; `Add clip` writes it to `musicalityClips` with the current default buffer/loop settings, then re-sorts by `startTime`.
+- **Player**: phase machine `lead-in` → `active` → `lead-out` per loop, driven by `timeupdate`. Big phase strip shows "Get ready", "NOW", or "Wind down" with a countdown to the next phase boundary. Progress bar shows the full segment with the green "active" band overlaid so you can see how much buffer is left on either side.
+- **Same-src seek quirk applies**: practice player and editor both reuse the same `<audio>` element across plays. When `audioEl.src` doesn't change, `loadedmetadata` won't fire, so `seekToCurrentSegmentStart()` checks `playerAudioEl.src === url && readyState >= 1` and seeks directly instead of waiting for the event.
+- **Per-clip overrides**: each row exposes `bufferBefore`, `bufferAfter`, `loopCount` independently. Defaults only apply at clip creation time.
+- **Deletes disabled per app-wide convention** — delete buttons rendered but `disabled`. Edit `metadata.json` directly to remove a clip.
 
 ### Song Sections (`/song`)
 

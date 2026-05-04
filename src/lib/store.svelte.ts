@@ -1,8 +1,8 @@
 import { PUBLIC_BUNNY_CDN_BASE } from '$env/static/public';
 import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl } from './bunny';
-import type { VideoMeta, VideoSection, ClipMeta, PracticeMeta } from './storage';
+import type { VideoMeta, VideoSection, MusicalityClip, ClipMeta, PracticeMeta } from './storage';
 
-export type { VideoMeta, VideoSection, ClipMeta, PracticeMeta };
+export type { VideoMeta, VideoSection, MusicalityClip, ClipMeta, PracticeMeta };
 
 type StorageState = 'loading' | 'ready';
 
@@ -10,11 +10,16 @@ let state = $state<StorageState>('loading');
 let videos = $state<VideoMeta[]>([]);
 let clips = $state<ClipMeta[]>([]);
 let practices = $state<PracticeMeta[]>([]);
+let musicality = $state<MusicalityClip[]>([]);
 
 export function getState() { return state; }
 export function getVideos() { return videos; }
 export function getClips() { return clips; }
 export function getPractices() { return practices; }
+export function getMusicality() { return musicality; }
+export function getMusicalityForVideo(videoId: string): MusicalityClip[] {
+	return musicality.filter(m => m.videoId === videoId);
+}
 export function getCdnUrlForVideo(videoId: string): string | null {
 	const video = videos.find(v => v.id === videoId);
 	if (video?.cdnUrl) return video.cdnUrl;
@@ -33,6 +38,7 @@ async function syncToBunny() {
 			videos: videos.map(v => ({ ...v })),
 			clips: clips.map(c => ({ ...c })),
 			practices: practices.map(p => ({ ...p })),
+			musicality: musicality.map(m => ({ ...m })),
 		};
 		await saveMetadataToCloud(JSON.stringify(meta, null, 2));
 	} catch (e) {
@@ -60,6 +66,7 @@ function loadMeta(meta: any) {
 			hiddenFromSearch: c.hiddenFromSearch ?? false,
 		}));
 	practices = (meta.practices ?? []).map((p: PracticeMeta) => ({ ...p }));
+	musicality = (meta.musicality ?? []).map((m: MusicalityClip) => ({ ...m }));
 }
 
 export async function init() {
@@ -191,7 +198,7 @@ export async function deleteClip(clipId: string) {
 }
 
 export async function exportMetadata(): Promise<string> {
-	return JSON.stringify({ videos, clips, practices }, null, 2);
+	return JSON.stringify({ videos, clips, practices, musicality }, null, 2);
 }
 
 export async function importMetadata(json: string): Promise<void> {
@@ -204,6 +211,7 @@ export async function nukeAll() {
 	videos = [];
 	clips = [];
 	practices = [];
+	musicality = [];
 	syncToBunny();
 }
 
@@ -273,6 +281,40 @@ export async function updatePractice(practiceId: string, updates: { name?: strin
 
 export async function deletePractice(practiceId: string) {
 	practices = practices.filter(p => p.id !== practiceId);
+	syncToBunny();
+}
+
+// Musicality (audio-only practice clips, top-level — independent of video clips)
+
+export async function addMusicalityClip(input: { videoId: string; name?: string; startTime: number; endTime: number; bufferBefore: number; bufferAfter: number; loopCount: number }) {
+	const clip: MusicalityClip = {
+		id: crypto.randomUUID(),
+		videoId: input.videoId,
+		name: input.name,
+		startTime: input.startTime,
+		endTime: input.endTime,
+		bufferBefore: input.bufferBefore,
+		bufferAfter: input.bufferAfter,
+		loopCount: input.loopCount,
+	};
+	musicality = [...musicality, clip];
+	syncToBunny();
+	return clip;
+}
+
+export async function updateMusicalityClip(clipId: string, updates: Partial<Omit<MusicalityClip, 'id' | 'videoId'>>) {
+	musicality = musicality.map(m => m.id === clipId ? { ...m, ...updates } : m);
+	syncToBunny();
+}
+
+export async function deleteMusicalityClip(clipId: string) {
+	musicality = musicality.filter(m => m.id !== clipId);
+	syncToBunny();
+}
+
+export async function setMusicalityForVideo(videoId: string, clips: MusicalityClip[]) {
+	const others = musicality.filter(m => m.videoId !== videoId);
+	musicality = [...others, ...clips];
 	syncToBunny();
 }
 

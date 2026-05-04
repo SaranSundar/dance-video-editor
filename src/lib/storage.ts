@@ -10,6 +10,17 @@ interface VideoSection {
 	loopCount: number;
 }
 
+interface MusicalityClip {
+	id: string;
+	videoId: string;
+	name?: string;
+	startTime: number;
+	endTime: number;
+	bufferBefore: number;
+	bufferAfter: number;
+	loopCount: number;
+}
+
 interface VideoMeta {
 	id: string;
 	name: string;
@@ -60,9 +71,10 @@ interface Metadata {
 	videos: VideoMeta[];
 	clips: ClipMeta[];
 	practices?: PracticeMeta[];
+	musicality?: MusicalityClip[];
 }
 
-export type { VideoMeta, VideoSection, ClipMeta, PracticeMeta, Metadata };
+export type { VideoMeta, VideoSection, MusicalityClip, ClipMeta, PracticeMeta, Metadata };
 
 let dirHandle: FileSystemDirectoryHandle | null = null;
 
