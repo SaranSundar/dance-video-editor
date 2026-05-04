@@ -11,7 +11,38 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:35:59.515Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/91533cb8-f9ec-418b-a444-8992d87747d6.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/91533cb8-f9ec-418b-a444-8992d87747d6.mp4",
+      "category": "demo",
+      "sections": [
+        {
+          "id": "4cf9b33f-e3a6-4f6f-82b6-bf0714d5e402",
+          "name": "Section 1",
+          "startTime": 0,
+          "endTime": 77.53846153846155,
+          "loopCount": 2
+        },
+        {
+          "id": "39acd7cd-32e6-43c1-91e3-46491a7153a8",
+          "name": "Section 2",
+          "startTime": 77.53846153846155,
+          "endTime": 110.76923076923077,
+          "loopCount": 2
+        },
+        {
+          "id": "273d83bd-9e08-4979-941a-2b672b7321f3",
+          "name": "Section 3",
+          "startTime": 110.76923076923077,
+          "endTime": 162.46153846153845,
+          "loopCount": 2
+        },
+        {
+          "id": "e9b519a4-bd60-42e6-9ab5-854b837ad614",
+          "name": "Section 4",
+          "startTime": 162.46153846153845,
+          "endTime": 216.181,
+          "loopCount": 2
+        }
+      ]
     },
     {
       "id": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
@@ -24,7 +55,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:05.057Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d.mp4",
+      "category": "demo"
     },
     {
       "id": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
@@ -37,7 +69,38 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:06.956Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/1d3f20f8-20bf-4677-8c3a-6f675021f6e2.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/1d3f20f8-20bf-4677-8c3a-6f675021f6e2.mp4",
+      "category": "demo",
+      "sections": [
+        {
+          "id": "cf432bf0-2eab-4075-9471-09ee8410b9e0",
+          "name": "Section 1",
+          "startTime": 0,
+          "endTime": 29.53846153846154,
+          "loopCount": 1
+        },
+        {
+          "id": "1e9b24d6-654b-4621-a63e-b24c407a90a5",
+          "name": "Section 2",
+          "startTime": 29.53846153846154,
+          "endTime": 77.53846153846155,
+          "loopCount": 1
+        },
+        {
+          "id": "4e45da81-3e57-4163-8f9b-e76ad52966b0",
+          "name": "Section 3",
+          "startTime": 77.53846153846155,
+          "endTime": 118.15384615384616,
+          "loopCount": 1
+        },
+        {
+          "id": "d4982693-768a-43f3-8570-51eea508f0e9",
+          "name": "Section 4",
+          "startTime": 118.15384615384616,
+          "endTime": 157.781,
+          "loopCount": 1
+        }
+      ]
     },
     {
       "id": "0648afb4-9c78-4b4e-81e2-9cdd19a81f36",
@@ -50,7 +113,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:08.501Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/0648afb4-9c78-4b4e-81e2-9cdd19a81f36.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/0648afb4-9c78-4b4e-81e2-9cdd19a81f36.mp4",
+      "category": "demo"
     },
     {
       "id": "a72c76f3-6271-4a3d-80c3-0dabfc40a25c",
@@ -63,7 +127,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:12.701Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/a72c76f3-6271-4a3d-80c3-0dabfc40a25c.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/a72c76f3-6271-4a3d-80c3-0dabfc40a25c.mp4",
+      "category": "demo"
     },
     {
       "id": "4ee66243-1d74-4a1f-9e97-5eadbff3540a",
@@ -76,7 +141,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:17.781Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/4ee66243-1d74-4a1f-9e97-5eadbff3540a.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/4ee66243-1d74-4a1f-9e97-5eadbff3540a.mp4",
+      "category": "demo"
     },
     {
       "id": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
@@ -89,7 +155,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:19.441Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/83f6847e-b609-4ee5-97a8-4e4a7f611abf.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/83f6847e-b609-4ee5-97a8-4e4a7f611abf.mp4",
+      "category": "demo"
     },
     {
       "id": "c2306f06-6978-4855-a046-8301a91929c5",
@@ -102,7 +169,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:21.217Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/c2306f06-6978-4855-a046-8301a91929c5.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/c2306f06-6978-4855-a046-8301a91929c5.mp4",
+      "category": "demo"
     },
     {
       "id": "412ba7de-0393-4a98-9674-654986b07ee1",
@@ -115,7 +183,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:23.863Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/412ba7de-0393-4a98-9674-654986b07ee1.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/412ba7de-0393-4a98-9674-654986b07ee1.mp4",
+      "category": "demo"
     },
     {
       "id": "13622e8c-cdef-4c41-9a3e-5e45f524e250",
@@ -128,7 +197,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:24.847Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/13622e8c-cdef-4c41-9a3e-5e45f524e250.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/13622e8c-cdef-4c41-9a3e-5e45f524e250.mp4",
+      "category": "demo"
     },
     {
       "id": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
@@ -141,7 +211,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:26.965Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/c95ac002-b0c6-409a-8d28-0bdd8704cb14.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/c95ac002-b0c6-409a-8d28-0bdd8704cb14.mp4",
+      "category": "demo"
     },
     {
       "id": "8b2adb38-7690-40b7-a45a-4ea59d04b81c",
@@ -154,7 +225,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:28.467Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/8b2adb38-7690-40b7-a45a-4ea59d04b81c.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/8b2adb38-7690-40b7-a45a-4ea59d04b81c.mp4",
+      "category": "demo"
     },
     {
       "id": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
@@ -167,7 +239,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:30.583Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/f8392a29-0502-4403-9bb3-8f16e0aeb88d.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/f8392a29-0502-4403-9bb3-8f16e0aeb88d.mp4",
+      "category": "demo"
     },
     {
       "id": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
@@ -180,7 +253,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:34.676Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/147f6c40-fb17-4fc7-9d46-7beffccd26c3.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/147f6c40-fb17-4fc7-9d46-7beffccd26c3.mp4",
+      "category": "demo"
     },
     {
       "id": "c2f05381-f8e2-4b36-8aa5-b88b68c98fae",
@@ -193,7 +267,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:35.690Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/c2f05381-f8e2-4b36-8aa5-b88b68c98fae.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/c2f05381-f8e2-4b36-8aa5-b88b68c98fae.mp4",
+      "category": "demo"
     },
     {
       "id": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
@@ -206,7 +281,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:38.457Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/38af8ebf-af5e-4d6e-b99d-d6e402adecd9.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/38af8ebf-af5e-4d6e-b99d-d6e402adecd9.mp4",
+      "category": "demo"
     },
     {
       "id": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
@@ -219,7 +295,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:42.469Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/721652e4-c8f0-47c9-898f-ee7fba4d7e77.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/721652e4-c8f0-47c9-898f-ee7fba4d7e77.mp4",
+      "category": "demo"
     },
     {
       "id": "681f2a97-0f5f-46fa-bafe-33d17dc7e2d2",
@@ -232,7 +309,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:48.860Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/681f2a97-0f5f-46fa-bafe-33d17dc7e2d2.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/681f2a97-0f5f-46fa-bafe-33d17dc7e2d2.mp4",
+      "category": "demo"
     },
     {
       "id": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
@@ -245,7 +323,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:52.384Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/67f73c26-d564-4cb6-acb1-03ba24f6fa3c.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/67f73c26-d564-4cb6-acb1-03ba24f6fa3c.mp4",
+      "category": "demo"
     },
     {
       "id": "d972dad0-acb8-49b4-80d0-0220a852681f",
@@ -258,7 +337,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:36:58.800Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/d972dad0-acb8-49b4-80d0-0220a852681f.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/d972dad0-acb8-49b4-80d0-0220a852681f.mp4",
+      "category": "demo"
     },
     {
       "id": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
@@ -271,7 +351,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:03.062Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/392e52fe-6d98-4e44-9635-d5bf9c5e558c.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/392e52fe-6d98-4e44-9635-d5bf9c5e558c.mp4",
+      "category": "demo"
     },
     {
       "id": "11177fbe-efd5-4723-bd25-061d553fe995",
@@ -284,7 +365,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:07.588Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/11177fbe-efd5-4723-bd25-061d553fe995.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/11177fbe-efd5-4723-bd25-061d553fe995.mp4",
+      "category": "demo"
     },
     {
       "id": "3442ca94-f878-4968-bd7a-e068f343aec7",
@@ -297,7 +379,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:08.638Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/3442ca94-f878-4968-bd7a-e068f343aec7.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/3442ca94-f878-4968-bd7a-e068f343aec7.mp4",
+      "category": "demo"
     },
     {
       "id": "2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b",
@@ -310,7 +393,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:09.225Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b.mp4",
+      "category": "demo"
     },
     {
       "id": "fc87f52f-4cf8-4476-8879-3250aad5e291",
@@ -323,7 +407,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:11.783Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/fc87f52f-4cf8-4476-8879-3250aad5e291.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/fc87f52f-4cf8-4476-8879-3250aad5e291.mp4",
+      "category": "demo"
     },
     {
       "id": "47021e97-5346-4416-ae5d-122abe2ce656",
@@ -336,7 +421,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:14.169Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/47021e97-5346-4416-ae5d-122abe2ce656.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/47021e97-5346-4416-ae5d-122abe2ce656.mp4",
+      "category": "demo"
     },
     {
       "id": "32715f49-cc8c-4264-adc3-499963bc95e6",
@@ -349,7 +435,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:18.673Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/32715f49-cc8c-4264-adc3-499963bc95e6.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/32715f49-cc8c-4264-adc3-499963bc95e6.mp4",
+      "category": "demo"
     },
     {
       "id": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
@@ -362,7 +449,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:25.283Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/bac3047c-cbd9-4a60-91b1-3467c8a434ac.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/bac3047c-cbd9-4a60-91b1-3467c8a434ac.mp4",
+      "category": "demo"
     },
     {
       "id": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
@@ -375,7 +463,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:28.296Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/7d00a6f3-1224-40c2-b29f-152afb3c8e7d.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/7d00a6f3-1224-40c2-b29f-152afb3c8e7d.mp4",
+      "category": "demo"
     },
     {
       "id": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
@@ -388,7 +477,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:30.207Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/d7a338be-9afe-476e-b1c1-8af7d8e07adf.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/d7a338be-9afe-476e-b1c1-8af7d8e07adf.mp4",
+      "category": "demo"
     },
     {
       "id": "78d7c114-3d6b-44fe-a15c-401bfd95cc6c",
@@ -401,7 +491,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:31.707Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/78d7c114-3d6b-44fe-a15c-401bfd95cc6c.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/78d7c114-3d6b-44fe-a15c-401bfd95cc6c.mp4",
+      "category": "demo"
     },
     {
       "id": "43aa935f-34a0-48da-801c-2e3abf541577",
@@ -414,7 +505,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:37.382Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/43aa935f-34a0-48da-801c-2e3abf541577.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/43aa935f-34a0-48da-801c-2e3abf541577.mp4",
+      "category": "demo"
     },
     {
       "id": "71715a86-12ee-4853-9537-bda00786fc87",
@@ -427,7 +519,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:41.269Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/71715a86-12ee-4853-9537-bda00786fc87.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/71715a86-12ee-4853-9537-bda00786fc87.mp4",
+      "category": "demo"
     },
     {
       "id": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
@@ -440,7 +533,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:46.106Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/db7c42fe-cf55-4ae6-9c79-9d1689e4ffad.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/db7c42fe-cf55-4ae6-9c79-9d1689e4ffad.mp4",
+      "category": "demo"
     },
     {
       "id": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
@@ -453,7 +547,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:49.194Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/ccb18b71-8937-4915-aa41-b100ebe5fdd7.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/ccb18b71-8937-4915-aa41-b100ebe5fdd7.mp4",
+      "category": "demo"
     },
     {
       "id": "16fc9cd9-207e-4034-be94-7b3c039be66e",
@@ -466,7 +561,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:37:55.676Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/16fc9cd9-207e-4034-be94-7b3c039be66e.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/16fc9cd9-207e-4034-be94-7b3c039be66e.mp4",
+      "category": "demo"
     },
     {
       "id": "5edfede5-7670-4485-ad3d-36fd8185bc46",
@@ -479,7 +575,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:03.316Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/5edfede5-7670-4485-ad3d-36fd8185bc46.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/5edfede5-7670-4485-ad3d-36fd8185bc46.mp4",
+      "category": "demo"
     },
     {
       "id": "c8545afb-b948-4a13-83fb-8666417103bb",
@@ -492,7 +589,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:06.650Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/c8545afb-b948-4a13-83fb-8666417103bb.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/c8545afb-b948-4a13-83fb-8666417103bb.mp4",
+      "category": "demo"
     },
     {
       "id": "e1a46276-38ce-4612-a4cb-93653a2bf83a",
@@ -505,7 +603,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:08.071Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/e1a46276-38ce-4612-a4cb-93653a2bf83a.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/e1a46276-38ce-4612-a4cb-93653a2bf83a.mp4",
+      "category": "demo"
     },
     {
       "id": "fadffdf9-a568-400f-b7bb-1d59bcd85866",
@@ -518,7 +617,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:09.833Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/fadffdf9-a568-400f-b7bb-1d59bcd85866.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/fadffdf9-a568-400f-b7bb-1d59bcd85866.mp4",
+      "category": "demo"
     },
     {
       "id": "9a60e90c-ec64-4dad-90b3-9a2dfd55ee55",
@@ -531,7 +631,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:11.717Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/9a60e90c-ec64-4dad-90b3-9a2dfd55ee55.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/9a60e90c-ec64-4dad-90b3-9a2dfd55ee55.mp4",
+      "category": "demo"
     },
     {
       "id": "7d6c5bd2-32a4-4a9f-b734-0dcf41836ac8",
@@ -544,7 +645,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:14.940Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/7d6c5bd2-32a4-4a9f-b734-0dcf41836ac8.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/7d6c5bd2-32a4-4a9f-b734-0dcf41836ac8.mp4",
+      "category": "demo"
     },
     {
       "id": "536020dc-a1f8-4df7-8ed6-570166528898",
@@ -557,7 +659,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T15:38:16.675Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/536020dc-a1f8-4df7-8ed6-570166528898.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/536020dc-a1f8-4df7-8ed6-570166528898.mp4",
+      "category": "demo"
     },
     {
       "id": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
@@ -570,7 +673,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:00.333Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/608b33bf-fcff-4cd2-bb51-af5bbe6b32fe.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/608b33bf-fcff-4cd2-bb51-af5bbe6b32fe.mp4",
+      "category": "demo"
     },
     {
       "id": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
@@ -583,7 +687,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:14.142Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/c47024cc-6730-44a3-8edc-2be2eaa259c2.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/c47024cc-6730-44a3-8edc-2be2eaa259c2.mp4",
+      "category": "demo"
     },
     {
       "id": "93b0a1f6-3605-472a-9087-c56da1c948d7",
@@ -596,7 +701,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:17.699Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/93b0a1f6-3605-472a-9087-c56da1c948d7.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/93b0a1f6-3605-472a-9087-c56da1c948d7.mp4",
+      "category": "demo"
     },
     {
       "id": "63cc38c2-c993-4f7b-bea0-0dfdf11ffe33",
@@ -609,7 +715,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:24.463Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/63cc38c2-c993-4f7b-bea0-0dfdf11ffe33.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/63cc38c2-c993-4f7b-bea0-0dfdf11ffe33.mp4",
+      "category": "demo"
     },
     {
       "id": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
@@ -622,7 +729,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T16:01:27.768Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e.mp4",
+      "category": "demo"
     },
     {
       "id": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
@@ -635,7 +743,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:02:04.208Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a.mp4",
+      "category": "demo"
     },
     {
       "id": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
@@ -648,7 +757,38 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:17:14.886Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/b64650a1-c9fb-4ad6-8151-4f23dcf5df8b.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/b64650a1-c9fb-4ad6-8151-4f23dcf5df8b.mp4",
+      "category": "demo",
+      "sections": [
+        {
+          "id": "388410ff-a057-42d7-b467-653b333c03e5",
+          "name": "Section 1",
+          "startTime": 0,
+          "endTime": 51.69230769230769,
+          "loopCount": 1
+        },
+        {
+          "id": "e974b67a-7b7a-4469-a98d-cf4298e033a0",
+          "name": "Section 2",
+          "startTime": 51.69230769230769,
+          "endTime": 103.38461538461539,
+          "loopCount": 1
+        },
+        {
+          "id": "f118d8be-e02f-4c70-b1a9-ad1372908bbc",
+          "name": "Section 3",
+          "startTime": 103.38461538461539,
+          "endTime": 155.0769230769231,
+          "loopCount": 8
+        },
+        {
+          "id": "180f75d9-1e02-42b8-931c-fbaa15acdfc0",
+          "name": "Section 4",
+          "startTime": 155.0769230769231,
+          "endTime": 209.301,
+          "loopCount": 8
+        }
+      ]
     },
     {
       "id": "065a3909-77c3-48ad-aed9-3266095f134b",
@@ -661,7 +801,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:17:23.749Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/065a3909-77c3-48ad-aed9-3266095f134b.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/065a3909-77c3-48ad-aed9-3266095f134b.mp4",
+      "category": "demo"
     },
     {
       "id": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
@@ -674,7 +815,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:17:36.512Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/5d8bf8dd-e749-45fb-bc8e-ede9a730e501.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/5d8bf8dd-e749-45fb-bc8e-ede9a730e501.mp4",
+      "category": "demo"
     },
     {
       "id": "7b5d7739-7af0-46c4-9332-396b162f6511",
@@ -687,7 +829,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:33:00.948Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/7b5d7739-7af0-46c4-9332-396b162f6511.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/7b5d7739-7af0-46c4-9332-396b162f6511.mp4",
+      "category": "demo"
     },
     {
       "id": "6ca492b0-34d9-4334-8ab8-408e43c63a08",
@@ -700,7 +843,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:33:04.440Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/6ca492b0-34d9-4334-8ab8-408e43c63a08.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/6ca492b0-34d9-4334-8ab8-408e43c63a08.mp4",
+      "category": "demo"
     },
     {
       "id": "d7e4b209-e87f-495a-8fdb-3183a8904561",
@@ -713,7 +857,8 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "addedAt": "2026-04-15T20:33:09.194Z",
-      "cdnUrl": "https://dance-videos.b-cdn.net/d7e4b209-e87f-495a-8fdb-3183a8904561.mp4"
+      "cdnUrl": "https://dance-videos.b-cdn.net/d7e4b209-e87f-495a-8fdb-3183a8904561.mp4",
+      "category": "demo"
     },
     {
       "id": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
@@ -728,6 +873,48 @@
       "addedAt": "2026-04-16T16:52:36.587Z",
       "cdnUrl": "https://dance-videos.b-cdn.net/be7d3dff-ffa1-4a12-9046-6ef32753832d.mp4",
       "category": "jack-and-jill"
+    },
+    {
+      "id": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "name": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "fingerprint": "245614828:153a5044ea0007fe4740075de4f1ff3c2c0bb264b06cc409b82165bea98cdf56",
+      "duration": 197.401,
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "category": "jack-and-jill",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-20T15:03:02.197Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/014d2d55-1495-469c-80c4-f4f37414e2a7.mp4"
+    },
+    {
+      "id": "b31de15e-9187-44ba-9432-a3b07f23cc12",
+      "name": "Elastic Heart - JES Y JENNY Bachata Mestiza - Dj Tronky",
+      "fingerprint": "41450753:5558148ce1a84ed80f1bc711f11fd3997f8673b02111febe01e679c5d70eeb3a",
+      "duration": 142.841,
+      "lead": "Jes",
+      "follow": "Jenny",
+      "dance": "bachata",
+      "category": "demo",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-22T07:17:20.072Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/b31de15e-9187-44ba-9432-a3b07f23cc12.mp4"
+    },
+    {
+      "id": "c9ab969a-de35-47c7-9ce4-868ff39e1d2b",
+      "name": "Jean & Alex - Pinto Picasso - Chacha",
+      "fingerprint": "31792537:86696617dd04764f077002fade7999930e3c85e662bba99ccf05e5145b1b462e",
+      "duration": 218.361,
+      "lead": "Jean",
+      "follow": "Alex",
+      "dance": "bachata",
+      "category": "demo",
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "addedAt": "2026-04-25T06:56:58.981Z",
+      "cdnUrl": "https://dance-videos.b-cdn.net/c9ab969a-de35-47c7-9ce4-868ff39e1d2b.mp4"
     }
   ],
   "clips": [
@@ -1132,19 +1319,3215 @@
       "hidden": false,
       "hiddenFromSearch": false,
       "createdAt": "2026-04-15T20:25:34.941Z"
+    },
+    {
+      "id": "4e9aa440-578c-49ff-8e73-3692402e7932",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Geneva J&J Part 1",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "sensual",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 543.667498,
+      "endTime": 608.192896,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:13:12.237Z"
+    },
+    {
+      "id": "7d6236db-b125-4a77-8c37-5c42dbe65e77",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Geneva winner early stage",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "sensual",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 653.121408,
+      "endTime": 741.966917,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:15:19.145Z"
+    },
+    {
+      "id": "7b98c993-0d25-4df2-9ca6-941ab7dc83ee",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Geneva 2nd winner early stage",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "sensual",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 889.379517,
+      "endTime": 919.588477,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:16:42.295Z"
+    },
+    {
+      "id": "d5bac2ed-7da2-4370-88ef-36f1ffad8051",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Adrian Geneva J&J",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 925.906936,
+      "endTime": 980.663384,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:17:30.866Z"
+    },
+    {
+      "id": "d583aab8-20e7-42e5-8da7-c4b43655c7f9",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Winner Geneva J&J",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "sensual",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 1800.346172,
+      "endTime": 1820.579115,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:18:56.433Z"
+    },
+    {
+      "id": "fee714d1-46f0-407a-abea-8de6eec227df",
+      "videoId": "be7d3dff-ffa1-4a12-9046-6ef32753832d",
+      "videoName": "The Finals - Bachata Social World Cup - Bachata Geneva Festival 2025",
+      "label": "Winner J&J Finals",
+      "lead": "",
+      "follow": "",
+      "dance": "bachata",
+      "style": "sensual",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 2219.787031,
+      "endTime": 2239.795267,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-16T19:20:08.561Z"
+    },
+    {
+      "id": "1b405273-b1d8-4741-927b-356a1e8ee2a3",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Intro",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 0,
+      "endTime": 15.577079,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T15:10:06.537Z"
+    },
+    {
+      "id": "34523856-fa16-4465-8f00-da6415a813b2",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Closed To Sliding Doors",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 24.525195,
+      "endTime": 33.617902,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T15:11:13.075Z"
+    },
+    {
+      "id": "cb3b2eef-6073-4878-b453-9574da47debe",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Basic Variations",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 32.613002,
+      "endTime": 45.209472,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T15:11:45.591Z"
+    },
+    {
+      "id": "2bd11521-4d83-4e5e-bed3-65006564e38d",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Styling",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 60.865565,
+      "endTime": 72.189641,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:22:44.865Z"
+    },
+    {
+      "id": "90e16fa1-81ed-4e41-a3a8-c0c4300c56e2",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Elbow Kick",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 74.116957,
+      "endTime": 83.374859,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:24:41.030Z"
+    },
+    {
+      "id": "55bc2161-f06f-42ae-9d16-640fb9254cb5",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Basic In Place",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 83.722944,
+      "endTime": 90.950683,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:25:10.597Z"
+    },
+    {
+      "id": "92e95b34-ec31-4bcf-929e-e112adbc12d7",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Basic Rotating",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 90.998692,
+      "endTime": 105.994052,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:25:47.489Z"
+    },
+    {
+      "id": "0df45bd7-b939-4755-b689-e160d13d91fe",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Foot work",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 115.760814,
+      "endTime": 149.635682,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:27:25.283Z"
+    },
+    {
+      "id": "769e4c0f-9d97-411d-a90e-e74f1b4ffb34",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Dip",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 143.201335,
+      "endTime": 149.355014,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:28:50.954Z"
+    },
+    {
+      "id": "878ed69f-9535-434f-89d7-9839264ac8f1",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel Basic Styling 2",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 149.814653,
+      "endTime": 161.795507,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:29:26.125Z"
+    },
+    {
+      "id": "f50136c4-cfa9-402b-b20f-99bcbbf0aba0",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "videoName": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
+      "label": "Maykel outro",
+      "lead": "Maykel Fidel",
+      "follow": "Vera Duarte",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 161.726341,
+      "endTime": 195.711138,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T17:30:24.102Z"
+    },
+    {
+      "id": "1bb990d6-7044-42b2-b2b4-d950180fe74e",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "videoName": "08 - Call_on_me_-_Johnny_Sky_Bachata_influence_by_Emilien_Tehina",
+      "label": "Emilien Footwork",
+      "lead": "Emilien",
+      "follow": "Tehina",
+      "dance": "bachata",
+      "style": "moderna",
+      "mastery": "seen",
+      "clipType": "musicality",
+      "startTime": 94.228326,
+      "endTime": 99.411081,
+      "tags": [],
+      "parentClipId": null,
+      "links": [],
+      "hidden": false,
+      "hiddenFromSearch": false,
+      "createdAt": "2026-04-20T19:16:39.426Z"
     }
   ],
   "practices": [
     {
-      "id": "6dd143c7-f52e-4bad-b380-0a4423374bdf",
-      "name": "musicality",
+      "id": "0dadeb8e-556f-4075-806c-f11586dc9b57",
+      "name": "Maykel Fidel & Vera Duarte - Jack & Jill Champions 2025 - Copenhagen Bachata Congress",
       "clipIds": [
-        "f0ae3837-acf1-4617-b72e-317305f2b59d",
-        "606892e7-66e9-4833-b1a2-c6190005eb42",
-        "22093679-8d57-407e-aca7-1b118c56fca2"
+        "34523856-fa16-4465-8f00-da6415a813b2",
+        "1b405273-b1d8-4741-927b-356a1e8ee2a3",
+        "cb3b2eef-6073-4878-b453-9574da47debe",
+        "2bd11521-4d83-4e5e-bed3-65006564e38d",
+        "90e16fa1-81ed-4e41-a3a8-c0c4300c56e2",
+        "92e95b34-ec31-4bcf-929e-e112adbc12d7",
+        "55bc2161-f06f-42ae-9d16-640fb9254cb5",
+        "769e4c0f-9d97-411d-a90e-e74f1b4ffb34",
+        "0df45bd7-b939-4755-b689-e160d13d91fe",
+        "878ed69f-9535-434f-89d7-9839264ac8f1",
+        "f50136c4-cfa9-402b-b20f-99bcbbf0aba0"
       ],
       "loop": false,
-      "createdAt": "2026-04-15T17:42:20.516Z"
+      "createdAt": "2026-04-20T17:34:51.664Z"
+    }
+  ],
+  "musicality": [
+    {
+      "id": "a6822b0a-035a-4374-ac24-8add1dc0d70f",
+      "videoId": "91533cb8-f9ec-418b-a444-8992d87747d6",
+      "startTime": 14.5,
+      "endTime": 22.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f1d9baf6-f445-4d34-a576-5a6447b8b42c",
+      "videoId": "91533cb8-f9ec-418b-a444-8992d87747d6",
+      "startTime": 32.25,
+      "endTime": 40.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b9c6aaf5-ca95-41e9-b40f-dbe6704f2e7d",
+      "videoId": "91533cb8-f9ec-418b-a444-8992d87747d6",
+      "startTime": 101.25,
+      "endTime": 110.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a7004fa4-93d6-4a5e-bfb1-48a4c2438b9c",
+      "videoId": "91533cb8-f9ec-418b-a444-8992d87747d6",
+      "startTime": 113.5,
+      "endTime": 122,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9c415b7c-7e53-46b0-be11-ba437f528c24",
+      "videoId": "91533cb8-f9ec-418b-a444-8992d87747d6",
+      "startTime": 195,
+      "endTime": 207.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "46f9cdb1-ed76-4d72-8edc-7ad6600a631c",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0cda2ea4-881e-45ae-a709-d664aff45c4b",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "87425d0b-1e38-44d9-b6d2-f12d830a0801",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e6a33282-f8ec-4502-b785-303f9c7d347d",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 30,
+      "endTime": 39.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e42dadef-a697-4ca7-b98b-d1ed0c5ceebb",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 40.25,
+      "endTime": 47.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9867ea35-e96e-487e-bf6d-000715616fd8",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 108.5,
+      "endTime": 116,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "df33ad15-a608-431a-8d53-12690edb0b3a",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 170.25,
+      "endTime": 178.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4abb42f4-165b-4c21-8f98-631f3c436c60",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 180.75,
+      "endTime": 188.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e510f48d-17bc-4e82-8206-ce9ec2fa5ec4",
+      "videoId": "3f14e23b-5b32-47ee-9bc8-91d6c83c8e2d",
+      "startTime": 195.25,
+      "endTime": 211.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a97de43f-9cd1-4523-800b-91c5e3a21336",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d134da8d-8f36-4f9d-8890-3fc48dabc889",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4197c795-5595-4a24-9f05-3cb238a1e5c8",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7670b333-e0a3-4c95-a85a-5e3831b341bc",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 30,
+      "endTime": 36.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "75009692-2194-4211-ba27-31ffa53569e3",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 76,
+      "endTime": 84.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5f780ed1-8b60-42a2-8254-ef22564129c0",
+      "videoId": "1d3f20f8-20bf-4677-8c3a-6f675021f6e2",
+      "startTime": 136.75,
+      "endTime": 151.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c0ed5395-b4bf-4cf3-a744-fa284c5b8eea",
+      "videoId": "0648afb4-9c78-4b4e-81e2-9cdd19a81f36",
+      "startTime": 0,
+      "endTime": 10.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b1ac7070-d25c-48da-9fa1-9716a852c055",
+      "videoId": "0648afb4-9c78-4b4e-81e2-9cdd19a81f36",
+      "startTime": 59.5,
+      "endTime": 68.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e4449fac-ef4c-4eda-a1ee-dc8ba822a454",
+      "videoId": "0648afb4-9c78-4b4e-81e2-9cdd19a81f36",
+      "startTime": 175.5,
+      "endTime": 183.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7e600e2b-fa48-4d4f-b5d2-6338815e64d7",
+      "videoId": "a72c76f3-6271-4a3d-80c3-0dabfc40a25c",
+      "startTime": 53.5,
+      "endTime": 62.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f8285ab7-14c8-4e3e-aa76-26cb54ab90ad",
+      "videoId": "a72c76f3-6271-4a3d-80c3-0dabfc40a25c",
+      "startTime": 169.5,
+      "endTime": 177.381,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c6a13d10-f027-4c61-9661-00e163dca273",
+      "videoId": "4ee66243-1d74-4a1f-9e97-5eadbff3540a",
+      "startTime": 0,
+      "endTime": 12.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6aa85fae-7642-4ddb-a037-8d44ebff060f",
+      "videoId": "4ee66243-1d74-4a1f-9e97-5eadbff3540a",
+      "startTime": 127.25,
+      "endTime": 146.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b63bf77e-b24f-4701-885a-1476a1741346",
+      "videoId": "4ee66243-1d74-4a1f-9e97-5eadbff3540a",
+      "startTime": 184.75,
+      "endTime": 198.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3b967b6b-ae7f-423b-8bee-beecaa7db2c9",
+      "videoId": "4ee66243-1d74-4a1f-9e97-5eadbff3540a",
+      "startTime": 198.5,
+      "endTime": 203.481,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "58da82bc-9cc7-4991-b382-899b0aa8849a",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a74115f7-c7d0-45f7-bc32-a62a7588f1be",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7285ed12-2bb5-4af7-8fc4-9e0e14a8bd16",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 20,
+      "endTime": 29.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "062ab008-37a7-492d-a63a-48c4cc549554",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 53,
+      "endTime": 72.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c0e023be-96f5-43b0-8c93-c31c1ec03acb",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 73,
+      "endTime": 88,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "826f025a-bb7c-4ff8-9fd4-213a3d45a4cc",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 111.75,
+      "endTime": 123.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8357cf4a-e567-4892-b631-c00fae3ec7a1",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 121.75,
+      "endTime": 133.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e4be9b29-f9f8-4d7f-98e5-f51637279327",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 131.75,
+      "endTime": 136,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e054e811-c865-47a9-86d3-d6e7c4098e32",
+      "videoId": "83f6847e-b609-4ee5-97a8-4e4a7f611abf",
+      "startTime": 161.5,
+      "endTime": 176.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "be07e0de-7b84-412c-824f-5241a478e1f1",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c0e20966-8ecf-4286-b880-21a0a5b6a4b9",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d9c530ac-6d74-4294-9438-7f3027fc3959",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "48b3176e-7aff-4bc3-9109-a899d6629bfd",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "startTime": 30,
+      "endTime": 36,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fd62ec6b-a26d-4a4f-862f-82926828a764",
+      "videoId": "c2306f06-6978-4855-a046-8301a91929c5",
+      "startTime": 103,
+      "endTime": 122,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2f19daec-10ad-425d-94e2-bd27471cdd36",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 1.5,
+      "endTime": 13.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "48897594-e8ff-474c-ad0a-163e9dfcb499",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 11.5,
+      "endTime": 23.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d20e26bb-fe55-4382-977d-4df7eca6ba90",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 21.5,
+      "endTime": 33.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a4a2e22a-4544-4c5f-9f0c-633d0bd50cfc",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 31.5,
+      "endTime": 43,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "75db84b0-a28b-4c12-ae78-1ce652500f5a",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 43.25,
+      "endTime": 52,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1087fa0c-2d0d-4122-9398-1d208c1a05d7",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 78,
+      "endTime": 97.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9db51499-f6dc-4ffc-832a-dbfefd256822",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 97.5,
+      "endTime": 110.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9bc32d53-6741-4563-8e39-cc8cb7494865",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 164,
+      "endTime": 183.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6bfdf6e8-20e5-4d1f-9537-41fb2759a460",
+      "videoId": "412ba7de-0393-4a98-9674-654986b07ee1",
+      "startTime": 222,
+      "endTime": 234.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7d474c9d-df3d-45d2-8bde-1ff1b8ff2940",
+      "videoId": "13622e8c-cdef-4c41-9a3e-5e45f524e250",
+      "startTime": 0,
+      "endTime": 18.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2611918a-c460-4a7f-a902-b24891677945",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 0,
+      "endTime": 13.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "07ad4353-ef59-4a7e-a8fa-0607a27d37ec",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 70.25,
+      "endTime": 82.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3a0f1ac8-1a7e-4061-b27b-871ddb4870dc",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 80.25,
+      "endTime": 92.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "68743029-07bb-4f43-a696-3fe04ebc1b31",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 90.25,
+      "endTime": 102.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4ea21ede-8dc5-43ec-af2b-dc030726ae3f",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 100.25,
+      "endTime": 112.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0012aa1b-5979-4561-97b0-42a0e0ba95e0",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 125.75,
+      "endTime": 137.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "285aa56e-e7df-4d90-ad4e-d049635f2537",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 135.75,
+      "endTime": 146,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "866c8b5a-56a0-430e-86ef-86aa50201cc0",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 148,
+      "endTime": 166.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "657411f2-5a63-4d3f-9e98-40b46c70b07d",
+      "videoId": "c95ac002-b0c6-409a-8d28-0bdd8704cb14",
+      "startTime": 210.5,
+      "endTime": 219.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2b416619-30f5-4282-a3f0-fa1ac31b72cf",
+      "videoId": "8b2adb38-7690-40b7-a45a-4ea59d04b81c",
+      "startTime": 0,
+      "endTime": 7.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "227082a3-b227-4c00-a142-1152da3b2ef3",
+      "videoId": "8b2adb38-7690-40b7-a45a-4ea59d04b81c",
+      "startTime": 90.5,
+      "endTime": 97,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "75c20e08-d473-4794-81ff-6f1edcd9250e",
+      "videoId": "8b2adb38-7690-40b7-a45a-4ea59d04b81c",
+      "startTime": 126,
+      "endTime": 134,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "30868595-e180-4a57-91f3-3a05cbd5c05a",
+      "videoId": "8b2adb38-7690-40b7-a45a-4ea59d04b81c",
+      "startTime": 135.25,
+      "endTime": 145,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a5ab4568-9dbb-4fe7-bde5-e3958739e55e",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 0,
+      "endTime": 9.809524,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e54beafc-01fe-4be4-8c01-748fa1eec0b2",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 34.057823,
+      "endTime": 52.802721,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "00c2763f-ffdd-4a94-b9f2-95b9e1591961",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 104.806122,
+      "endTime": 120.557823,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "56db92ac-a776-44dd-a0af-ffe149b1a025",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 146.166667,
+      "endTime": 158.166667,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e10c5ef2-9289-49db-9bbf-42d95c367e88",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 156.166667,
+      "endTime": 168.166667,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7cc61064-b778-4838-87b5-b923e8d2f2a4",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 166.166667,
+      "endTime": 175.428571,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6e47cfff-3f99-42ab-ad1c-c8cb3006165e",
+      "videoId": "f8392a29-0502-4403-9bb3-8f16e0aeb88d",
+      "startTime": 202.765306,
+      "endTime": 210.897959,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a539db99-8327-4536-85ba-96d8e5cb4b99",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "059ebd90-0f7a-4049-ab84-4bfddedfe74a",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "846e3f28-2d79-4b93-b6f7-a4e36101051d",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5abd1f1f-5033-4890-b28c-b909f37cc5bc",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 100,
+      "endTime": 111,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "dc13251c-9417-4b01-90ab-13d23700fe2f",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 111.25,
+      "endTime": 119,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fb3fd7f3-ef33-4e10-a7e1-8e33dc6434e5",
+      "videoId": "147f6c40-fb17-4fc7-9d46-7beffccd26c3",
+      "startTime": 157.5,
+      "endTime": 169.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "47e88bdb-5e43-4717-bfd1-849f19b443e7",
+      "videoId": "c2f05381-f8e2-4b36-8aa5-b88b68c98fae",
+      "startTime": 0,
+      "endTime": 18.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d88186b1-ef8b-498f-928e-f83e8b03caac",
+      "videoId": "c2f05381-f8e2-4b36-8aa5-b88b68c98fae",
+      "startTime": 33.25,
+      "endTime": 39.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "97311bbf-a3a2-4297-a3ff-fac9b411f140",
+      "videoId": "c2f05381-f8e2-4b36-8aa5-b88b68c98fae",
+      "startTime": 59.25,
+      "endTime": 64.101,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7b8c5f21-ec93-4eab-bb14-5bdf4b3bb6f5",
+      "videoId": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "63c98600-6135-49d6-8e1a-905a280a52f9",
+      "videoId": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8240cbc5-678d-43da-9dff-055d3b409b83",
+      "videoId": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
+      "startTime": 20,
+      "endTime": 29,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b1119618-c3ec-4816-94d0-e2ce5d2f0a58",
+      "videoId": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
+      "startTime": 188.25,
+      "endTime": 200.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "606a86e6-da62-4c14-8375-be3096a6bd17",
+      "videoId": "38af8ebf-af5e-4d6e-b99d-d6e402adecd9",
+      "startTime": 198.25,
+      "endTime": 209.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9712deae-4ec6-4ae5-8377-0ed757b938b1",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f8051793-153c-45fb-9d8a-01f89141f953",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b60ba3bc-ad8d-4313-ac9a-d0fcf14c0c16",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 22.25,
+      "endTime": 30.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b3af8465-083f-48bf-b255-6b7b09421f9d",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 75,
+      "endTime": 87.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4667ba0e-5f9f-4eea-9b9a-ca7a97fff4cd",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 97.25,
+      "endTime": 105.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7ccbdde3-85f9-42b1-82cb-50d3553d671f",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 145.25,
+      "endTime": 151.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "44491bed-4579-4551-a5e2-87f57787d77d",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 178,
+      "endTime": 190,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "15380729-8652-4fae-bf41-3f044597cb62",
+      "videoId": "721652e4-c8f0-47c9-898f-ee7fba4d7e77",
+      "startTime": 188,
+      "endTime": 199.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "46c94ccb-831a-40bd-a3ab-45d9f71e17a1",
+      "videoId": "681f2a97-0f5f-46fa-bafe-33d17dc7e2d2",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "aef0e9b2-d7e5-409c-9349-28ccc12394be",
+      "videoId": "681f2a97-0f5f-46fa-bafe-33d17dc7e2d2",
+      "startTime": 10,
+      "endTime": 20.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ad546af9-3d0f-412b-bafc-0d1ee58c551d",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 2.493197,
+      "endTime": 14.493197,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "149cae5c-8577-4371-9ea6-637693163bf7",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 12.493197,
+      "endTime": 24.493197000000002,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "01a5eb90-d7b8-4992-9132-f6ceec99818d",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 22.493197000000002,
+      "endTime": 34.493197,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f8f08b5a-57cc-4ce2-97f3-22e3534af7f2",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 32.493197,
+      "endTime": 37.020408,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9d0868f0-09de-475f-b641-11cf1e542363",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 69.431973,
+      "endTime": 86.721088,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "68bef53c-76d1-4e0a-bb3e-098e65edceec",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 113.513605,
+      "endTime": 127.537415,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fd47e49f-66f2-4ea9-8d50-a9c6521003ec",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 138.003401,
+      "endTime": 150.003401,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d3400fce-6a56-4ab4-8a0c-fc8c5ce1955a",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 148.003401,
+      "endTime": 159.102041,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "00d21793-eb78-4af0-8d4b-ecc905fecc9c",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 185.078231,
+      "endTime": 197.078231,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4f1fa52c-d225-45dc-a7cd-e1e28f4b547c",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 195.078231,
+      "endTime": 205.183673,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3fbe16a2-b093-45a8-ac6d-f9f1a72cd1bc",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 225.622449,
+      "endTime": 241.37415,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "018aeb44-cdc6-4193-b4ac-94d54bee7f69",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 272.969388,
+      "endTime": 284.969388,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e76b1b46-c749-4906-9bec-91aa01495aa4",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 282.969388,
+      "endTime": 294.969388,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7edf7bb5-81fe-423c-ad6d-454f032f3603",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 292.969388,
+      "endTime": 304.969388,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6338071c-7402-4c73-aa84-5fb1f325ba8b",
+      "videoId": "67f73c26-d564-4cb6-acb1-03ba24f6fa3c",
+      "startTime": 302.969388,
+      "endTime": 310.217687,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "049a48ed-7821-4ba0-963d-323fb81e4dae",
+      "videoId": "d972dad0-acb8-49b4-80d0-0220a852681f",
+      "startTime": 0,
+      "endTime": 7.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "86ef22e4-57cc-4f11-86fc-975226ca7c5d",
+      "videoId": "d972dad0-acb8-49b4-80d0-0220a852681f",
+      "startTime": 76.5,
+      "endTime": 85,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a143b930-e523-47d5-a441-35306d9f290d",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "132864a6-cda4-4963-8256-86182fa3e126",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "88e5e111-a397-4428-94b7-91f5216cfe4e",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 20,
+      "endTime": 26.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0dbc9b54-1969-44f0-a2ed-509ec8b7f5c4",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 27.5,
+      "endTime": 35.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "552d478c-a208-4518-b96a-0890055f1dc0",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 45,
+      "endTime": 52,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6a5fb357-005f-4b22-a271-627ae24511da",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 91,
+      "endTime": 100,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6b79b1ea-120a-42d8-9d0b-0089c71f0c58",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 109,
+      "endTime": 116,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f043e880-d72c-4964-9127-54a7ca1e5b1f",
+      "videoId": "392e52fe-6d98-4e44-9635-d5bf9c5e558c",
+      "startTime": 145.5,
+      "endTime": 154.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "220abf7f-68b2-40a1-b864-6490e9d9b12c",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "32912e2f-b0d2-4b83-9a79-7f58b10ebe55",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ec12dfd2-ea1b-4137-aed8-a6294b3bdb70",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 20,
+      "endTime": 28,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2722b4e0-036a-4a34-bb5b-9d8dadcd602d",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 85,
+      "endTime": 99.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "843ae7ba-d482-4c47-b2ef-678af5e47049",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 98.25,
+      "endTime": 105.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "370fd4ef-99dd-4a8d-9b1b-0979a2181691",
+      "videoId": "11177fbe-efd5-4723-bd25-061d553fe995",
+      "startTime": 148.5,
+      "endTime": 155,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f59ef659-c98d-4726-876c-30264f32860c",
+      "videoId": "2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "87d6f489-fa8e-4212-bc53-2092032b6224",
+      "videoId": "2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b",
+      "startTime": 10,
+      "endTime": 21,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "306f320c-034d-434b-a64e-38dbb7398d70",
+      "videoId": "2f38c21a-c2c6-4d11-9ab4-b03c6f74d98b",
+      "startTime": 27.5,
+      "endTime": 34.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4b9933fc-81ff-4fee-91f1-23dd7043a654",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "889a493c-8d9c-4960-8c35-13601d4673df",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e226a86c-1043-47f3-9a31-7971f7ba4701",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "18f11945-b864-4d6b-8d27-1d57a9811c6e",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 30,
+      "endTime": 42,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a0e93933-4c57-4c75-a1a3-9d16bea1805c",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 70.75,
+      "endTime": 77.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c83a232e-e1e8-451f-b656-9b19f878ee63",
+      "videoId": "fc87f52f-4cf8-4476-8879-3250aad5e291",
+      "startTime": 97.75,
+      "endTime": 104.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "438e31fb-6c05-4952-8e4c-bf30f78999de",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 0,
+      "endTime": 17.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "14e4f4ab-215c-4671-ae29-ffd2e67044ad",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 16.75,
+      "endTime": 23.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f9bb0df7-0780-4c43-b0ee-cd0e8f406903",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 60,
+      "endTime": 72,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ab49814b-82fd-4442-bea7-3671b59d6dd7",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 70,
+      "endTime": 82,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "44d412c8-1eeb-4afb-919a-bd91ee1389d8",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 105,
+      "endTime": 115.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "911ef800-f9e0-4b3f-9613-6b173d0257b5",
+      "videoId": "47021e97-5346-4416-ae5d-122abe2ce656",
+      "startTime": 162.25,
+      "endTime": 182,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1d222498-b90f-4fef-a0d8-a33426ecf635",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d7fc6775-7f2e-40d0-857b-b5480b31d1e8",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7eeafa87-0e8b-4160-8706-63a304723431",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 20,
+      "endTime": 27.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "28323981-da70-4372-8a82-d99183b37944",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 51,
+      "endTime": 68.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "477cf2ee-e57a-48d0-baf4-b4616ef4829d",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 95.25,
+      "endTime": 107.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0add23b2-ae20-4dea-b643-18065ccd701a",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 105.25,
+      "endTime": 117.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "11d1224b-e664-4ebd-8f38-694377c7044b",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 196.25,
+      "endTime": 208.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5477bb08-2704-464c-a6d1-323db059fa4b",
+      "videoId": "32715f49-cc8c-4264-adc3-499963bc95e6",
+      "startTime": 206.25,
+      "endTime": 218.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "74f2977d-47b6-498a-84b1-339fff1e1388",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "bd812ef2-9cd3-4124-8ec0-7221c8bffad7",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0c1d2a06-bb32-432c-85ae-a107100f6911",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "44dabd2d-d0e5-4f8f-bb58-f5f56c4e3398",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 30,
+      "endTime": 40.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "97c65a7a-ff71-4a4d-b2ae-faf0802d0e0f",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 47.75,
+      "endTime": 56.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5ca1bc12-3159-4b91-b5c3-dea358850037",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 95,
+      "endTime": 103,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "844342c1-7fdb-43fa-bf2a-0ef9e5d0bccb",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 124.75,
+      "endTime": 133.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "99fda87b-cf96-45cb-ba05-f3e42cd90d9e",
+      "videoId": "bac3047c-cbd9-4a60-91b1-3467c8a434ac",
+      "startTime": 202.5,
+      "endTime": 211.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7243cc14-6c18-4bb6-8e13-460d3d3ac18d",
+      "videoId": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2357876a-073f-411d-8fd3-ee0b156ceddc",
+      "videoId": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f66062be-e1b3-4130-aeca-a7ae7941fbc4",
+      "videoId": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
+      "startTime": 106.75,
+      "endTime": 113.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a8684e7f-a51a-45d5-8bc0-11664d192116",
+      "videoId": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
+      "startTime": 112.75,
+      "endTime": 122.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7e958614-7458-4ea5-96f2-2158502c7555",
+      "videoId": "7d00a6f3-1224-40c2-b29f-152afb3c8e7d",
+      "startTime": 185,
+      "endTime": 194.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c67c13c7-e8b6-4ec3-a30f-d1ab25417daf",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 4.5,
+      "endTime": 16.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "dd49325a-5f43-468a-b93a-e213c9c003b2",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 14.5,
+      "endTime": 26.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "518c9a59-e04c-41d8-b99b-579099b261da",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 24.5,
+      "endTime": 36.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "59827c40-f171-4074-93c8-a22b0b8a8f7f",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 34.5,
+      "endTime": 45,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8de4bf0e-c73c-40ed-9853-784de7ba261a",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 131,
+      "endTime": 137.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b57a944a-f357-4e18-834b-03866eebbd0d",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 139.25,
+      "endTime": 146,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8489fdd7-1daa-48c7-aff5-160069121ded",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 146.25,
+      "endTime": 158.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6e895189-a384-4d9b-b7ef-4cbd23f8249c",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 156.25,
+      "endTime": 166.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "65e49a2f-deef-46c4-acaa-dab2a8d2e4c2",
+      "videoId": "d7a338be-9afe-476e-b1c1-8af7d8e07adf",
+      "startTime": 192.75,
+      "endTime": 200.481,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "37ee3b5d-5b8c-45ef-b50b-dd12ae1012fd",
+      "videoId": "78d7c114-3d6b-44fe-a15c-401bfd95cc6c",
+      "startTime": 11.25,
+      "endTime": 19.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2e3e8374-fd7a-45c1-87ac-f161c2fefd61",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c0c14262-0432-4a7f-90c7-6d88f7cc8ef9",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "63a6381a-b5e2-4e6c-9d8c-109e66c8061c",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3e757902-dc7a-4ddf-be4a-971a3fc3799b",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 30,
+      "endTime": 34.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "41d4b389-42de-4a3a-bde1-e1b4f217ba91",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 102.5,
+      "endTime": 109.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0e97e20d-5a01-444f-aabe-a150d515353e",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 120,
+      "endTime": 128,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e9504d81-5db2-473c-9ab0-b75ca6a108cd",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 180.75,
+      "endTime": 188.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4f494624-acd4-4fc2-bf8d-a336b7cdf1a4",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 225.5,
+      "endTime": 234.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c6fb6c61-fce8-4c90-829e-e22c08cf7e03",
+      "videoId": "43aa935f-34a0-48da-801c-2e3abf541577",
+      "startTime": 240.5,
+      "endTime": 256.021,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6591cd39-1c5b-47b1-a11f-05024bda99ad",
+      "videoId": "71715a86-12ee-4853-9537-bda00786fc87",
+      "startTime": 0.75,
+      "endTime": 18.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ca5aad34-8bf0-4517-b2b6-b89fc609680e",
+      "videoId": "71715a86-12ee-4853-9537-bda00786fc87",
+      "startTime": 87.5,
+      "endTime": 94.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "233c5351-e54f-4c06-8224-3c7fd8401031",
+      "videoId": "71715a86-12ee-4853-9537-bda00786fc87",
+      "startTime": 112.25,
+      "endTime": 118.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ac743265-275f-4308-8794-7d400c26b1cc",
+      "videoId": "71715a86-12ee-4853-9537-bda00786fc87",
+      "startTime": 179,
+      "endTime": 183.381,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "52a1613c-0864-41d9-bb6d-7c8544485bde",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 0,
+      "endTime": 13.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "22c36ea2-145e-41c3-b9ba-b8249782b819",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 53.75,
+      "endTime": 66.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "bc8d2918-ebc9-4e24-8fd4-41baaedb2472",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 116.75,
+      "endTime": 124.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ece71050-7797-4040-8504-3604ad9f057b",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 147.75,
+      "endTime": 159.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "bf65adc9-7777-4aab-ac62-5545ae94e3c2",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 178.25,
+      "endTime": 191.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b4f084c2-9c08-4f20-9995-08d7b2b810de",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 190.25,
+      "endTime": 199.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1140f5e1-2445-468e-a0ee-031f0ebf5437",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 198.5,
+      "endTime": 206.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1965b770-4ad9-40dc-a089-28e5425921c3",
+      "videoId": "db7c42fe-cf55-4ae6-9c79-9d1689e4ffad",
+      "startTime": 213.25,
+      "endTime": 223,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2715213d-b4ed-40f9-a5fa-6281045d83e2",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3625eabb-ca1f-4b29-9474-0e54dafb5d50",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "cf0b41a6-7af5-4e06-850c-7b60914561c0",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 20,
+      "endTime": 27,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "50b38d77-ae7e-4d11-b767-bcf8cd7dc42c",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 66,
+      "endTime": 78,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f0f98ff1-8bf7-4ca9-8242-2a44116c0f5f",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 76,
+      "endTime": 88,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "946bc660-d38d-4614-8d21-18d2d5d6e748",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 86,
+      "endTime": 98,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0472a10d-7adb-4143-8b95-63e7d9d95860",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 96,
+      "endTime": 101,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5a74d7ff-5807-46c1-81a5-187d62efbf40",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 127,
+      "endTime": 145.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d0227633-d297-43c6-ad32-e9adcb313e39",
+      "videoId": "ccb18b71-8937-4915-aa41-b100ebe5fdd7",
+      "startTime": 173,
+      "endTime": 183.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ef0effb8-2f5f-4832-8a0b-4e3a20e130c1",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 1.5,
+      "endTime": 17.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "88d84ba9-2d34-46c1-a552-694bb35ea1f4",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 40.75,
+      "endTime": 47.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "66e6ff61-7ac6-4dc9-b01e-2ad64e1d6119",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 113.5,
+      "endTime": 120.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "545147ff-1757-4767-8dd0-126f3dcd2a93",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 142.25,
+      "endTime": 150.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3796a105-90eb-4ec7-8a2c-cf5457022d40",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 174.75,
+      "endTime": 193.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "97e25b01-aa26-4ab4-a39d-7cec7f4137a2",
+      "videoId": "16fc9cd9-207e-4034-be94-7b3c039be66e",
+      "startTime": 202,
+      "endTime": 212,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4e7f4fae-efef-43a4-90a0-457ddb0704d0",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1162c6fa-4fdc-4b89-b453-7d18fd2ef191",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a1c07436-b91a-4b7d-822b-db1ea35ee541",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "62a695f8-5240-4d10-91ba-8c387c3a6f42",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 30,
+      "endTime": 42,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3ffa0790-ee25-4638-b1dd-20e8b054bae4",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 40,
+      "endTime": 52,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e8d55378-7cf8-4cdb-b26d-3087e7b7818a",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 50,
+      "endTime": 62,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "23a36651-8abd-4db9-9f40-30b222c71e92",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 61.25,
+      "endTime": 69.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2b15b66b-ab4f-4aeb-941f-4d23a47f23bd",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 119.25,
+      "endTime": 131.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "29b19b7c-41c3-40e9-a453-7b57498e030f",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 129.25,
+      "endTime": 139.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "64f70353-7abf-4fde-a95f-9c14f8f2a8d1",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 189.25,
+      "endTime": 201.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5fcaca31-858e-48bc-9e52-32cfc1bdafda",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 199.25,
+      "endTime": 211.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c348a129-0ad6-47cb-b3f8-8b6543f1918f",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 209.25,
+      "endTime": 220.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "97e36623-1f3a-45da-8be4-51ca25c82c91",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 242.75,
+      "endTime": 254.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fe211cb7-e954-42c7-b4e2-843ce5098210",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 252.75,
+      "endTime": 264.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c367030c-d888-4572-85ad-36b052a58240",
+      "videoId": "5edfede5-7670-4485-ad3d-36fd8185bc46",
+      "startTime": 262.75,
+      "endTime": 272.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "66334f3f-91aa-41cd-9958-500dec4a3c5a",
+      "videoId": "c8545afb-b948-4a13-83fb-8666417103bb",
+      "startTime": 0,
+      "endTime": 6,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "65489d72-4116-4832-8977-478a86b1d31b",
+      "videoId": "c8545afb-b948-4a13-83fb-8666417103bb",
+      "startTime": 62,
+      "endTime": 67.897911,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "81cb419f-adee-40b6-a65e-c50cc41189b3",
+      "videoId": "e1a46276-38ce-4612-a4cb-93653a2bf83a",
+      "startTime": 0,
+      "endTime": 6,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f36dc2e6-0702-4893-9cba-5ad452799af3",
+      "videoId": "fadffdf9-a568-400f-b7bb-1d59bcd85866",
+      "startTime": 0,
+      "endTime": 9.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "29d60144-9932-4644-8be4-8e226ceab33f",
+      "videoId": "9a60e90c-ec64-4dad-90b3-9a2dfd55ee55",
+      "startTime": 0,
+      "endTime": 7.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "98036692-5e36-41f0-9c86-d6bb9d9fd152",
+      "videoId": "7d6c5bd2-32a4-4a9f-b734-0dcf41836ac8",
+      "startTime": 0,
+      "endTime": 9.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c8a775d0-5ea0-46a2-92a8-2a1f585894fd",
+      "videoId": "536020dc-a1f8-4df7-8ed6-570166528898",
+      "startTime": 0.5,
+      "endTime": 14.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e1dedde2-8198-48bb-ab4d-06c22a5b0362",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0d392c1d-e276-4d01-a606-948ae076af53",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7bb44b52-24cf-455d-8743-8a62eb6d7cec",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "754715ed-659c-486f-ab33-24af36488e93",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 30,
+      "endTime": 42,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c0264c92-da01-410f-93ac-642c2ddd6049",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 40,
+      "endTime": 52,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c8dd94b1-cbcc-41e1-b8f2-54de635b1709",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 50,
+      "endTime": 57.428571,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1eb9be39-4dab-4fe5-bf68-281dc309b001",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 77.323129,
+      "endTime": 85.455782,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1d78bfef-c108-46cd-876d-e87d868e093d",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 129.02381,
+      "endTime": 139.333333,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5b5e8b83-8d66-4408-8b28-772b865d1a1c",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 166.030612,
+      "endTime": 178.030612,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fad9e73e-d778-4484-a8de-66264643151d",
+      "videoId": "608b33bf-fcff-4cd2-bb51-af5bbe6b32fe",
+      "startTime": 176.030612,
+      "endTime": 188.030612,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5f3d3289-3d74-48f8-b8aa-8b0b7a879691",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b94f7ba3-69bc-447d-b6dc-5f692497adeb",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2cb3574a-5516-4276-8cf7-fe7b61003b51",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fae71a45-d3e5-46f3-82f8-e914acea0762",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 30,
+      "endTime": 39.197279,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "23216a71-28be-4ead-be12-c7011049e6fd",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 40.316327,
+      "endTime": 47.265306,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7c23c0d6-76b0-4e8f-a83d-8ffcf2da0f08",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 108.615646,
+      "endTime": 116.108844,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "020d0dcc-7944-4b0a-81db-db46c1070db0",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 180.996599,
+      "endTime": 188.489796,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3c51a0c4-2d06-4804-8c14-3d4889030e23",
+      "videoId": "c47024cc-6730-44a3-8edc-2be2eaa259c2",
+      "startTime": 195.146259,
+      "endTime": 211.986395,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "eb0e2160-5d04-471a-9df5-d03a39237650",
+      "videoId": "93b0a1f6-3605-472a-9087-c56da1c948d7",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0b5cd3aa-56f7-4483-b587-01ffee69d09f",
+      "videoId": "93b0a1f6-3605-472a-9087-c56da1c948d7",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ca9d2f80-9eea-4650-9499-51588f4b0dd8",
+      "videoId": "93b0a1f6-3605-472a-9087-c56da1c948d7",
+      "startTime": 87.663265,
+      "endTime": 102.870748,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "aaf8295d-f89e-4fb8-af31-4871d9cfd71d",
+      "videoId": "93b0a1f6-3605-472a-9087-c56da1c948d7",
+      "startTime": 102.085034,
+      "endTime": 112.027211,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0a3d4548-39c1-4abd-9381-2d15b156e2bf",
+      "videoId": "63cc38c2-c993-4f7b-bea0-0dfdf11ffe33",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "616b196f-09a9-4428-b150-b0259fd98cf6",
+      "videoId": "63cc38c2-c993-4f7b-bea0-0dfdf11ffe33",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0dde02c9-b5da-4d1c-b3dc-a5c9dff494dc",
+      "videoId": "63cc38c2-c993-4f7b-bea0-0dfdf11ffe33",
+      "startTime": 20,
+      "endTime": 29.129252,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "5e97f9b3-9051-4508-ab61-8bc17900d20a",
+      "videoId": "63cc38c2-c993-4f7b-bea0-0dfdf11ffe33",
+      "startTime": 71.608844,
+      "endTime": 83.55102,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "1c92d097-c16d-44f0-8e08-4f6e2d891f95",
+      "videoId": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2e7fa886-bc44-42aa-8cb2-a5b2182450e2",
+      "videoId": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0437751c-6199-4534-9d65-5a375dbb860f",
+      "videoId": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
+      "startTime": 75.962585,
+      "endTime": 84.639456,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c218a0de-0621-4509-91ca-ed224e18acc1",
+      "videoId": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
+      "startTime": 170.928571,
+      "endTime": 182.928571,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "122187bb-06d9-4e1e-bf92-69363ffcf268",
+      "videoId": "a4e3fedb-6cb4-4aa9-a625-563a1ed63c2e",
+      "startTime": 180.928571,
+      "endTime": 192.928571,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f48fe734-b77c-4dd7-8588-3b38bb052056",
+      "videoId": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7768fb96-f444-437f-813c-ad901fb2f1dd",
+      "videoId": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
+      "startTime": 11.5,
+      "endTime": 27.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "42f6c36a-42c4-4886-90e9-205f97e3fe39",
+      "videoId": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
+      "startTime": 65.25,
+      "endTime": 73.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6eecb403-fd31-4fbd-8e0a-5fdb611889cb",
+      "videoId": "b2ca2e2b-1e68-4bb5-bc72-2535daf6b65a",
+      "startTime": 192,
+      "endTime": 208.661,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "adb618aa-6308-466a-bc51-2f3b5359f650",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "9674af82-796c-45e8-8be6-5b2435166676",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f0f2680c-59e3-4529-93bc-56fb7043c7ee",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "963c427e-92c7-41cc-b110-ddd8e3cb26d2",
+      "videoId": "b64650a1-c9fb-4ad6-8151-4f23dcf5df8b",
+      "startTime": 30,
+      "endTime": 39.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "163fe242-8878-46b6-8cb9-68bdfc8bd604",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3cf3c415-42fd-4a21-a8a8-a52d904b7afe",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e2ff5b81-1bed-4571-87d1-7cd0b40ecfef",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 20,
+      "endTime": 24.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "fca904b1-4b95-4863-b1bb-05effba90b53",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 67,
+      "endTime": 79,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "813ae06a-906b-4d7d-88ac-ca10f24153d4",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 77,
+      "endTime": 89,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ab568d08-ab18-4b84-bda5-40b1592daae3",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 114.5,
+      "endTime": 123,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "dacc5195-f56a-4fa0-85b4-b5dd86f9d3f5",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 168.75,
+      "endTime": 180.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4b837ab1-f23b-401e-b5eb-cfb04a81f43d",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 178.75,
+      "endTime": 190.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "14b2cd6d-c81c-4222-8465-5c20bed8681f",
+      "videoId": "065a3909-77c3-48ad-aed9-3266095f134b",
+      "startTime": 188.75,
+      "endTime": 198.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "15f458fd-8f74-47ee-b7a1-62ad80ca5d28",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e3f077e2-6f60-4a5a-93f5-6e0055c3c45e",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "f4b53d32-ffc6-49c5-95fc-80fc848c86f3",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6fa8c080-d17c-4ec2-be59-f1bbd3f785df",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 30,
+      "endTime": 42,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "feefa216-9988-42a6-b07c-6eae09f3e2e9",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 96.5,
+      "endTime": 108.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a863bd93-58ae-4b5c-9541-5d64b189ce7e",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 106.5,
+      "endTime": 118.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "e1d6d92d-a309-413c-a700-dd0958bdcc2f",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 116.5,
+      "endTime": 121.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "28bd5d2e-26ea-4fdf-b87b-593f2256c729",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 171.25,
+      "endTime": 181.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "111eab8b-bc30-43ac-9f06-14838cd67009",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 202,
+      "endTime": 219.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b6334165-a145-4e88-9ea6-3c9adf0a8f87",
+      "videoId": "5d8bf8dd-e749-45fb-bc8e-ede9a730e501",
+      "startTime": 240.75,
+      "endTime": 256.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "d0a93f21-22b8-4d32-8658-1dac5e12de8d",
+      "videoId": "7b5d7739-7af0-46c4-9332-396b162f6511",
+      "startTime": 15,
+      "endTime": 23.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a93dd2f8-5b38-4aee-bded-e51d66b958b3",
+      "videoId": "7b5d7739-7af0-46c4-9332-396b162f6511",
+      "startTime": 200,
+      "endTime": 207.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "2d212e65-45ac-49a3-9aec-3661c09e0cdc",
+      "videoId": "6ca492b0-34d9-4334-8ab8-408e43c63a08",
+      "startTime": 0,
+      "endTime": 18.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "0039af0a-0e2f-4c5b-8a1d-a04e044a973f",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "482e7670-60ff-4847-aaf9-a1fd0c46cce3",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 10,
+      "endTime": 22,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "3380f840-22f1-4c8e-9ee6-4b0986433fb8",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 20,
+      "endTime": 32,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c6e93bcc-90c2-445b-8623-62221325e520",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 30,
+      "endTime": 42,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "bc9406f1-eaf8-46b2-aa25-8ac83e664c02",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 40,
+      "endTime": 50,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4b5d38a7-eac4-4c8e-a62f-68da19ae7d23",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 82.75,
+      "endTime": 102,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4a223ed6-3eaa-47cd-a8cf-76470ddfba59",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 102.25,
+      "endTime": 114.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "ff250e68-3f9c-4edb-8253-b969973237a4",
+      "videoId": "d7e4b209-e87f-495a-8fdb-3183a8904561",
+      "startTime": 169.5,
+      "endTime": 185.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b5a3775d-d2e5-4751-a9e6-a6a31c12b0c8",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "startTime": 0,
+      "endTime": 12,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8e162351-b3cb-4664-8f1c-e186532dd1e5",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "startTime": 10,
+      "endTime": 20.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "69a5a6e6-f2d2-4cc4-98ef-b4119de326e8",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "startTime": 26,
+      "endTime": 34.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "b7a71d5c-8e8f-4366-8e0c-522485d2b11b",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "startTime": 56.75,
+      "endTime": 63.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "46933792-02c8-4e85-9ec6-9c32d4151b65",
+      "videoId": "014d2d55-1495-469c-80c4-f4f37414e2a7",
+      "startTime": 183.5,
+      "endTime": 197.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "bca2845a-7979-492a-b260-8962a90f7203",
+      "videoId": "b31de15e-9187-44ba-9432-a3b07f23cc12",
+      "startTime": 2.5,
+      "endTime": 18.5,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "a1504f59-2108-47db-8da5-a71a29ae59d7",
+      "videoId": "b31de15e-9187-44ba-9432-a3b07f23cc12",
+      "startTime": 19.5,
+      "endTime": 28.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "923d83cd-dfd2-468b-be35-420a395dbb9b",
+      "videoId": "b31de15e-9187-44ba-9432-a3b07f23cc12",
+      "startTime": 43.75,
+      "endTime": 52,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "7005d077-3194-4b73-a676-b4f977db8055",
+      "videoId": "b31de15e-9187-44ba-9432-a3b07f23cc12",
+      "startTime": 98.75,
+      "endTime": 110.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "6652cb6d-bd8a-4028-9ccd-d57d11aaa9d1",
+      "videoId": "c9ab969a-de35-47c7-9ce4-868ff39e1d2b",
+      "startTime": 12.75,
+      "endTime": 21,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "4db505ad-982b-420f-9e0c-2f1d95b63c48",
+      "videoId": "c9ab969a-de35-47c7-9ce4-868ff39e1d2b",
+      "startTime": 88.75,
+      "endTime": 101.25,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "8e7383d1-1001-4e70-8859-37e439910021",
+      "videoId": "c9ab969a-de35-47c7-9ce4-868ff39e1d2b",
+      "startTime": 167.75,
+      "endTime": 179,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
+    },
+    {
+      "id": "c35f75f9-930c-4ccf-8795-8824808edf91",
+      "videoId": "c9ab969a-de35-47c7-9ce4-868ff39e1d2b",
+      "startTime": 180,
+      "endTime": 186.75,
+      "bufferBefore": 5,
+      "bufferAfter": 5,
+      "loopCount": 2
     }
   ]
 }
