@@ -317,6 +317,17 @@
 		seekToCurrentSegmentStart(url);
 	}
 
+	async function playClip(idx: number) {
+		if (!selectedVideo || idx < 0 || idx >= clips.length || !playerAudioEl) return;
+		const url = await ensureAudio(selectedVideo.id);
+		if (!url) return;
+		if (editorAudioEl) editorAudioEl.pause();
+		currentClipIdx = idx;
+		currentLoop = 1;
+		segElapsed = 0;
+		seekToCurrentSegmentStart(url);
+	}
+
 	function seekToCurrentSegmentStart(url: string) {
 		if (!playerAudioEl || !currentClip) return;
 		pendingSeekTo = segmentStart;
@@ -751,10 +762,11 @@
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="editor-track" onclick={seekEditor}>
 				<!-- existing clip markers -->
-				{#each clips as c (c.id)}
+				{#each clips as c, i (c.id)}
 					<div
 						class="editor-clip-marker"
-						style="left: {editorPctOf(c.startTime)}%; width: {editorPctOf(c.endTime - c.startTime)}%; background-color: hsl({(clips.indexOf(c) * 360) / clips.length}, 50%, 35%);"
+						class:active={playerActive && i === currentClipIdx}
+						style="left: {editorPctOf(c.startTime)}%; width: {editorPctOf(c.endTime - c.startTime)}%; background-color: hsl({(i * 360) / clips.length}, 50%, 35%);"
 						title="{c.name ?? 'Clip'} ({formatTime(c.startTime)} – {formatTime(c.endTime)})"
 					></div>
 				{/each}
@@ -814,7 +826,18 @@
 				</div>
 				<div class="section-list">
 					{#each clips as c, i (c.id)}
-						<div class="clip-row" class:active={i === currentClipIdx && playerActive}>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							class="clip-row clickable"
+							class:active={i === currentClipIdx && playerActive}
+							onclick={(e) => {
+								// Ignore clicks on inputs/buttons inside the row
+								if ((e.target as HTMLElement).closest('button, input')) return;
+								playClip(i);
+							}}
+							title="Click to play this clip"
+						>
 							<span class="seg-index">{i + 1}</span>
 							<input
 								type="text"
@@ -1142,6 +1165,13 @@
 		position: absolute; top: 6px; bottom: 6px;
 		opacity: 0.85;
 		border-radius: 3px;
+		transition: box-shadow 0.2s, transform 0.2s, opacity 0.2s, top 0.2s, bottom 0.2s;
+	}
+	.editor-clip-marker.active {
+		opacity: 1;
+		top: 2px; bottom: 2px;
+		box-shadow: 0 0 0 2px #818cf8, 0 0 16px 4px rgba(129, 140, 248, 0.55);
+		z-index: 1;
 	}
 	.editor-draft-band {
 		position: absolute; top: 0; bottom: 0;
@@ -1226,10 +1256,17 @@
 		background: #18181b;
 		border: 1px solid rgba(255, 255, 255, 0.04);
 		border-radius: 6px;
+		transition: background 0.12s, border-color 0.12s;
+	}
+	.clip-row.clickable { cursor: pointer; }
+	.clip-row.clickable:hover {
+		background: rgba(255, 255, 255, 0.03);
+		border-color: rgba(255, 255, 255, 0.08);
 	}
 	.clip-row.active {
-		border-color: rgba(99, 102, 241, 0.4);
-		background: rgba(99, 102, 241, 0.06);
+		border-color: rgba(99, 102, 241, 0.5);
+		background: rgba(99, 102, 241, 0.08);
+		box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
 	}
 	.seg-index {
 		color: #52525b; font-size: 11px; font-weight: 600;
