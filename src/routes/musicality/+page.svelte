@@ -13,6 +13,14 @@
 	let showPicker = $state(false);
 	let playbackRate = $state(1);
 
+	// Offline mode + audio cache stats
+	let offlineMode = $state(false);
+	let cachedSongs = $state(0);
+	let downloadingAll = $state(false);
+	let downloadAllProgress = $state(0);
+	let downloadAllTotal = $state(0);
+	let storageEstimateMb = $state<number | null>(null);
+
 	let defaultBufferBefore = $state(5);
 	let defaultBufferAfter = $state(5);
 	let defaultLoops = $state(1);
@@ -95,7 +103,9 @@
 		} catch {
 			// ignore
 		}
+		offlineMode = store.isOfflineMode();
 		prefetchAllWithClips();
+		refreshCacheStats();
 	});
 
 	$effect(() => {
@@ -183,6 +193,16 @@
 		const url = store.getCdnUrlForVideo(videoId);
 		if (!url) return null;
 		try {
+			// In offline mode, only read from disk cache — never hit the network
+			if (offlineMode && typeof caches !== 'undefined') {
+				const cache = await caches.open(PERSISTENT_CACHE_NAME);
+				const hit = await cache.match(url);
+				if (!hit) return null;
+				const blob = await hit.blob();
+				const blobUrl = URL.createObjectURL(blob);
+				audioCache.set(videoId, blobUrl);
+				return blobUrl;
+			}
 			const blob = await loadBlobFromCacheOrFetch(url);
 			const blobUrl = URL.createObjectURL(blob);
 			audioCache.set(videoId, blobUrl);
@@ -191,6 +211,71 @@
 			console.error('Audio prefetch failed', videoId, e);
 			return null;
 		}
+	}
+
+	// --- Offline mode + cache stats ---
+
+	const idsWithMusicality = $derived([...new Set(allMusicality.map(m => m.videoId))]);
+
+	async function refreshCacheStats() {
+		if (typeof caches === 'undefined') return;
+		try {
+			const cache = await caches.open(PERSISTENT_CACHE_NAME);
+			let count = 0;
+			for (const id of idsWithMusicality) {
+				const url = store.getCdnUrlForVideo(id);
+				if (url && (await cache.match(url))) count++;
+			}
+			cachedSongs = count;
+			if ('storage' in navigator && 'estimate' in navigator.storage) {
+				const est = await navigator.storage.estimate();
+				if (est.usage) storageEstimateMb = Math.round(est.usage / 1024 / 1024);
+			}
+		} catch (e) {
+			console.warn('refreshCacheStats failed:', e);
+		}
+	}
+
+	async function downloadAllForOffline() {
+		if (downloadingAll) return;
+		downloadingAll = true;
+		downloadAllProgress = 0;
+		downloadAllTotal = idsWithMusicality.length;
+		try {
+			for (const id of idsWithMusicality) {
+				await ensureAudio(id);
+				downloadAllProgress++;
+				if (downloadAllProgress % 5 === 0) refreshCacheStats();
+			}
+			// Snapshot the latest metadata so init can read it offline
+			const meta = {
+				videos: store.getVideos().map(v => ({ ...v })),
+				clips: store.getClips().map(c => ({ ...c })),
+				practices: store.getPractices().map(p => ({ ...p })),
+				musicality: store.getMusicality().map(m => ({ ...m })),
+			};
+			await import('$lib/bunny').then(m => m.cacheMetadataLocally(meta));
+		} finally {
+			downloadingAll = false;
+			refreshCacheStats();
+		}
+	}
+
+	async function clearOfflineCache() {
+		if (!confirm('Delete all cached audio? Songs will need to re-download next time.')) return;
+		if (typeof caches !== 'undefined') {
+			await caches.delete(PERSISTENT_CACHE_NAME);
+			await caches.delete('clipit-metadata-v1');
+		}
+		// Revoke any in-memory blob URLs
+		for (const url of audioCache.values()) URL.revokeObjectURL(url);
+		audioCache.clear();
+		refreshCacheStats();
+	}
+
+	function toggleOfflineMode() {
+		offlineMode = !offlineMode;
+		store.setOfflineMode(offlineMode);
 	}
 
 	async function prefetchAllWithClips() {
@@ -508,7 +593,7 @@
 
 <div class="page">
 	<header class="hero">
-		<h1>Musicality</h1>
+		<h1>Musicality {#if offlineMode}<span class="offline-pill">offline</span>{/if}</h1>
 		<p class="sub">Mark interesting moments in a song. Each clip plays with a lead-in &amp; lead-out so you can settle into the musicality.</p>
 		{#if prefetchInProgress}
 			<div class="prefetch-bar">
@@ -517,6 +602,53 @@
 			</div>
 		{/if}
 	</header>
+
+	<!-- Offline / cache controls -->
+	<section class="panel offline-panel">
+		<div class="offline-row">
+			<div class="offline-summary">
+				<div class="offline-title">
+					{cachedSongs}/{idsWithMusicality.length} songs cached for offline
+					{#if storageEstimateMb !== null}
+						<span class="offline-storage">· {storageEstimateMb} MB used</span>
+					{/if}
+				</div>
+				<div class="offline-hint">
+					{#if offlineMode && cachedSongs < idsWithMusicality.length}
+						<span class="offline-warn">Offline mode is on but {idsWithMusicality.length - cachedSongs} song{idsWithMusicality.length - cachedSongs === 1 ? '' : 's'} aren't cached — they won't play. Toggle off + download first.</span>
+					{:else if offlineMode}
+						You're in offline mode — no network requests. Edits save locally and will push to Bunny next time you go online.
+					{:else if cachedSongs < idsWithMusicality.length}
+						Download every song to make this page work fully offline.
+					{:else}
+						Every song is cached. You can switch to offline mode any time.
+					{/if}
+				</div>
+			</div>
+			<div class="offline-actions">
+				{#if downloadingAll}
+					<div class="download-progress">
+						Downloading {downloadAllProgress}/{downloadAllTotal}…
+					</div>
+				{:else if cachedSongs < idsWithMusicality.length}
+					<button class="ghost-btn small" onclick={downloadAllForOffline}>
+						Download {idsWithMusicality.length - cachedSongs} song{idsWithMusicality.length - cachedSongs === 1 ? '' : 's'}
+					</button>
+				{:else}
+					<button class="ghost-btn small" onclick={clearOfflineCache} title="Free up disk space">Clear cache</button>
+				{/if}
+				<label class="checkbox-row offline-toggle">
+					<input type="checkbox" checked={offlineMode} onchange={toggleOfflineMode} />
+					<span>Offline mode</span>
+				</label>
+			</div>
+		</div>
+		{#if downloadingAll && downloadAllTotal > 0}
+			<div class="prefetch-bar offline-progress">
+				<div class="prefetch-fill" style="width: {(downloadAllProgress / downloadAllTotal) * 100}%"></div>
+			</div>
+		{/if}
+	</section>
 
 	<!-- Practice player -->
 	<section class="player-card" class:active={playerActive}>
@@ -1130,6 +1262,35 @@
 	}
 	.num-input:focus { outline: none; border-color: rgba(99, 102, 241, 0.4); }
 	.num-suffix { color: #71717a; font-size: 12px; margin-left: 4px; }
+
+	.offline-pill {
+		display: inline-block; margin-left: 8px;
+		font-size: 11px; font-weight: 600;
+		padding: 2px 8px; border-radius: 999px;
+		background: rgba(34, 197, 94, 0.15); color: #4ade80;
+		text-transform: uppercase; letter-spacing: 0.04em;
+		vertical-align: middle;
+	}
+	.offline-panel { padding: 14px 16px; }
+	.offline-row {
+		display: flex; align-items: center; justify-content: space-between;
+		gap: 16px; flex-wrap: wrap;
+	}
+	.offline-summary { min-width: 0; flex: 1; }
+	.offline-title {
+		font-size: 13px; font-weight: 600; color: #e4e4e7;
+		font-variant-numeric: tabular-nums;
+	}
+	.offline-storage { color: #71717a; font-weight: 500; margin-left: 4px; }
+	.offline-hint { color: #71717a; font-size: 11px; margin-top: 4px; line-height: 1.5; }
+	.offline-warn { color: #fbbf24; }
+	.offline-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+	.offline-toggle { font-size: 12px; }
+	.download-progress {
+		font-size: 12px; color: #a5b4fc; font-weight: 500;
+		font-variant-numeric: tabular-nums;
+	}
+	.offline-progress { margin-top: 10px; height: 4px; }
 
 	.override-row {
 		margin-top: 6px;

@@ -15,10 +15,38 @@ if (!CDN_BASE) {
 
 // Metadata
 
+const META_CACHE_NAME = 'clipit-metadata-v1';
+const META_CACHE_URL = 'https://cache.local/metadata.json';
+
 export async function fetchMetadata(): Promise<any> {
 	const res = await fetch(`${CDN_BASE}/metadata.json?t=${Date.now()}`);
 	if (!res.ok) return { videos: [], clips: [], practices: [] };
-	return res.json();
+	const meta = await res.json();
+	// Snapshot for offline / fallback use
+	cacheMetadataLocally(meta).catch(e => console.warn('cacheMetadata failed:', e));
+	return meta;
+}
+
+export async function cacheMetadataLocally(meta: any): Promise<void> {
+	if (typeof caches === 'undefined') return;
+	const cache = await caches.open(META_CACHE_NAME);
+	const response = new Response(JSON.stringify(meta), {
+		headers: { 'Content-Type': 'application/json' },
+	});
+	await cache.put(META_CACHE_URL, response);
+}
+
+export async function getCachedMetadata(): Promise<any | null> {
+	if (typeof caches === 'undefined') return null;
+	try {
+		const cache = await caches.open(META_CACHE_NAME);
+		const hit = await cache.match(META_CACHE_URL);
+		if (!hit) return null;
+		return await hit.json();
+	} catch (e) {
+		console.warn('getCachedMetadata failed:', e);
+		return null;
+	}
 }
 
 export async function saveMetadataToCloud(json: string): Promise<void> {

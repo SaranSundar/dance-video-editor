@@ -1,6 +1,18 @@
 import { PUBLIC_BUNNY_CDN_BASE } from '$env/static/public';
-import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl } from './bunny';
+import { fetchMetadata as fetchBunnyMetadata, saveMetadataToCloud, getCdnUrl, getThumbnailCdnUrl, getCachedMetadata, cacheMetadataLocally } from './bunny';
 import type { VideoMeta, VideoSection, MusicalityClip, ClipMeta, PracticeMeta } from './storage';
+
+const OFFLINE_MODE_KEY = 'clipit-offline-mode';
+
+export function isOfflineMode(): boolean {
+	if (typeof localStorage === 'undefined') return false;
+	return localStorage.getItem(OFFLINE_MODE_KEY) === 'true';
+}
+
+export function setOfflineMode(v: boolean) {
+	if (typeof localStorage === 'undefined') return;
+	localStorage.setItem(OFFLINE_MODE_KEY, String(v));
+}
 
 export type { VideoMeta, VideoSection, MusicalityClip, ClipMeta, PracticeMeta };
 
@@ -69,6 +81,27 @@ async function actuallySync() {
 	if (!wasDirty.videos && !wasDirty.clips && !wasDirty.practices && !wasDirty.musicality) {
 		return; // nothing to do
 	}
+	// In offline mode: snapshot to local cache instead of pushing to Bunny.
+	// Mutations persist locally across reloads but won't reach the server until
+	// the user toggles back online (where the next sync trigger will push).
+	if (isOfflineMode()) {
+		try {
+			await cacheMetadataLocally({
+				videos: videos.map(v => ({ ...v })),
+				clips: clips.map(c => ({ ...c })),
+				practices: practices.map(p => ({ ...p })),
+				musicality: musicality.map(m => ({ ...m })),
+			});
+			// Re-mark dirty so the next online sync still pushes these edits to Bunny
+			if (wasDirty.videos)     dirty.videos     = true;
+			if (wasDirty.clips)      dirty.clips      = true;
+			if (wasDirty.practices)  dirty.practices  = true;
+			if (wasDirty.musicality) dirty.musicality = true;
+		} catch (e) {
+			console.warn('Offline sync to local cache failed:', e);
+		}
+		return;
+	}
 	try {
 		// Fetch live so we can preserve sections we didn't touch.
 		let live: any;
@@ -131,7 +164,20 @@ function loadMeta(meta: any) {
 
 export async function init() {
 	state = 'loading';
+	const offline = isOfflineMode();
 	try {
+		// Offline mode: never touch Bunny. Read from the local Cache API snapshot,
+		// fall back to bundled default-metadata.json if there's no snapshot yet.
+		if (offline) {
+			const cached = await getCachedMetadata();
+			if (cached) {
+				loadMeta(cached);
+			} else {
+				const res = await fetch('/default-metadata.json');
+				if (res.ok) loadMeta(await res.json());
+			}
+			return;
+		}
 		const meta = await fetchBunnyMetadata();
 		const hasData = meta.videos?.length > 0 || meta.clips?.length > 0 || meta.practices?.length > 0;
 		if (hasData) {
@@ -147,11 +193,17 @@ export async function init() {
 			}
 		}
 	} catch (e) {
-		console.error('Failed to load from Bunny:', e);
-		try {
-			const res = await fetch('/default-metadata.json');
-			if (res.ok) loadMeta(await res.json());
-		} catch { /* truly offline, empty state */ }
+		console.error('Failed to load from Bunny, trying local cache:', e);
+		// Online but Bunny unreachable — try the offline snapshot before giving up
+		const cached = await getCachedMetadata();
+		if (cached) {
+			loadMeta(cached);
+		} else {
+			try {
+				const res = await fetch('/default-metadata.json');
+				if (res.ok) loadMeta(await res.json());
+			} catch { /* truly offline with no caches, empty state */ }
+		}
 	} finally {
 		state = 'ready';
 	}
