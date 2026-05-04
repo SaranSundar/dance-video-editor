@@ -76,6 +76,13 @@
 
 	const playerActive = $derived(phase === 'lead-in' || phase === 'active' || phase === 'lead-out' || phase === 'paused');
 
+	// Full-song playback mode (alternative to clip practice)
+	let songMode = $state(false);
+	let songElapsed = $state(0);
+	let songPaused = $state(false);
+	const songDuration = $derived(selectedVideo?.duration ?? 0);
+	const songProgressPct = $derived(songDuration > 0 ? Math.min(100, (songElapsed / songDuration) * 100) : 0);
+
 	const filteredVideos = $derived(
 		[...videos]
 			.filter(v => {
@@ -396,6 +403,10 @@
 		if (!url) return;
 		// Pause editor so two audios don't overlap
 		if (editorAudioEl) editorAudioEl.pause();
+		// Exit song mode if we were listening straight through
+		songMode = false;
+		songPaused = false;
+		songElapsed = 0;
 		currentClipIdx = 0;
 		currentLoop = 1;
 		segElapsed = 0;
@@ -407,10 +418,64 @@
 		const url = await ensureAudio(selectedVideo.id);
 		if (!url) return;
 		if (editorAudioEl) editorAudioEl.pause();
+		songMode = false;
+		songPaused = false;
 		currentClipIdx = idx;
 		currentLoop = 1;
 		segElapsed = 0;
 		seekToCurrentSegmentStart(url);
+	}
+
+	async function startSongPlayback() {
+		if (!selectedVideo || !playerAudioEl) return;
+		const url = await ensureAudio(selectedVideo.id);
+		if (!url) return;
+		if (editorAudioEl) editorAudioEl.pause();
+		// Exit practice mode
+		phase = 'idle';
+		segElapsed = 0;
+		songMode = true;
+		songPaused = false;
+		songElapsed = 0;
+		// Same-src seek shortcut, otherwise wait for loadedmetadata
+		if (playerAudioEl.src === url && playerAudioEl.readyState >= 1) {
+			needsSeek = false;
+			playerAudioEl.currentTime = 0;
+			playerAudioEl.playbackRate = playbackRate;
+			playerAudioEl.play().catch(() => {});
+		} else {
+			needsSeek = true;
+			pendingSeekTo = 0;
+			playerAudioUrl = url;
+		}
+	}
+
+	function toggleSongPause() {
+		if (!playerAudioEl) return;
+		if (songPaused) {
+			songPaused = false;
+			playerAudioEl.play().catch(() => {});
+		} else {
+			songPaused = true;
+			playerAudioEl.pause();
+		}
+	}
+
+	function stopSongPlayback() {
+		if (playerAudioEl) playerAudioEl.pause();
+		songMode = false;
+		songPaused = false;
+		songElapsed = 0;
+	}
+
+	function seekSong(e: MouseEvent) {
+		if (!playerAudioEl || !songMode || songDuration <= 0) return;
+		const bar = e.currentTarget as HTMLElement;
+		const rect = bar.getBoundingClientRect();
+		const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+		const t = pct * songDuration;
+		playerAudioEl.currentTime = t;
+		songElapsed = t;
 	}
 
 	function seekToCurrentSegmentStart(url: string) {
@@ -438,8 +503,14 @@
 	}
 
 	function handlePlayerTimeUpdate() {
-		if (!playerAudioEl || !currentClip || phase === 'idle' || phase === 'ended' || phase === 'paused') return;
+		if (!playerAudioEl) return;
 		if (needsSeek) return;
+		// Full-song mode: just track elapsed; no clip advance logic.
+		if (songMode) {
+			songElapsed = playerAudioEl.currentTime;
+			return;
+		}
+		if (!currentClip || phase === 'idle' || phase === 'ended' || phase === 'paused') return;
 		const t = playerAudioEl.currentTime;
 		segElapsed = Math.max(0, t - segmentStart);
 		// Phase tracking
@@ -532,6 +603,9 @@
 	function resetToIdle() {
 		if (playerAudioEl) playerAudioEl.pause();
 		phase = 'idle';
+		songMode = false;
+		songPaused = false;
+		songElapsed = 0;
 		currentClipIdx = 0;
 		currentLoop = 1;
 		segElapsed = 0;
@@ -579,6 +653,7 @@
 	preload="auto"
 	onloadedmetadata={handlePlayerLoaded}
 	ontimeupdate={handlePlayerTimeUpdate}
+	onended={() => { if (songMode) { songMode = false; songPaused = false; } }}
 ></audio>
 
 <audio
@@ -651,14 +726,64 @@
 	</section>
 
 	<!-- Practice player -->
-	<section class="player-card" class:active={playerActive}>
+	<section class="player-card" class:active={playerActive || songMode}>
 		{#if !selectedVideo}
 			<div class="idle">
 				<p class="hint">Pick a song below to get started.</p>
 			</div>
+		{:else if songMode}
+			<div class="now-playing">
+				<div class="now-header">
+					<div class="now-title">
+						<div class="section-name">{selectedVideo.name}</div>
+						<div class="now-meta">
+							<span>{formatTime(songElapsed)} / {formatTime(songDuration)}</span>
+						</div>
+					</div>
+					<button class="icon-btn" onclick={stopSongPlayback} title="Stop">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+							<rect x="5" y="5" width="14" height="14" rx="1" />
+						</svg>
+					</button>
+				</div>
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div class="progress-bar seekable" onclick={seekSong}>
+					<div class="progress-fill" style="width: {songProgressPct}%"></div>
+				</div>
+				<div class="controls">
+					<button class="ctrl-btn primary" onclick={toggleSongPause}>
+						{#if songPaused}
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+							Resume
+						{:else}
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+							Pause
+						{/if}
+					</button>
+					<select class="speed-select" value={playbackRate} onchange={(e) => setSpeed(Number((e.target as HTMLSelectElement).value))}>
+						{#each SPEEDS as s}
+							<option value={s}>{s}×</option>
+						{/each}
+					</select>
+				</div>
+			</div>
 		{:else if clips.length === 0}
 			<div class="idle">
 				<div class="song-name">{selectedVideo.name}</div>
+				<div class="meta-row">
+					<span>{formatTime(songLen)}</span>
+					{#if !audioReady}
+						<span class="dot"></span>
+						<span class="warn-text">audio streaming</span>
+					{/if}
+				</div>
+				<div class="idle-actions">
+					<button class="start-btn" onclick={startSongPlayback}>
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+						Play song
+					</button>
+				</div>
 				<p class="hint">No clips yet. Use the editor below to mark moments in the song.</p>
 			</div>
 		{:else if phase === 'idle'}
@@ -673,12 +798,18 @@
 						<span class="warn-text">audio streaming</span>
 					{/if}
 				</div>
-				<button class="start-btn" onclick={startPlayback}>
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-						<polygon points="5 3 19 12 5 21 5 3" />
-					</svg>
-					Practice
-				</button>
+				<div class="idle-actions">
+					<button class="start-btn" onclick={startPlayback}>
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+							<polygon points="5 3 19 12 5 21 5 3" />
+						</svg>
+						Practice clips
+					</button>
+					<button class="ghost-btn" onclick={startSongPlayback}>
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px; vertical-align: -2px;"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+						Play song
+					</button>
+				</div>
 				{#if !audioReady}
 					<button class="ghost-btn small" onclick={downloadCurrentSong}>Download for instant playback</button>
 				{/if}
@@ -1070,6 +1201,11 @@
 	}
 	.dot { width: 3px; height: 3px; border-radius: 50%; background: #3f3f46; }
 	.warn-text { color: #fbbf24; }
+
+	.idle-actions {
+		display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+		justify-content: center;
+	}
 
 	.start-btn {
 		display: flex; align-items: center; gap: 8px;
