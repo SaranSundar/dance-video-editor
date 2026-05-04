@@ -34,14 +34,15 @@ All data flows through Bunny CDN/Storage. Configuration comes from env vars — 
 
 **What's stored on Bunny (under `${BUNNY_STORAGE_ZONE}/`):**
 ```
-metadata.json         # { videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[] }
+metadata.json         # { videos: VideoMeta[], clips: ClipMeta[], practices: PracticeMeta[], musicality: MusicalityClip[] }
 {uuid}.mp4            # Video files (H.265 encoded)
 {uuid}-thumb.jpg      # Thumbnail images
 ```
 
 **Data flow:**
 - **Init**: fetch `metadata.json` from Bunny CDN (`cache: 'no-store'`) → load into memory → ready
-- **Every mutation** (add/edit/delete videos, clips, practices, links): update in-memory state → fire-and-forget sync `metadata.json` back to Bunny Storage
+- **Every mutation** (add/edit/delete videos, clips, practices, links, musicality): update in-memory state → mark the touched section(s) dirty → debounced (500ms) sync to Bunny
+- **Sync semantics — read-merge-write per section** (`src/lib/store.svelte.ts`): each mutation calls `markDirty('videos' | 'clips' | 'practices' | 'musicality')`. On sync, the store fetches the live `metadata.json`, then writes back a merged document where dirty sections come from local memory and clean sections come straight from the live fetch. This prevents one tab/session from clobbering a section it never touched (e.g. a tab loaded before the `musicality` field existed can still safely edit a video clip without wiping all musicality data). After a successful sync, in-memory state for non-dirty sections is refreshed from the live fetch so subsequent edits diff against the current server state instead of stale memory. If sync fails, dirty flags are restored so the next trigger retries. The pre-existing `default-metadata.json` push path uses `markAllDirty()` — first launch is the one case where overwriting everything is correct.
 - **Video playback**: always CDN URLs, no local blobs
 - **Video upload**: files uploaded directly to Bunny Storage from browser (XHR with progress tracking), then `cdnUrl` set on metadata
 - **Fallback**: if Bunny fetch fails on init, falls back to `static/default-metadata.json`

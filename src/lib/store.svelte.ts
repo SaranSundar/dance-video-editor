@@ -30,19 +30,79 @@ function stripExt(name: string): string {
 	return name.replace(/\.mp4$/i, '');
 }
 
-// Build metadata JSON from in-memory state and save to Bunny
-async function syncToBunny() {
+// --- Sync hardening: per-section dirty flags + read-merge-write ---
+// Prevents one tab from wiping a section it never touched. Each mutation
+// flips the flag for the section it changed; on sync we fetch the live
+// metadata and only overwrite the sections that are actually dirty,
+// leaving everything else as the server has it.
+const dirty = {
+	videos: false,
+	clips: false,
+	practices: false,
+	musicality: false,
+};
+function markDirty(...sections: (keyof typeof dirty)[]) {
+	for (const s of sections) dirty[s] = true;
+}
+function markAllDirty() {
+	dirty.videos = dirty.clips = dirty.practices = dirty.musicality = true;
+}
+
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+let syncInFlight: Promise<void> | null = null;
+const SYNC_DEBOUNCE_MS = 500;
+
+function syncToBunny() {
+	if (syncTimer) clearTimeout(syncTimer);
+	syncTimer = setTimeout(() => {
+		syncTimer = null;
+		// Chain after any in-flight sync so writes are serialized
+		syncInFlight = (syncInFlight ?? Promise.resolve()).then(actuallySync, actuallySync);
+	}, SYNC_DEBOUNCE_MS);
+}
+
+async function actuallySync() {
+	// Snapshot which sections were dirty AT TIME OF SYNC, then clear flags so
+	// any mutation during the in-flight network call sets a fresh dirty state.
+	const wasDirty = { ...dirty };
+	dirty.videos = dirty.clips = dirty.practices = dirty.musicality = false;
+	if (!wasDirty.videos && !wasDirty.clips && !wasDirty.practices && !wasDirty.musicality) {
+		return; // nothing to do
+	}
 	try {
-		// Use raw names (already stripped on load, addVideo strips too)
-		const meta = {
-			videos: videos.map(v => ({ ...v })),
-			clips: clips.map(c => ({ ...c })),
-			practices: practices.map(p => ({ ...p })),
-			musicality: musicality.map(m => ({ ...m })),
+		// Fetch live so we can preserve sections we didn't touch.
+		let live: any;
+		try {
+			live = await fetchBunnyMetadata();
+		} catch (e) {
+			console.warn('syncToBunny: live fetch failed, falling back to in-memory snapshot:', e);
+			live = {
+				videos: videos.map(v => ({ ...v })),
+				clips: clips.map(c => ({ ...c })),
+				practices: practices.map(p => ({ ...p })),
+				musicality: musicality.map(m => ({ ...m })),
+			};
+		}
+		const merged = {
+			videos:     wasDirty.videos     ? videos.map(v => ({ ...v }))     : (live.videos     ?? []),
+			clips:      wasDirty.clips      ? clips.map(c => ({ ...c }))      : (live.clips      ?? []),
+			practices:  wasDirty.practices  ? practices.map(p => ({ ...p }))  : (live.practices  ?? []),
+			musicality: wasDirty.musicality ? musicality.map(m => ({ ...m })) : (live.musicality ?? []),
 		};
-		await saveMetadataToCloud(JSON.stringify(meta, null, 2));
+		await saveMetadataToCloud(JSON.stringify(merged, null, 2));
+		// Refresh in-memory state for sections we pulled from live, so future
+		// dirty edits diff against the latest server data instead of stale memory.
+		if (!wasDirty.videos)     videos     = merged.videos;
+		if (!wasDirty.clips)      clips      = merged.clips;
+		if (!wasDirty.practices)  practices  = merged.practices;
+		if (!wasDirty.musicality) musicality = merged.musicality;
 	} catch (e) {
 		console.error('Bunny metadata sync failed:', e);
+		// Restore dirty flags so we'll retry on the next sync trigger
+		if (wasDirty.videos)     dirty.videos     = true;
+		if (wasDirty.clips)      dirty.clips      = true;
+		if (wasDirty.practices)  dirty.practices  = true;
+		if (wasDirty.musicality) dirty.musicality = true;
 	}
 }
 
@@ -82,7 +142,8 @@ export async function init() {
 			if (res.ok) {
 				const defaultData = await res.json();
 				loadMeta(defaultData);
-				syncToBunny(); // push defaults to Bunny
+				markAllDirty(); // pushing defaults — overwrite empty server with everything
+				syncToBunny();
 			}
 		}
 	} catch (e) {
@@ -105,6 +166,7 @@ export async function addVideo(_file: File, duration: number, _thumbnailBlob: Bl
 		existing.duration = duration || existing.duration;
 		existing.fingerprint = fingerprint;
 		videos = videos.map(v => v.id === id ? { ...existing } : v);
+		markDirty('videos');
 		syncToBunny();
 		return existing;
 	}
@@ -123,14 +185,17 @@ export async function addVideo(_file: File, duration: number, _thumbnailBlob: Bl
 	};
 
 	videos = [...videos, video];
+	markDirty('videos');
 	syncToBunny();
 	return video;
 }
 
 export async function updateVideo(videoId: string, updates: { name?: string; lead?: string; follow?: string; dance?: string; category?: 'demo' | 'jack-and-jill' | 'workshop' | 'social'; hidden?: boolean; hiddenFromSearch?: boolean; cdnUrl?: string; bpm?: number; sections?: VideoSection[] }) {
 	videos = videos.map(v => v.id === videoId ? { ...v, ...updates } : v);
+	markDirty('videos');
 	if (updates.name !== undefined) {
 		clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: updates.name! } : c);
+		markDirty('clips');
 	}
 	syncToBunny();
 }
@@ -142,12 +207,15 @@ export async function getVideoThumbnail(videoId: string): Promise<string | null>
 export async function deleteVideo(videoId: string) {
 	videos = videos.filter(v => v.id !== videoId);
 	clips = clips.filter(c => c.videoId !== videoId);
+	musicality = musicality.filter(m => m.videoId !== videoId);
+	markDirty('videos', 'clips', 'musicality');
 	syncToBunny();
 }
 
 export async function renameVideo(videoId: string, newName: string) {
 	videos = videos.map(v => v.id === videoId ? { ...v, name: newName } : v);
 	clips = clips.map(c => c.videoId === videoId ? { ...c, videoName: newName } : c);
+	markDirty('videos', 'clips');
 	syncToBunny();
 }
 
@@ -183,17 +251,20 @@ export async function addClip(
 		createdAt: new Date().toISOString(),
 	};
 	clips = [...clips, clip];
+	markDirty('clips');
 	syncToBunny();
 	return clip;
 }
 
 export async function updateClip(clipId: string, updates: { label?: string; lead?: string; follow?: string; dance?: string; style?: string; mastery?: string; clipType?: string; tags?: string[]; parentClipId?: string | null; links?: { id: string; type: 'clip' | 'video'; label: string }[]; hidden?: boolean; hiddenFromSearch?: boolean }) {
 	clips = clips.map(c => c.id === clipId ? { ...c, ...updates } : c);
+	markDirty('clips');
 	syncToBunny();
 }
 
 export async function deleteClip(clipId: string) {
 	clips = clips.filter(c => c.id !== clipId);
+	markDirty('clips');
 	syncToBunny();
 }
 
@@ -204,6 +275,7 @@ export async function exportMetadata(): Promise<string> {
 export async function importMetadata(json: string): Promise<void> {
 	const imported = JSON.parse(json);
 	loadMeta(imported);
+	markAllDirty();
 	syncToBunny();
 }
 
@@ -212,6 +284,7 @@ export async function nukeAll() {
 	clips = [];
 	practices = [];
 	musicality = [];
+	markAllDirty();
 	syncToBunny();
 }
 
@@ -245,6 +318,7 @@ export async function addLink(clipId: string, targetId: string, targetType: 'cli
 		}
 		return c;
 	});
+	markDirty('clips');
 	syncToBunny();
 }
 
@@ -256,6 +330,7 @@ export async function removeLink(clipId: string, targetId: string) {
 		}
 		return c;
 	});
+	markDirty('clips');
 	syncToBunny();
 }
 
@@ -270,17 +345,20 @@ export async function addPractice(input: { name: string; clipIds: string[]; loop
 		createdAt: new Date().toISOString(),
 	};
 	practices = [...practices, practice];
+	markDirty('practices');
 	syncToBunny();
 	return practice;
 }
 
 export async function updatePractice(practiceId: string, updates: { name?: string; clipIds?: string[]; loop?: boolean }) {
 	practices = practices.map(p => p.id === practiceId ? { ...p, ...updates } : p);
+	markDirty('practices');
 	syncToBunny();
 }
 
 export async function deletePractice(practiceId: string) {
 	practices = practices.filter(p => p.id !== practiceId);
+	markDirty('practices');
 	syncToBunny();
 }
 
@@ -298,23 +376,27 @@ export async function addMusicalityClip(input: { videoId: string; name?: string;
 		loopCount: input.loopCount,
 	};
 	musicality = [...musicality, clip];
+	markDirty('musicality');
 	syncToBunny();
 	return clip;
 }
 
 export async function updateMusicalityClip(clipId: string, updates: Partial<Omit<MusicalityClip, 'id' | 'videoId'>>) {
 	musicality = musicality.map(m => m.id === clipId ? { ...m, ...updates } : m);
+	markDirty('musicality');
 	syncToBunny();
 }
 
 export async function deleteMusicalityClip(clipId: string) {
 	musicality = musicality.filter(m => m.id !== clipId);
+	markDirty('musicality');
 	syncToBunny();
 }
 
 export async function setMusicalityForVideo(videoId: string, clips: MusicalityClip[]) {
 	const others = musicality.filter(m => m.videoId !== videoId);
 	musicality = [...others, ...clips];
+	markDirty('musicality');
 	syncToBunny();
 }
 
