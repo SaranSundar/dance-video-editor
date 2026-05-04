@@ -16,6 +16,7 @@
 	let defaultBufferBefore = $state(5);
 	let defaultBufferAfter = $state(5);
 	let defaultLoops = $state(1);
+	let overrideExisting = $state(false);
 
 	// Editor draft
 	let draftStart = $state<number | null>(null);
@@ -89,6 +90,7 @@
 				if (typeof c.defaultBufferAfter === 'number') defaultBufferAfter = c.defaultBufferAfter;
 				if (typeof c.defaultLoops === 'number') defaultLoops = c.defaultLoops;
 				if (typeof c.playbackRate === 'number' && SPEEDS.includes(c.playbackRate as never)) playbackRate = c.playbackRate;
+				if (typeof c.overrideExisting === 'boolean') overrideExisting = c.overrideExisting;
 			}
 		} catch {
 			// ignore
@@ -97,7 +99,7 @@
 	});
 
 	$effect(() => {
-		const c = { selectedVideoId, defaultBufferBefore, defaultBufferAfter, defaultLoops, playbackRate };
+		const c = { selectedVideoId, defaultBufferBefore, defaultBufferAfter, defaultLoops, playbackRate, overrideExisting };
 		try {
 			localStorage.setItem(CONFIG_KEY, JSON.stringify(c));
 		} catch {
@@ -116,6 +118,38 @@
 			if (url) editorAudioUrl = url;
 		})();
 	});
+
+	// When override is enabled, propagate current defaults into every existing
+	// clip for the selected song. Re-fires on default changes, song changes,
+	// and clip-list changes — but only writes if anything actually differs,
+	// so it stabilizes after one round and won't infinite-loop.
+	$effect(() => {
+		if (!overrideExisting) return;
+		const id = selectedVideoId;
+		if (!id) return;
+		const bb = defaultBufferBefore;
+		const ba = defaultBufferAfter;
+		const lc = defaultLoops;
+		const songClips = clips;
+		if (songClips.length === 0) return;
+		const needsUpdate = songClips.some(c =>
+			c.bufferBefore !== bb || c.bufferAfter !== ba || c.loopCount !== lc
+		);
+		if (!needsUpdate) return;
+		const updated = songClips.map(c => ({ ...c, bufferBefore: bb, bufferAfter: ba, loopCount: lc }));
+		store.setMusicalityForVideo(id, updated);
+	});
+
+	function applyDefaultsToAllClips() {
+		if (!selectedVideoId || clips.length === 0) return;
+		const updated = clips.map(c => ({
+			...c,
+			bufferBefore: defaultBufferBefore,
+			bufferAfter: defaultBufferAfter,
+			loopCount: defaultLoops,
+		}));
+		store.setMusicalityForVideo(selectedVideoId, updated);
+	}
 
 	// Persistent disk cache via Cache API — survives page reloads.
 	// In-memory `audioCache` still holds blob: URLs (one per page load),
@@ -672,6 +706,21 @@
 						<button class="num-btn" onclick={() => defaultLoops = Math.min(20, defaultLoops + 1)} disabled={defaultLoops >= 20} aria-label="Increase">+</button>
 					</div>
 				</div>
+
+				<div class="override-row">
+					<label class="checkbox-row">
+						<input type="checkbox" bind:checked={overrideExisting} />
+						<span>Override existing clips on this song with these defaults</span>
+					</label>
+					{#if !overrideExisting && clips.length > 0}
+						<button class="ghost-btn small" onclick={applyDefaultsToAllClips}>
+							Apply once to {clips.length} clip{clips.length === 1 ? '' : 's'}
+						</button>
+					{/if}
+					{#if overrideExisting}
+						<p class="override-hint">Per-clip in/out/loop edits below are now disabled — they'd be overwritten on every change. Uncheck to edit individually.</p>
+					{/if}
+				</div>
 			</div>
 		</section>
 
@@ -778,23 +827,23 @@
 								<span class="seg-time">{formatTime(c.startTime)} – {formatTime(c.endTime)}</span>
 								<span class="seg-dur">{(c.endTime - c.startTime).toFixed(1)}s</span>
 							</div>
-							<div class="buffer-cell" title="Lead-in seconds">
+							<div class="buffer-cell" title={overrideExisting ? 'Locked — uncheck "Override existing clips" to edit per-clip' : 'Lead-in seconds'}>
 								<span class="cell-label">in</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferBefore: Math.max(0, c.bufferBefore - 1) })} disabled={c.bufferBefore <= 0} aria-label="Decrease">−</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferBefore: Math.max(0, c.bufferBefore - 1) })} disabled={overrideExisting || c.bufferBefore <= 0} aria-label="Decrease">−</button>
 								<span class="loop-val">{c.bufferBefore}s</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferBefore: Math.min(60, c.bufferBefore + 1) })} disabled={c.bufferBefore >= 60} aria-label="Increase">+</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferBefore: Math.min(60, c.bufferBefore + 1) })} disabled={overrideExisting || c.bufferBefore >= 60} aria-label="Increase">+</button>
 							</div>
-							<div class="buffer-cell" title="Lead-out seconds">
+							<div class="buffer-cell" title={overrideExisting ? 'Locked — uncheck "Override existing clips" to edit per-clip' : 'Lead-out seconds'}>
 								<span class="cell-label">out</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferAfter: Math.max(0, c.bufferAfter - 1) })} disabled={c.bufferAfter <= 0} aria-label="Decrease">−</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferAfter: Math.max(0, c.bufferAfter - 1) })} disabled={overrideExisting || c.bufferAfter <= 0} aria-label="Decrease">−</button>
 								<span class="loop-val">{c.bufferAfter}s</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferAfter: Math.min(60, c.bufferAfter + 1) })} disabled={c.bufferAfter >= 60} aria-label="Increase">+</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { bufferAfter: Math.min(60, c.bufferAfter + 1) })} disabled={overrideExisting || c.bufferAfter >= 60} aria-label="Increase">+</button>
 							</div>
-							<div class="buffer-cell" title="Loops">
+							<div class="buffer-cell" title={overrideExisting ? 'Locked — uncheck "Override existing clips" to edit per-clip' : 'Loops'}>
 								<span class="cell-label">×</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { loopCount: Math.max(1, c.loopCount - 1) })} disabled={c.loopCount <= 1} aria-label="Decrease">−</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { loopCount: Math.max(1, c.loopCount - 1) })} disabled={overrideExisting || c.loopCount <= 1} aria-label="Decrease">−</button>
 								<span class="loop-val">{c.loopCount}</span>
-								<button class="num-btn tiny" onclick={() => updateClip(c.id, { loopCount: Math.min(20, c.loopCount + 1) })} disabled={c.loopCount >= 20} aria-label="Increase">+</button>
+								<button class="num-btn tiny" onclick={() => updateClip(c.id, { loopCount: Math.min(20, c.loopCount + 1) })} disabled={overrideExisting || c.loopCount >= 20} aria-label="Increase">+</button>
 							</div>
 							<button class="row-btn danger" onclick={() => deleteClip(c.id)} disabled title="Deletion disabled in UI — edit metadata.json manually">
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -1058,6 +1107,21 @@
 	}
 	.num-input:focus { outline: none; border-color: rgba(99, 102, 241, 0.4); }
 	.num-suffix { color: #71717a; font-size: 12px; margin-left: 4px; }
+
+	.override-row {
+		margin-top: 6px;
+		padding-top: 12px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		display: flex; flex-direction: column; gap: 8px;
+	}
+	.checkbox-row {
+		display: flex; align-items: center; gap: 8px;
+		font-size: 13px; color: #e4e4e7; cursor: pointer;
+	}
+	.checkbox-row input[type="checkbox"] {
+		width: 16px; height: 16px; accent-color: #6366f1; cursor: pointer;
+	}
+	.override-hint { margin: 0; color: #71717a; font-size: 11px; line-height: 1.5; }
 
 	.editor-controls {
 		display: flex; gap: 6px; align-items: center; margin-bottom: 12px;
