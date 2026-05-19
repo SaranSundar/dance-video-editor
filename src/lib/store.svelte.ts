@@ -452,8 +452,12 @@ export async function setMusicalityForVideo(videoId: string, clips: MusicalityCl
 	syncToBunny();
 }
 
-export async function getVideoBlob(_videoId: string): Promise<Blob> {
-	throw new Error('Local video blobs not available in cloud mode');
+export async function getVideoBlob(videoId: string): Promise<Blob> {
+	const cdnUrl = getCdnUrlForVideo(videoId);
+	if (!cdnUrl) throw new Error('Video not available via CDN.');
+	const res = await fetch(cdnUrl);
+	if (!res.ok) throw new Error(`Failed to fetch video (${res.status})`);
+	return res.blob();
 }
 
 // Stubs for backward compatibility with UI components that reference these
